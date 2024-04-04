@@ -98,7 +98,7 @@ const updateAProduct = asyncHandler(async (req, res) => {
     const { id } = req.params;
     try{
         if (req.body.title) {
-            req.body.slug = slugify(req.body.title);
+            req.body.slug = slugify(req.body.title); // slugify dùng để chuyển giá trị của title thành slug
         }
         const updateProduct = await Product.findByIdAndUpdate(id, req.body,{ new: true }
         );
