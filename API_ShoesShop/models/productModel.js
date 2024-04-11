@@ -49,7 +49,11 @@ var productSchena = new mongoose.Schema(
                 star: Number,
                 postedby: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
             }
-        ]
+        ],
+        totalrating:{
+            type: String,
+            default: 0
+        }
     }, 
     {
         timestamps: true

@@ -1,4 +1,6 @@
+const { get } = require("mongoose");
 const Product = require("../models/productModel");
+const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 
@@ -100,6 +102,7 @@ const updateAProduct = asyncHandler(async (req, res) => {
         if (req.body.title) {
             req.body.slug = slugify(req.body.title); // slugify dùng để chuyển giá trị của title thành slug
         }
+        // (new: true) : một tùy chọn cho phép bạn trả về bản ghi đã được cập nhật thay vì bản ghi gốc trước khi cập nhật
         const updateProduct = await Product.findByIdAndUpdate(id, req.body,{ new: true }
         );
         res.json(updateProduct);
@@ -119,10 +122,103 @@ const deleteProduct = asyncHandler(async (req, res) => {
     }
 });
 
+// thêm sản phẩm vào yêu thích
+const addWishList = asyncHandler(async (req, res) => {
+    const { _id } = req.user; // trích xuất _id từ req.user
+    const { prodId } = req.body;
+    try {
+        const user = await User.findById(_id); // tìm kiếm một người dùng trong cơ sở dữ liệu dựa trên _id đã được trích xuất từ req.user
+        const addWishList = user.wishlist.find( id => id.toString() === prodId); // kiểm tra sản phẩm đã có trong wishlist chưa
+        if (addWishList) { // nếu prodId tồn tại thì loại bỏ prodId khỏi wishlist
+            let user = await User.findByIdAndUpdate(
+                _id,
+                {
+                    $pull : {wishlist: prodId}
+                },
+                {
+                    new: true
+                }
+            )
+            res.json(user);
+        } else { // nếu prodId chưa tồn tại thì thêm prodId vào wishlist
+            let user = await User.findByIdAndUpdate(
+                _id,
+                {
+                    $push : {wishlist: prodId}
+                },
+                {
+                    new: true
+                }
+            )
+            res.json(user);
+        }
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+// đánh giá
+const rating = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { star, prodId } = req.body;
+    try {
+        const product = await Product.findById(prodId);
+        let alreadyRated = product.ratings.find( userId => userId.postedby.toString() === _id.toString());
+        if (alreadyRated) {
+            const updateRating = await Product.updateOne(
+                {
+                    ratings: { $elemMatch: alreadyRated }
+                },
+                {
+                    $set: { "ratings.$.star": star }
+                },
+                {
+                    new: true
+                }
+            );
+        }else{
+            const rateProduct = await Product.findByIdAndUpdate(
+                prodId,
+                {
+                    $push: {
+                        ratings: {
+                            star: star,
+                            postedby: _id
+                        }
+                    }
+                },
+                {
+                    new: true
+                }
+            )
+        }
+        const getAllRatings = await Product.findById(prodId);
+        let totalRatings = getAllRatings.ratings.length;
+        let ratingSum = getAllRatings.ratings
+            .map(item => item.star)
+            .reduce((prev, curr) => prev + curr, 0);
+        let actualRating = Math.round(ratingSum / totalRatings);
+        let finalProduct = await Product.findByIdAndUpdate(
+            prodId,
+            {
+                totalrating: actualRating
+            },
+            {
+                new: true
+            }
+        );
+        res.json(finalProduct);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 module.exports = {
     createProduct,
     getAllProduct,
     getAProduct,
     updateAProduct,
-    deleteProduct
+    deleteProduct,
+    addWishList,
+    rating
 };
