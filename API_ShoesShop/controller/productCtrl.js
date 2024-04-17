@@ -159,17 +159,26 @@ const addWishList = asyncHandler(async (req, res) => {
 
 // đánh giá
 const rating = asyncHandler(async (req, res) => {
-    const { _id } = req.user;
-    const { star, prodId } = req.body;
+    const { _id } = req.user; // trích xuất _id từ req.user
+    const { star, prodId } = req.body; // lấy star và prodId từ body
     try {
-        const product = await Product.findById(prodId);
+        const product = await Product.findById(prodId); // Tìm kiếm sản phẩm có id là prodId trong Product
+        //Tìm kiếm xem người dùng đã đánh giá sản phẩm này trước đó chưa bằng cách so sánh _id với postedby trong mảng ratings
         let alreadyRated = product.ratings.find( userId => userId.postedby.toString() === _id.toString());
-        if (alreadyRated) {
+        // vd: alreadyRated = {
+        //     star: 4,
+        //     postedby: new ObjectId('6606206a587f0dd4b0146bfe'),
+        //     _id: new ObjectId('66165d1145001683863185e8')
+        //   }
+        if (alreadyRated) { // kiểm tra người dùng đã đánh giá sản phẩm này chưa
+            // nếu rồi thì Cập nhật đánh giá nếu người dùng đã đánh giá trước đó
             const updateRating = await Product.updateOne(
                 {
+                    // tìm kiếm trong mảng ratings mà trùng khớp với alreadyRated được truyền vào không
                     ratings: { $elemMatch: alreadyRated }
                 },
                 {
+                    // ccập nhật thuộc tính star của phần tử đã tìm thấy trong mảng ratings với giá trị mới được truyền qua biến star
                     $set: { "ratings.$.star": star }
                 },
                 {
@@ -177,9 +186,11 @@ const rating = asyncHandler(async (req, res) => {
                 }
             );
         }else{
+            //Thêm đánh giá mới nếu người dùng chưa đánh giá trước đó
             const rateProduct = await Product.findByIdAndUpdate(
                 prodId,
                 {
+                    // push dùng để thêm đánh giá vào trong mảng ratings
                     $push: {
                         ratings: {
                             star: star,
@@ -192,15 +203,23 @@ const rating = asyncHandler(async (req, res) => {
                 }
             )
         }
+        //Lấy lại thông tin của sản phẩm sau khi đã cập nhật hoặc thêm đánh giá
         const getAllRatings = await Product.findById(prodId);
+        // Đếm số lượng đánh giá của sản phẩm
         let totalRatings = getAllRatings.ratings.length;
+        //Tính tổng số sao của tất cả đánh giá của sản phẩm
         let ratingSum = getAllRatings.ratings
+            //prev là giá trị tích lũy từ các lần lặp trước đó, ban đầu là 0.
+            //curr là phần tử hiện tại trong mảng, tức là một điểm đánh giá.
             .map(item => item.star)
             .reduce((prev, curr) => prev + curr, 0);
-        let actualRating = Math.round(ratingSum / totalRatings);
+        //Tính điểm đánh giá trung bình của sản phẩm
+        let actualRating = (ratingSum / totalRatings);
+        //Cập nhật điểm đánh giá trung bình vào thông tin của sản phẩm
         let finalProduct = await Product.findByIdAndUpdate(
             prodId,
             {
+                // gán actualRating vào totalrating trong Product
                 totalrating: actualRating
             },
             {
