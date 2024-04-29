@@ -160,7 +160,7 @@ const addWishList = asyncHandler(async (req, res) => {
 // đánh giá
 const rating = asyncHandler(async (req, res) => {
     const { _id } = req.user; // trích xuất _id từ req.user
-    const { star, prodId } = req.body; // lấy star và prodId từ body
+    const { star, prodId, comment } = req.body; // lấy star và prodId từ body
     try {
         const product = await Product.findById(prodId); // Tìm kiếm sản phẩm có id là prodId trong Product
         //Tìm kiếm xem người dùng đã đánh giá sản phẩm này trước đó chưa bằng cách so sánh _id với postedby trong mảng ratings
@@ -179,7 +179,7 @@ const rating = asyncHandler(async (req, res) => {
                 },
                 {
                     // ccập nhật thuộc tính star của phần tử đã tìm thấy trong mảng ratings với giá trị mới được truyền qua biến star
-                    $set: { "ratings.$.star": star }
+                    $set: { "ratings.$.star": star, "ratings.$.comment": comment }
                 },
                 {
                     new: true
@@ -194,6 +194,7 @@ const rating = asyncHandler(async (req, res) => {
                     $push: {
                         ratings: {
                             star: star,
+                            comment: comment,
                             postedby: _id
                         }
                     }
