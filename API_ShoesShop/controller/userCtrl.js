@@ -1,5 +1,7 @@
 const { generateToken } = require("../config/jwtToken");
 const User = require("../models/userModel");
+const Product = require("../models/productModel");
+const Cart = require("../models/cartModel");
 const asyncHandler = require("express-async-handler");
 const { param } = require("../routes/authRoute");
 const { validateMongodbId } = require("../utils/validateMongodbId");
@@ -59,6 +61,45 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
     }
 });
 
+// admin đăng nhập
+const loginAdmin = asyncHandler(async (req, res) => {
+    const {email, password} = req.body;
+    // xem thử tài khoản người dùng có tồn tại hay không
+    const findAdmin = await User.findOne({ email }); // tìm kiếm email trong cơ sở dữ liệu
+    if(findAdmin.role !=='admin') throw new Error("Not Authorised");
+    //Kiểm tra xem tài khoản người dùng có tồn tại và mật khẩu có khớp không
+    if(findAdmin && (await findAdmin.isPasswordMatched(password))){ //isPasswordMatched dùng để so sánh mật khẩu
+        //Nếu tài khoản và mật khẩu hợp lệ, tạo một token làm mới để cập nhật cho việc xác thực sau này
+        const refreshToken = await generateRefreshToken(findAdmin?._id);
+        //Cập nhật token mới vào cơ sở dữ liệu cho người dùng đăng nhập.
+        const updateUser = await User.findByIdAndUpdate(
+            findAdmin.id,
+            {
+                refreshToken: refreshToken
+            },
+            {
+                new: true
+            }
+        );
+        //Gửi một cookie chứa refresh token cho client với thời gian sống là 72 giờ
+        res.cookie("refreshToken", refreshToken,{
+            httpOnly: true,
+            maxAge: 72 * 60 * 60 *1000
+        });
+        //Gửi phản hồi JSON chứa thông tin người dùng và một token được tạo để sử dụng trong các yêu cầu sau này.
+        res.json({
+            _id: findAdmin?._id,
+            firstname: findAdmin?.firstname,
+            lastname: findAdmin?.lastname,
+            email: findAdmin?.email,
+            mobile: findAdmin?.mobile,
+            token: generateToken(findAdmin?._id)
+        });
+    } else{
+        throw new Error("Invalid Credentials");
+    }
+});
+
 //lấy tất cả user
 const getallUsers = asyncHandler(async (req, res) => {
     try{
@@ -71,9 +112,7 @@ const getallUsers = asyncHandler(async (req, res) => {
 
 //lấy 1 user
 const getAUser = asyncHandler(async (req, res) => {
-    const { id } = req.params; // lấy id từ url
-    // kiểm tra chuỗi id truyền vào có hợp lệ không
-    validateMongodbId(id);
+    const { id } = req.params;
     try {
         const getUser = await User.findById(id);
         res.json(getUser);
@@ -150,7 +189,7 @@ const updateAUser = asyncHandler(async (req, res) => {
 //xóa 1 user
 const deleteAUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    validateMongodbId(id);
+    //validateMongodbId(id);
     try {
         const getUser = await User.findByIdAndDelete(id);
         res.json(getUser);
@@ -161,7 +200,7 @@ const deleteAUser = asyncHandler(async (req, res) => {
 
 const blockUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    validateMongodbId(id);
+    //validateMongodbId(id);
     try{
         const block = await User.findByIdAndUpdate(
             id,
@@ -180,7 +219,7 @@ const blockUser = asyncHandler(async (req, res) => {
 
 const unBlockUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    validateMongodbId(id);
+    //validateMongodbId(id);
     try{
         const unblock = await User.findByIdAndUpdate(
             id,
@@ -201,7 +240,7 @@ const unBlockUser = asyncHandler(async (req, res) => {
 const updatePassword = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     const password = req.body.password;
-    validateMongodbId(_id);
+    //validateMongodbId(_id);
     const user = await User.findById(_id);
     if (password) {
         user.password = password; // gán giá trị password vào password trong user
@@ -267,6 +306,80 @@ const resetPassword = asyncHandler (async (req, res) => {
     res.json(user);
 });
 
+// lưu địa chỉ
+const saveAddress = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const saveAddress = await User.findByIdAndUpdate(
+            _id,
+            {
+                address:req?.body?.address
+            },
+            {
+                new: true
+            }
+        );
+        res.json(saveAddress);
+    } catch(error) {
+        throw new Error(error);
+    }
+});
+
+const userCart = asyncHandler(async (req, res) => {
+    const { cart } = req.body;
+    const { _id } = req.user;
+    try {
+        let products = [];
+        const user = await User.findById(_id);
+        const alreadyExistCart = await Cart.findOne({ orderby: user._id });
+        if (alreadyExistCart) {
+            await Cart.deleteOne({ orderby: user._id });
+        }
+        for (let i = 0; i < cart.length; i++) {
+            let object = {};
+            object.product = cart[i]._id;
+            object.count = cart[i].count;
+            object.color = cart[i].color;
+            let getPrice = await Product.findById(cart[i]._id).select("price").exec();
+            object.price = getPrice.price;
+            products.push(object);
+        }
+        let cartTotal = 0;
+        for (let i = 0; i < products.length; i++) {
+            cartTotal += products[i].price * products[i].count;
+        }
+        let newCart = await new Cart({
+            products,
+            cartTotal,
+            orderby: user._id
+        }).save();
+        res.json(newCart);
+    } catch(error) {
+        throw new Error(error);
+    }
+});
+
+const UserCart = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const cart = await Cart.findOne({ orderby: _id }).populate("products.product");
+        res.json(cart);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+const emptyCart = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const user = await User.findOne({ _id });
+        const cart = await Cart.findOneAndRemove({ orderby: user._id });
+        res.json(cart);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
 module.exports = { 
     createUser, 
     loginUserCtrl, 
@@ -280,5 +393,10 @@ module.exports = {
     logout,
     updatePassword,
     forgotPasswordToken,
-    resetPassword
+    resetPassword,
+    loginAdmin,
+    saveAddress,
+    userCart,
+    UserCart,
+    emptyCart
 };
