@@ -1,16 +1,22 @@
 const express = require("express");
-const { createUser, loginUserCtrl, getallUsers, getAUser, deleteAUser, updateAUser, blockUser, unBlockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, saveAddress, userCart, UserCart, emptyCart } = require("../controller/userCtrl");
+const { createUser, loginUserCtrl, getallUsers, getAUser, deleteAUser, updateAUser, blockUser, unBlockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, saveAddress, userCart, UserCart, emptyCart, applyCoupon, createOrder ,getOrders, updateOrderStatus, getAllOrders, uploadAvatar} = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
+const { uploadPhoto } = require("../middlewares/uploadImages");
 const router =  express.Router();
 
 router.post('/register', createUser);
 router.post('/forgot-password', forgotPasswordToken);
 router.put('/reset-password/:token', resetPassword);
 router.put('/password', authMiddleware, updatePassword);
+router.put("/upload/:id", authMiddleware, isAdmin, uploadPhoto.array("images", 1), uploadAvatar);
 router.post('/login', loginUserCtrl);
 router.post('/admin-login', loginAdmin);
 router.post('/cart', authMiddleware, userCart);
+router.post('/cart/apply-coupon', authMiddleware, applyCoupon);
+router.post('/cart/cash-order', authMiddleware, createOrder);
 router.get('/all-users', getallUsers);
+router.get('/all-orders', authMiddleware, getOrders);
+router.get('/all-orders-user', authMiddleware, getAllOrders);
 router.get('/refresh', handleRefreshToken);
 router.get('/logout', logout);
 router.get('/cart', authMiddleware, UserCart);
@@ -21,5 +27,6 @@ router.put('/edit-user', authMiddleware, updateAUser);
 router.put('/save-address', authMiddleware, saveAddress);
 router.put('/block-user/:id', authMiddleware, isAdmin, blockUser);
 router.put('/unblock-user/:id', authMiddleware, isAdmin, unBlockUser);
+router.put('/order/update-order/:id', authMiddleware, isAdmin, updateOrderStatus);
 
 module.exports = router;

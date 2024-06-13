@@ -1,6 +1,6 @@
 const Coupon = require("../models/couponModel");
 const asyncHandler = require("express-async-handler");
-const validateMongoDbId = require("../utils/validateMongodbId");
+
 
 // tạo 1 phiếu giảm giá
 const createCoupon = asyncHandler(async (req, res) => {
@@ -29,7 +29,7 @@ const getAllCoupon = asyncHandler(async (req, res) => {
 // lấy 1 phiếu giảm giá
 const getACoupon = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    validateMongoDbId(id);
+    
     try {
         const getACoupon = await Coupon.findById(id);
         res.json(getACoupon);
@@ -41,7 +41,7 @@ const getACoupon = asyncHandler(async (req, res) => {
 // xóa 1 phiếu giảm giá
 const deleteACoupon = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    validateMongoDbId(id);
+    
     try {
         const deleteACoupon = await Coupon.findByIdAndDelete(id);
         res.json(deleteACoupon);

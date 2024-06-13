@@ -22,12 +22,10 @@ var productSchena = new mongoose.Schema(
             required: true
         },
         category:{
-            type: String,
-            required: true
+            type: mongoose.Schema.Types.ObjectId, ref: "Category" 
         },
         brand:{
-            type: String,
-            required: true
+            type: mongoose.Schema.Types.ObjectId, ref: "Brand" 
         },
         quantity:{
             type: Number,
@@ -38,10 +36,18 @@ var productSchena = new mongoose.Schema(
             default: 0
         },
         images:[],
-        color:{
-            type: String,
-            required: true
-        },
+        colors:[
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Color"
+            }
+        ],
+        size:[
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Size"
+            }
+        ],
         ratings:[
             {
                 star: Number,

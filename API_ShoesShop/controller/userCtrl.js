@@ -2,6 +2,8 @@ const { generateToken } = require("../config/jwtToken");
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
+const Coupon = require("../models/couponModel");
+const Order = require("../models/orderModel")
 const asyncHandler = require("express-async-handler");
 const { param } = require("../routes/authRoute");
 const { validateMongodbId } = require("../utils/validateMongodbId");
@@ -9,6 +11,8 @@ const { generateRefreshToken } = require("../config/refreshToken");
 const jwt = require("jsonwebtoken");
 const { sendEmail } = require("./emailCtrl");
 const crypto = require("crypto");
+const uniqid = require('uniqid');
+const { cloudinaryUploadImg } = require("../utils/cloudinary");
 
 //đăng kí user
 const createUser = asyncHandler(async (req, res) => {
@@ -54,6 +58,8 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
             lastname: findUser?.lastname,
             email: findUser?.email,
             mobile: findUser?.mobile,
+            address: findUser?.address,
+            images: findUser?.images,
             token: generateToken(findUser?._id)
         });
     } else{
@@ -93,6 +99,8 @@ const loginAdmin = asyncHandler(async (req, res) => {
             lastname: findAdmin?.lastname,
             email: findAdmin?.email,
             mobile: findAdmin?.mobile,
+            address: findAdmin?.address,
+            images: findAdmin?.images,
             token: generateToken(findAdmin?._id)
         });
     } else{
@@ -189,7 +197,7 @@ const updateAUser = asyncHandler(async (req, res) => {
 //xóa 1 user
 const deleteAUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    //validateMongodbId(id);
+    //
     try {
         const getUser = await User.findByIdAndDelete(id);
         res.json(getUser);
@@ -200,7 +208,7 @@ const deleteAUser = asyncHandler(async (req, res) => {
 
 const blockUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    //validateMongodbId(id);
+    //
     try{
         const block = await User.findByIdAndUpdate(
             id,
@@ -219,7 +227,7 @@ const blockUser = asyncHandler(async (req, res) => {
 
 const unBlockUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    //validateMongodbId(id);
+    //
     try{
         const unblock = await User.findByIdAndUpdate(
             id,
@@ -255,11 +263,21 @@ const updatePassword = asyncHandler(async (req, res) => {
 const forgotPasswordToken = asyncHandler(async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email });
-    if (!user) throw new Error("User not found with this email");
+    if (!user) {
+        return res.status(404).json({ message: "User not found with this email" });
+    }
+
     try {
-        const token = await user.createPasswordResetToken(); // tạo 1 token để đặt lại mật khẩu
-        await user.save();
-        // tạo dữ liệu để gửi vào email
+        const token = await user.createPasswordResetToken(); // Tạo mã thông báo để đặt lại mật khẩu
+        user.passwordResetToken = token; // Đặt mã thông báo đặt lại
+        user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Đặt thời gian hết hạn (10 phút)
+
+        // Đảm bảo không có trường không hợp lệ nào xuất hiện trước khi lưu
+        user.address = user.address || ''; // Đặt địa chỉ thành chuỗi trống nếu nó rỗng hoặc không xác định
+
+        await user.save({ validateBeforeSave: true });
+
+        // Tạo dữ liệu email
         const resetURL = `Chào, Vui lòng theo dõi liên kết này để đặt lại mật khẩu của bạn. Liên kết này có giá trị đến 10 phút kể từ bây giờ. <a href='http://localhost:5000/api/user/reset-password/${token}'>Liên kết ở đây</a>`;
         const data = {
             to: email,
@@ -267,11 +285,17 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
             subject: "Liên kết quên mật khẩu của bạn",
             htm: resetURL
         };
-        //gửi đường dẫn đặt lại mật khẩu đến email của người dùng.
-        sendEmail(data);
-        res.json(token);
+
+        // Gửi email đặt lại mật khẩu
+        await sendEmail(data);
+
+        res.json({ message: "Password reset link sent to email", token });
     } catch (error) {
-        throw new Error(error);
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save({ validateBeforeSave: false });
+
+        res.status(500).json({ message: error.message });
     }
 });
 
@@ -337,12 +361,23 @@ const userCart = asyncHandler(async (req, res) => {
         }
         for (let i = 0; i < cart.length; i++) {
             let object = {};
-            object.product = cart[i]._id;
-            object.count = cart[i].count;
-            object.color = cart[i].color;
-            let getPrice = await Product.findById(cart[i]._id).select("price").exec();
-            object.price = getPrice.price;
-            products.push(object);
+            let existingProduct = products.find(p => p.product.toString() === cart[i]._id &&
+            p.color === cart[i].color &&
+            p.size === cart[i].size);
+
+            if (existingProduct) {
+                // If the product already exists in the cart, update the count
+                existingProduct.count += cart[i].count;
+            } else {
+                // If the product is new, add it to the products array
+                object.product = cart[i]._id;
+                object.count = cart[i].count;
+                object.color = cart[i].color;
+                object.size = cart[i].size;
+                let getPrice = await Product.findById(cart[i]._id).select("price").exec();
+                object.price = getPrice.price;
+                products.push(object);
+            }
         }
         let cartTotal = 0;
         for (let i = 0; i < products.length; i++) {
@@ -373,8 +408,151 @@ const emptyCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     try {
         const user = await User.findOne({ _id });
-        const cart = await Cart.findOneAndRemove({ orderby: user._id });
+        const cart = await Cart.findOneAndDelete({ orderby: user._id });
         res.json(cart);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+const applyCoupon = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { coupon } = req.body;
+    const validCoupon = await Coupon.findOne({ name: coupon });
+    if (!validCoupon) {
+        return res.status(400).json({ message: "Invalid Coupon" });
+    }
+    const user = await User.findOne({ _id });
+    let { cartTotal } = await Cart.findOne({
+        orderby: user._id,
+    }).populate("products.product");
+    let totalAfterDiscount = (
+        cartTotal - 
+        (cartTotal * validCoupon.discount) / 100
+    ).toFixed(2);
+    await Cart.findOneAndUpdate(
+        { orderby: user._id },
+        { totalAfterDiscount },
+        { new: true }
+    );
+    res.json(totalAfterDiscount);
+});
+
+const createOrder = asyncHandler(async (req, res) => {
+    const { COD, couponApplied } = req.body;
+    const { _id } = req.user;
+    try {
+        if (!COD) throw new Error("Create cash order failed");
+        const user = await User.findById(_id);
+        const userCart = await Cart.findOne({ orderby: user._id });
+        let finalAmount = couponApplied && userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
+
+        for (let item of userCart.products) {
+            let product = await Product.findById(item.product._id);
+            if (!product) throw new Error(`Product with ID ${item.product._id} not found`);
+            if (product.quantity < item.count) {
+                throw new Error(`Insufficient stock for product ${product.title}`);
+            }
+        }
+
+        let newOrder = await new Order({
+            products: userCart.products,
+            paymentIntent:{
+                id: uniqid(),
+                method: "COD",
+                amount: finalAmount,
+                status: "Cash on Delivery",
+                created: Date.now(),
+                currency: "vnd"
+            },
+            orderby: user._id,
+            orderStatus: "Cash on Delivery"
+        }).save();
+
+        let update = userCart.products.map( item => {
+            return {
+                updateOne: {
+                    filter: { _id: item.product._id },
+                    update: { $inc: { quantity: -item.count, sold: +item.count }}
+                }
+            };
+        });
+        const updated = await Product.bulkWrite(update, {});
+        await Cart.deleteOne({ orderby: user._id });
+        res.json(newOrder);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+const getOrders = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const getOrders = await Order.findOne({ orderby: _id }).populate("products.product").exec();
+        res.json(getOrders);
+    } catch(error) {
+        throw new Error(error);
+    }
+});
+
+const getAllOrders = asyncHandler(async (req, res) => {
+    try {
+        const getAllOrders = await Order.find().populate("products.product").populate("orderby").exec();
+        res.json(getAllOrders);
+    } catch(error) {
+        throw new Error(error);
+    }
+});
+
+const updateOrderStatus = asyncHandler(async (req, res) => {
+    const { id }  = req.params;
+    const { status } = req.body;
+    try {
+        const updateOrderStatus = await Order.findByIdAndUpdate(
+            id,
+            {
+                orderStatus: status,
+                paymentIntent: {
+                    status: status
+                }
+            },
+            {
+                new: true
+            }
+        );
+        res.json(updateOrderStatus)
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+const uploadAvatar = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    try {  
+        const uploader = (path) => cloudinaryUploadImg(path, "images");
+        const urls = [];
+        const files = req.files;
+        for (const file of files) {
+            const { path } = file;
+            const newpath = await uploader(path);
+            console.log(newpath);
+            urls.push(newpath);        
+        }
+        const images = urls.map((file) => {
+            return file;
+        })
+        const findUser = await User.findByIdAndUpdate(
+            id,
+            {
+                images: urls.map((file) => {
+                    return file;
+                })
+            },
+            {
+                new: true
+            }
+        );
+        res.json(images);
     } catch (error) {
         throw new Error(error);
     }
@@ -398,5 +576,11 @@ module.exports = {
     saveAddress,
     userCart,
     UserCart,
-    emptyCart
+    emptyCart,
+    applyCoupon,
+    createOrder,
+    getOrders,
+    getAllOrders,
+    updateOrderStatus,
+    uploadAvatar
 };
