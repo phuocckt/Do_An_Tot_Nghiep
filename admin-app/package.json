@@ -32,6 +32,7 @@
     "react-rte": "^0.16.5",
     "react-scripts": "5.0.1",
     "react-spinners": "^0.13.8",
+    "react-toastify": "^10.0.5",
     "react-widgets": "^5.8.4",
     "sweetalert2": "^11.11.0",
     "toastr": "^2.1.4",

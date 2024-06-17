@@ -3,8 +3,6 @@ const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 
-const {cloudinaryUploadImg, cloudinaryDeleteImg} = require("../utils/cloudinary");
-
 // tạo sản phẩm
 const createProduct = asyncHandler(async(req, res) => {
     const title = req.body.title;
@@ -76,7 +74,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
             //Nếu trang không tồn tại (tức là số lượng phẩm cần bỏ qua lớn hơn hoặc bằng tổng số lượng sản phẩm), một lỗi sẽ được ném
             if (skip >= productCount) throw new Error("This Page doesn't exists");
         }
-        query = query.populate("colors").populate("size").populate("brand").populate("category");
+        query = query.populate("color").populate("size").populate("brand").populate("category");
         const products = await query;
         res.json(products);
     } catch(error) {
@@ -89,7 +87,7 @@ const getAProduct = asyncHandler(async (req, res) => {
     const { id } = req.params;
     //
     try {
-        const getProducts = await Product.findById(id);
+        const getProducts = await Product.findById(id).populate("color").populate("size").populate("brand").populate("category");
         res.json(getProducts);
     } catch(error) {
         throw new Error(error);
@@ -234,48 +232,6 @@ const rating = asyncHandler(async (req, res) => {
     }
 });
 
-const uploadImages = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    try {  
-        const uploader = (path) => cloudinaryUploadImg(path, "images");
-        const urls = [];
-        const files = req.files;
-        for (const file of files) {
-            const { path } = file;
-            const newpath = await uploader(path);
-            console.log(newpath);
-            urls.push(newpath);        
-        }
-        const images = urls.map((file) => {
-            return file;
-        })
-        const findProduct = await Product.findByIdAndUpdate(
-            id,
-            {
-                images: urls.map((file) => {
-                    return file;
-                })
-            },
-            {
-                new: true
-            }
-        );
-        res.json(images);
-    } catch (error) {
-        throw new Error(error);
-    }
-});
-
-const deleteImages = asyncHandler(async (req, res) => { 
-    const { id } = req.params;
-    try {  
-        const deleted = cloudinaryDeleteImg(id, "images");
-        res.json({ message: "Deleted" });
-    } catch (error) {
-        throw new Error(error);
-    }
-});
-
 module.exports = {
     createProduct,
     getAllProduct,
@@ -283,7 +239,5 @@ module.exports = {
     updateAProduct,
     deleteProduct,
     addWishList,
-    rating,
-    uploadImages,
-    deleteImages
+    rating
 };

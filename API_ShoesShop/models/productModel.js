@@ -14,8 +14,10 @@ var productSchena = new mongoose.Schema(
             lowercase: true
         },
         description:{
-            type: String,
-            required: true,
+            type: String
+        },
+        priceOld:{
+            type: Number
         },
         price:{
             type: Number,
@@ -35,8 +37,11 @@ var productSchena = new mongoose.Schema(
             type: Number,
             default: 0
         },
-        images:[],
-        colors:[
+        image:[{
+            public_id: String,
+            url: String
+        }],
+        color:[
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "Color"
