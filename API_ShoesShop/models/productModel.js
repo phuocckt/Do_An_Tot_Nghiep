@@ -1,73 +1,73 @@
 const mongoose = require("mongoose");
 
-var productSchena = new mongoose.Schema(
+var productSchema = new mongoose.Schema(
     {
-        title:{
+        title: {
             type: String,
             required: true,
             trim: true
         },
-        slug:{
+        slug: {
             type: String,
             required: true,
             unique: true,
             lowercase: true
         },
-        description:{
+        description: {
             type: String
         },
-        priceOld:{
+        priceOld: {
             type: Number
         },
-        price:{
+        price: {
             type: Number,
             required: true
         },
-        category:{
-            type: mongoose.Schema.Types.ObjectId, ref: "Category" 
+        category: {
+            type: mongoose.Schema.Types.ObjectId, ref: "Category"
         },
-        brand:{
-            type: mongoose.Schema.Types.ObjectId, ref: "Brand" 
+        brand: {
+            type: mongoose.Schema.Types.ObjectId, ref: "Brand"
         },
-        quantity:{
+        quantity: {
             type: Number,
             required: true
         },
-        sold:{
+        sold: {
             type: Number,
             default: 0
         },
-        image:[{
+        image: [{
             public_id: String,
             url: String
         }],
-        color:[
+        variants: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Color"
+                size: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Size"
+                },
+                quantity: {
+                    type: Number,
+                    required: true
+                }
             }
         ],
-        size:[
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "Size"
-            }
-        ],
-        ratings:[
+        ratings: [
             {
                 star: Number,
                 comment: String,
                 postedby: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
             }
         ],
-        totalrating:{
+        totalrating: {
             type: Number,
             default: 0
         }
-    }, 
+    },
     {
         timestamps: true
     }
 );
 
-module.exports = mongoose.model('Product', productSchena);
+module.exports = mongoose.model('Product', productSchema);

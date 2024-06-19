@@ -11,11 +11,10 @@ const { Option } = Select;
 
 const Products = () => {
   const dispatch = useDispatch();
-  const [selectedBrand, setSelectedBrand] = useState(null); // Thương hiệu được chọn
+  const [selectedBrand, setSelectedBrand] = useState(null);
   const [searchName, setSearchName] = useState('');
   const [searchPrice, setSearchPrice] = useState('');
   const [searchCategory, setSearchCategory] = useState('');
-  const [searchSize, setSearchSize] = useState('');
 
   useEffect(() => {
     dispatch(getProducts());
@@ -36,7 +35,7 @@ const Products = () => {
           .unwrap()
           .then(() => {
             Swal.fire('Đã xóa!', 'Sản phẩm đã được xóa.', 'success');
-            dispatch(getProducts()); // Refresh the product list after deletion
+            dispatch(getProducts());
           })
           .catch((error) => {
             Swal.fire('Thất bại!', error.message, 'error');
@@ -47,27 +46,19 @@ const Products = () => {
 
   const filteredProducts = () => {
     return productState.filter(product => {
-      // Kiểm tra tên sản phẩm
       if (searchName && !product.title.toLowerCase().includes(searchName.toLowerCase())) {
         return false;
       }
-      // Kiểm tra giá
       if (searchPrice && parseFloat(product.price) !== parseFloat(searchPrice)) {
         return false;
       }
-      // Kiểm tra loại
       if (searchCategory && product.category.title.toLowerCase() !== searchCategory.toLowerCase()) {
-        return false;
-      }
-      // Kiểm tra kích thước
-      if (searchSize && !product.size.some(size => size.title.toLowerCase() === searchSize.toLowerCase())) {
         return false;
       }
       return true;
     });
   };
 
-  // Nhóm sản phẩm theo thương hiệu
   const groupedProducts = {};
   productState.forEach(product => {
     if (!groupedProducts[product.brand.title]) {
@@ -83,11 +74,14 @@ const Products = () => {
       description: product.description,
       priceOld: product.priceOld,
       price: product.price,
-      category: product.category.title,
+      category: product.category ? product.category.title : '',
       quantity: product.quantity,
       image: product.image,
-      color: product.color.map(color => color.title).join(", "),
-      size: product.size.map(size => size.title).join(", "),
+      variants: product.variants.map(variant => ({
+        color: variant.color ? variant.color.title : '',
+        size: variant.size ? variant.size.title : '',
+        quantity: variant.quantity
+      })),
       action: (
         <>
           <Link to='/' className='ps-3 text-warning'>
@@ -108,11 +102,14 @@ const Products = () => {
       description: product.description,
       priceOld: product.priceOld,
       price: product.price,
-      category: product.category.title,
+      category: product.category ? product.category.title : '',
       quantity: product.quantity,
       image: product.image,
-      color: product.color.map(color => color.title).join(", "),
-      size: product.size.map(size => size.title).join(", "),
+      variants: product.variants.map(variant => ({
+        color: variant.color ? variant.color.title : '',
+        size: variant.size ? variant.size.title : '',
+        quantity: variant.quantity
+      })),
       action: (
         <>
           <Link to='/' className='ps-3 text-warning'>
@@ -168,17 +165,19 @@ const Products = () => {
     {
       title: 'Ảnh',
       dataIndex: 'image',
-      render: image => image.map((imageURL, index) => (
-        <img key={index} src={imageURL.url} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover', margin: '5px' }} />
+      render: image => image.map((img, index) => (
+        <img key={index} src={img.url} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover', margin: '5px' }} />
       ))
     },
     {
-      title: 'Màu sắc',
-      dataIndex: 'color',
-    },
-    {
-      title: 'Kích thước',
-      dataIndex: 'size',
+      title: 'Biến thể',
+      dataIndex: 'variants',
+      render: variants => variants.map((variant, index) => (
+        <div key={index}>
+          Kích thước: {variant.size}, Số lượng: {variant.quantity}
+        </div>
+      )),
+      width: 300,
     },
     {
       title: 'Hành động',
@@ -220,12 +219,6 @@ const Products = () => {
         style={{ width: 200, marginBottom: 10 }}
       />
 
-      <Input
-        placeholder="Tìm kiếm theo kích thước"
-        value={searchSize}
-        onChange={e => setSearchSize(e.target.value)}
-        style={{ width: 200, marginBottom: 10 }}
-      />
       <div>
         <Table columns={columns} dataSource={tableData} scroll={{ x: 1500 }} />
       </div>

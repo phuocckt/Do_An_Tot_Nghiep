@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import CustomerInput from '../Components/CustomerInput';
@@ -7,10 +7,8 @@ import * as yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBrands } from '../features/brand/brandSlice';
 import { getCategories } from '../features/category/categorySlice';
-import { getColors } from '../features/color/colorSlice';
 import { getSizes } from '../features/size/sizeSlice';
 import { Select } from 'antd';
-import Multiselect from 'react-widgets/Multiselect';
 import 'react-widgets/styles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dropzone from 'react-dropzone';
@@ -18,50 +16,54 @@ import { deleteImage, uploadImage } from '../features/upload/uploadSlice';
 import { createProduct } from '../features/product/productSlice';
 import Swal from 'sweetalert2';
 
+const { Option } = Select;
+
 const schema = yup.object().shape({
     title: yup.string().required('Title is required'),
     description: yup.string(),
     priceOld: yup.number()
-        .typeError('Quantity must be a number')
-        .positive('Quantity must be a positive number')
-        .integer('Quantity must be an integer'),
+        .typeError('Price must be a number')
+        .positive('Price must be a positive number')
+        .integer('Price must be an integer'),
     price: yup.number()
         .required('Price is required')
-        .typeError('Quantity must be a number')
-        .positive('Quantity must be a positive number')
-        .integer('Quantity must be an integer'),
+        .typeError('Price must be a number')
+        .positive('Price must be a positive number')
+        .integer('Price must be an integer'),
     brand: yup.string().required('Brand is required'),
     category: yup.string().required('Category is required'),
-    color: yup.array(),
-    size: yup.array().min(1, 'Size is required').required('Size is required'),
+    variants: yup.array().of(
+        yup.object().shape({
+            size: yup.string().required('Size is required'),
+            quantity: yup.number()
+                .required('Quantity is required')
+                .typeError('Quantity must be a number')
+                .positive('Quantity must be a positive number')
+                .integer('Quantity must be an integer')
+        })
+    ).min(1, 'At least one variant is required').required('Variants are required'),
+    image: yup.array().min(1, 'Image is required').required('Image is required'),
     quantity: yup.number()
         .typeError('Quantity must be a number')
         .positive('Quantity must be a positive number')
         .integer('Quantity must be an integer')
-        .required('Quantity is required'),
-    image: yup.array().min(1, 'Image is required').required('Image is required'),
+        .required('Total quantity is required')
 });
 
 function AddProduct() {
     const dispatch = useDispatch();
+    const [variants, setVariants] = useState([]);
 
     useEffect(() => {
         dispatch(getBrands());
         dispatch(getCategories());
-        dispatch(getColors());
         dispatch(getSizes());
     }, [dispatch]);
 
     const brandState = useSelector((state) => state.brand.brands);
     const categoryState = useSelector((state) => state.category.categories);
-    const colorState = useSelector((state) => state.color.colors);
     const sizeState = useSelector((state) => state.size.sizes);
     const uploadState = useSelector((state) => state.upload.images);
-
-    const colors = colorState.map(i => ({
-        _id: i._id,
-        color: i.title
-    }));
 
     const sizes = sizeState.map(i => ({
         _id: i._id,
@@ -74,9 +76,36 @@ function AddProduct() {
     }));
 
     useEffect(() => {
-        //formik.setFieldValue('image', images);
         formik.values.image = images;
     }, [images]);
+
+    const handleAddVariant = () => {
+        const newVariants = [...variants, { size: '', quantity: '' }];
+        setVariants(newVariants);
+        formik.setFieldValue('variants', newVariants);
+        updateTotalQuantity(newVariants);
+    };
+
+    const handleRemoveVariant = (index) => {
+        const updatedVariants = variants.filter((_, idx) => idx !== index);
+        setVariants(updatedVariants);
+        formik.setFieldValue('variants', updatedVariants);
+        updateTotalQuantity(updatedVariants);
+    };
+
+    const handleVariantChange = (index, field, value) => {
+        const updatedVariants = variants.map((variant, idx) => 
+            idx === index ? { ...variant, [field]: value } : variant
+        );
+        setVariants(updatedVariants);
+        formik.setFieldValue('variants', updatedVariants);
+        updateTotalQuantity(updatedVariants);
+    };
+
+    const updateTotalQuantity = (updatedVariants) => {
+        const totalQuantity = updatedVariants.reduce((total, variant) => total + Number(variant.quantity || 0), 0);
+        formik.setFieldValue('quantity', totalQuantity);
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -86,17 +115,22 @@ function AddProduct() {
             price: '',
             brand: '',
             category: '',
-            color: [],
-            size: [],
-            quantity: '',
-            image: []
+            variants: [],
+            image: [],
+            quantity: 0
         },
         validationSchema: schema,
         onSubmit: values => {
             dispatch(createProduct(values));
-            //alert(JSON.stringify(values));
         },
     });
+
+    useEffect(() => {
+        if (formik.values.variants !== variants) {
+            setVariants(formik.values.variants);
+        }
+    }, [formik.values.variants]);
+    
     const {createdProduct, isLoading, isError, isSuccess, message, isCreate } = useSelector(
         (state) => state.product
     );
@@ -109,6 +143,7 @@ function AddProduct() {
             confirmButtonText: "OK",
           });
         } 
+
         else if (isError && !isSuccess) {
           Swal.fire({
             title: "Thêm thất bại!",
@@ -119,7 +154,7 @@ function AddProduct() {
       }, [isSuccess, isError, isLoading, message, isCreate]);
 
     return (
-        <div className="container">
+        <div>
             <h3 className='mb-4 title'>Thêm sản phẩm</h3>
             <form onSubmit={formik.handleSubmit}>
                 <div className="row">
@@ -129,7 +164,7 @@ function AddProduct() {
                             value={formik.values.title}
                             label="Nhập tên sản phẩm"
                             name="title"
-                            onChange={formik.handleChange}
+                            onChange={formik.handleChange("title")}
                         />
                         {formik.touched.title && formik.errors.title ? (
                             <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.title}</p>
@@ -139,9 +174,9 @@ function AddProduct() {
                         <CustomerInput
                             type="number"
                             value={formik.values.priceOld}
-                            label="Giá tiền cũ"
+                            label="Giá gốc"
                             name="priceOld"
-                            onChange={formik.handleChange}
+                            onChange={formik.handleChange("priceOld")}
                         />
                         {formik.touched.priceOld && formik.errors.priceOld ? (
                             <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.priceOld}</p>
@@ -151,28 +186,26 @@ function AddProduct() {
                         <CustomerInput
                             type="number"
                             value={formik.values.price}
-                            label="Giá tiền"
+                            label="Giá khuyến mãi"
                             name="price"
-                            onChange={formik.handleChange}
+                            onChange={formik.handleChange("price")}
                         />
                         {formik.touched.price && formik.errors.price ? (
                             <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.price}</p>
                         ) : null}
                     </div>
-                </div>
-                <div className="row">
                     <div className="col-md-6 mb-3">
-                        <label htmlFor="brand">Thương hiệu</label>
                         <Select
                             name='brand'
                             className='form-control'
                             value={formik.values.brand}
                             onChange={(value) => formik.setFieldValue('brand', value)}
                         >
+                            <Option value="" disabled hidden>Chọn thương hiệu</Option>
                             {brandState.map((i, j) => (
-                                <option key={j} value={i._id}>
+                                <Option key={j} value={i._id}>
                                     {i.title}
-                                </option>
+                                </Option>
                             ))}
                         </Select>
                         {formik.touched.brand && formik.errors.brand ? (
@@ -180,68 +213,75 @@ function AddProduct() {
                         ) : null}
                     </div>
                     <div className="col-md-6 mb-3">
-                        <label htmlFor="brand">Loại sản phẩm</label>
                         <Select
                             name='category'
                             className='form-control'
                             value={formik.values.category}
                             onChange={(value) => formik.setFieldValue('category', value)}
                         >
+                            <Option value="" disabled hidden>Chọn loại sản phẩm</Option>
                             {categoryState.map((i, j) => (
-                                <option key={j} value={i._id}>
+                                <Option key={j} value={i._id}>
                                     {i.title}
-                                </option>
+                                </Option>
                             ))}
                         </Select>
                         {formik.touched.category && formik.errors.category ? (
                             <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.category}</p>
                         ) : null}
                     </div>
-                </div>
-                <div className="row">
-                    <div className="col-md-6 mb-3">
-                        <label htmlFor="brand">Màu sắc</label>
-                        <Multiselect
-                            name="color"
-                            dataKey="_id"
-                            textField="color"
-                            data={colors}
-                            value={formik.values.color}
-                            onChange={(value) => formik.setFieldValue('color', value)}
-                        />
-                        {formik.touched.color && formik.errors.color ? (
-                            <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.color}</p>
-                        ) : null}
-                    </div>
-                    <div className="col-md-6 mb-3">
-                        <label htmlFor="brand">Kích thước</label>
-                        <Multiselect
-                            name="size"
-                            dataKey="_id"
-                            textField="size"
-                            data={sizes}
-                            value={formik.values.size}
-                            onChange={(value) => formik.setFieldValue('size', value)}
-                        />
-                        {formik.touched.size && formik.errors.size ? (
-                            <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.size}</p>
-                        ) : null}
-                    </div>
                     <div className="col-md-6 mb-3">
                         <CustomerInput
                             type="number"
                             value={formik.values.quantity}
-                            label="Số lượng"
+                            label="Tổng số lượng"
                             name="quantity"
-                            onChange={formik.handleChange}
+                            readOnly
                         />
                         {formik.touched.quantity && formik.errors.quantity ? (
                             <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.quantity}</p>
                         ) : null}
                     </div>
                 </div>
+                <div>
+                    <button type="button" className="btn btn-primary mb-3" onClick={handleAddVariant}>
+                        Thêm biến thể
+                    </button>
+                </div>
+                {variants.map((variant, index) => (
+                    <div key={index} className="row mb-3">
+                        <div className="col-md-3">
+                            <Select
+                                value={variant.size}
+                                onChange={(value) => handleVariantChange(index, 'size', value)}
+                                className="form-control"
+                            >
+                                <Option value="" disabled hidden>Chọn kích thước</Option>
+                                {sizes.map((size, idx) => (
+                                    <Option key={idx} value={size._id}>
+                                        {size.size}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </div>
+                        <div className="col-md-3">
+                            <CustomerInput
+                                type="number"
+                                value={variant.quantity}
+                                label="Số lượng"
+                                name={`variants[${index}].quantity`}
+                                onChange={(e) => handleVariantChange(index, 'quantity', e.target.value)}
+                            />
+                        </div>
+                        <div className="col-md-3">
+                            <button type="button" className="btn btn-danger mt-4" onClick={() => handleRemoveVariant(index)}>
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                ))}
                 <div className="mb-3">
-                    <label htmlFor="brand">Mô tả</label>
+                    <label htmlFor="description">Mô tả</label>
                     <ReactQuill
                         theme="snow"
                         value={formik.values.description}

@@ -6,17 +6,16 @@ const slugify = require("slugify");
 // tạo sản phẩm
 const createProduct = asyncHandler(async(req, res) => {
     const title = req.body.title;
-    const findProduct = await Product.findOne({ title: title });
-    if (!findProduct) { // kiểm tra tên sản phẩm có tồn tại chưa
-        if (req.body.title) {
-            req.body.slug = slugify(req.body.title);
-        }
-        // Tạo sản phẩm mới và đợi cho đến khi nó được tạo xong
-        const newProduct = await Product.create(req.body);
-        res.json(newProduct);
-    } else {
-        throw new Error("Product Already Axists");
+    if (title) {
+        const slug = slugify(title);
+        // Tìm số lượng sản phẩm đã có để tạo id duy nhất
+        const countProducts = await Product.countDocuments();
+        const productId = countProducts + 1; // Tạo id duy nhất
+        req.body.slug = `${slug}-${productId.toString().padStart(4, '0')}`;
     }
+    // Tạo sản phẩm mới và đợi cho đến khi nó được tạo xong
+    const newProduct = await Product.create(req.body);
+    res.json(newProduct);
 });
 
 // lấy tất cả sản phẩm
@@ -74,7 +73,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
             //Nếu trang không tồn tại (tức là số lượng phẩm cần bỏ qua lớn hơn hoặc bằng tổng số lượng sản phẩm), một lỗi sẽ được ném
             if (skip >= productCount) throw new Error("This Page doesn't exists");
         }
-        query = query.populate("color").populate("size").populate("brand").populate("category");
+        query = query.populate("variants.size").populate("brand").populate("category");
         const products = await query;
         res.json(products);
     } catch(error) {
@@ -87,7 +86,11 @@ const getAProduct = asyncHandler(async (req, res) => {
     const { id } = req.params;
     //
     try {
-        const getProducts = await Product.findById(id).populate("color").populate("size").populate("brand").populate("category");
+        const getProducts = await Product.findById(id)
+                                        .populate('variants.color')
+                                        .populate('variants.size')
+                                        .populate("brand")
+                                        .populate("category");
         res.json(getProducts);
     } catch(error) {
         throw new Error(error);

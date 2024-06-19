@@ -4,7 +4,6 @@ import Login from './pages/Login';
 import MainLayout from './Components/MainLayout';
 import Dashboard from './pages/Dashboard';
 import './App.css'
-import ColorList from './pages/ColorList';
 import CategoryList from './pages/CategoryList';
 import Products from './pages/Products';
 import SizeList from './pages/SizeList';
@@ -12,7 +11,6 @@ import Forgotpassword from './pages/Forgotpassword';
 import Resetpassword from './pages/Resetpassword';
 import Orders from './pages/Orders';
 import Customers from './pages/Customers';
-import AddColor from './pages/AddColor';
 import AddSize from './pages/AddSize';
 import Brand from './pages/Brand';
 import AddProduct from './pages/AddProduct';
@@ -35,8 +33,6 @@ const App = () => {
             </ProtectedRoute>
           }>
             <Route index element={<Dashboard />} />
-            <Route path="add-color" element={<AddColor />} />
-            <Route path="color-list" element={<ColorList />} />
             <Route path="add-brand" element={<AddBrand />} />
             <Route path="brand-list" element={<Brand />} />
             <Route path="add-category" element={<AddCategory />} />

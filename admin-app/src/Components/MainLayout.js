@@ -106,16 +106,6 @@ const MainLayout = () => {
                   label: 'Category List',
                 },
                 {
-                  key: 'add-color',
-                  icon: <BsCartPlus className='fs-4' />,
-                  label: 'Add Color',
-                },
-                {
-                  key: 'color-list',
-                  icon: <AiOutlineBgColors className='fs-4' />,
-                  label: 'Color List',
-                },
-                {
                   key: 'add-size',
                   icon: <BsCartPlus className='fs-4' />,
                   label: 'Add Size',
