@@ -3,12 +3,14 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
-import { AiOutlineBgColors, AiOutlineDashboard, AiOutlineShoppingCart } from "react-icons/ai";
+import { AiOutlineDashboard, AiOutlineShoppingCart } from "react-icons/ai";
+import { RiCoupon2Fill } from "react-icons/ri";
 import { BsCartPlus } from "react-icons/bs";
 import { CiUser, CiViewList } from "react-icons/ci";
 import { SiBrandfolder } from "react-icons/si";
 import { BiCategoryAlt, BiFontSize } from "react-icons/bi";
 import { FaClipboardList } from "react-icons/fa6";
+import { ImBullhorn } from "react-icons/im";
 import { Layout, Menu, theme } from 'antd';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -114,6 +116,23 @@ const MainLayout = () => {
                   key: 'size-list',
                   icon: <BiFontSize className='fs-4' />,
                   label: 'Size List',
+                }
+              ]
+            },
+            {
+              key: 'Marketing',
+              icon: <ImBullhorn className='fs-4' />,
+              label: 'Marketing',
+              children: [
+                {
+                  key: 'add-coupon',
+                  icon: <BsCartPlus className='fs-4' />,
+                  label: 'Add Coupon',
+                },
+                {
+                  key: 'coupon-list',
+                  icon: <RiCoupon2Fill className='fs-4' />,
+                  label: 'Coupon List',
                 }
               ]
             },

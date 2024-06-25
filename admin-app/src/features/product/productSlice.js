@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import productService from "./productService";
 
 export const getProducts = createAsyncThunk(
@@ -12,8 +12,19 @@ export const getProducts = createAsyncThunk(
     }
 )
 
+export const getProduct = createAsyncThunk(
+    "products/get-product",
+    async (id, thunkAPI) => {
+        try {
+            return await productService.getProduct(id);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
 export const createProduct = createAsyncThunk(
-    "products/create-products",
+    "products/create-product",
     async (product, thunkAPI) => {
         try {
             return await productService.createProduct(product);
@@ -24,7 +35,7 @@ export const createProduct = createAsyncThunk(
 )
 
 export const deleteProduct = createAsyncThunk(
-    "products/delete-products",
+    "products/delete-product",
     async (id, thunkAPI) => {
         try {
             return await productService.deleteProduct(id);
@@ -34,13 +45,27 @@ export const deleteProduct = createAsyncThunk(
     }
 )
 
+export const updateProduct = createAsyncThunk(
+    "category/update-category",
+    async (product, thunkAPI) => {
+        try {
+            return await productService.updateProduct(product);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
+export const resetState = createAction("Reset_all");
+
 const initialState = {
     products: [],
     createdProduct: "",
+    updatedProduct: "",
+    product: "",
     isError: false,
     isLoading: false,
     isSuccess: false,
-    isCreate: false,
     message: ""
 };
 
@@ -57,7 +82,6 @@ export const productSlice = createSlice({
                 state.isLoading = false;
                 state.isError = false;
                 state.isSuccess = true;
-                state.isCreate = false;
                 state.products = action.payload;
             })
             .addCase(getProducts.rejected, (state, action) => {
@@ -73,7 +97,6 @@ export const productSlice = createSlice({
                 state.isLoading = false;
                 state.isError = false;
                 state.isSuccess = true;
-                state.isCreate = true;
                 state.createdProduct = action.payload;
             })
             .addCase(createProduct.rejected, (state, action) => {
@@ -81,7 +104,39 @@ export const productSlice = createSlice({
                 state.isError = true;
                 state.isSuccess = false;
                 state.message = action.error;
-            });
+            })
+            .addCase(updateProduct.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(updateProduct.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isError = false;
+                state.isSuccess = true;
+                state.updatedProduct = action.payload;
+                state.message = "Category updated successfully!";
+            })
+            .addCase(updateProduct.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+                state.message = action.error;
+            })
+            .addCase(getProduct.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(getProduct.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isError = false;
+                state.isSuccess = true;
+                state.product = action.payload;
+            })
+            .addCase(getProduct.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+                state.message = action.error;
+            })
+            .addCase(resetState, () => initialState);
     }
 });
 

@@ -7,6 +7,11 @@ const getProducts = async () => {
     return res.data;
 }
 
+const getProduct = async (id) => {
+    const res = await axios.get(`${base_url}products/${id}`);
+    return res.data;
+}
+
 const createProduct = async (product) => {
     try {
         const res = await axios.post(`${base_url}products/create-product`, product, config);
@@ -15,6 +20,11 @@ const createProduct = async (product) => {
         console.error("Error creating product:", error.response?.data || error.message);
         throw error;
     }
+}
+
+const updateProduct = async (product) => {
+    const res = await axios.put(`${base_url}products/${product.id}`, product.productData, config);
+    return res.data;
 }
 
 const deleteProduct = async (id) => {
@@ -30,7 +40,9 @@ const deleteProduct = async (id) => {
 const productService = {
     getProducts,
     createProduct,
-    deleteProduct
+    deleteProduct,
+    getProduct,
+    updateProduct
 }
 
 export default productService;

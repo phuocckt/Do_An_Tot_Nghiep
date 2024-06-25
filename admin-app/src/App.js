@@ -18,6 +18,8 @@ import AddBrand from './pages/AddBrand';
 import AddCategory from './pages/AddCategory';
 import ViewProfile from './pages/ViewProfile';
 import ProtectedRoute from './features/auth/ProtectedRoute';
+import AddCoupon from './pages/AddCoupon';
+import Coupons from './pages/CouponList';
 
 const App = () => {
   return (
@@ -41,6 +43,8 @@ const App = () => {
             <Route path="product" element={<Products />} />
             <Route path="add-size" element={<AddSize />} />
             <Route path="size-list" element={<SizeList />} />
+            <Route path="add-coupon" element={<AddCoupon />} />
+            <Route path="coupon-list" element={<Coupons />} />
             <Route path="orders" element={<Orders />} />
             <Route path="customers" element={<Customers />} />
             <Route path="profile" element={<ViewProfile />} />

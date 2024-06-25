@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import CustomerInput from '../Components/CustomerInput';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { createSize } from '../features/size/sizeSlice';
 import Swal from 'sweetalert2';
 
@@ -20,44 +20,39 @@ function AddSize() {
         },
         validationSchema: schema,
         onSubmit: values => {
-            dispatch(createSize(values));
-            //alert(JSON.stringify(values));
+            dispatch(createSize(values))
+                .unwrap()
+                .then(() => {
+                    Swal.fire({
+                        title: "Thêm thành công!",
+                        icon: "success",
+                        confirmButtonText: "OK",
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        title: "Thêm thất bại!",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                });
         },
     });
-    const { isLoading, isError, isSuccess, message, isCreate } = useSelector(
-        (state) => state.size
-    );
-    useEffect(() => {
-        if (!isLoading && isSuccess && isCreate) {
-          Swal.fire({
-            title: "Thêm thành công!",
-            icon: "success",
-            confirmButtonText: "OK",
-          });
-        } 
-        else if (isError && !isSuccess) {
-          Swal.fire({
-            title: "Thêm thất bại!",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-        }
-      }, [isSuccess, isError, isLoading, message, isCreate]);
     return (
         <div className="container">
             <h3 className='mb-4 title'>Thêm size</h3>
             <div className=''>
                 <form onSubmit={formik.handleSubmit}>
-                    <CustomerInput 
-                        type="text" 
-                        label="Nhập size" 
-                        value={formik.values.title} 
+                    <CustomerInput
+                        type="text"
+                        label="Nhập size"
+                        value={formik.values.title}
                         name="title"
                         onChange={formik.handleChange}
                     />
                     {formik.touched.title && formik.errors.title ? (
-                            <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.title}</p>
-                        ) : null}
+                        <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.title}</p>
+                    ) : null}
                     <button type='submit' className='btn btn-success border-0 rounded-3'>
                         Thêm
                     </button>

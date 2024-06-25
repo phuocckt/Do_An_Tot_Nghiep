@@ -15,6 +15,7 @@ import Dropzone from 'react-dropzone';
 import { deleteImage, uploadImage } from '../features/upload/uploadSlice';
 import { createProduct } from '../features/product/productSlice';
 import Swal from 'sweetalert2';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const { Option } = Select;
 
@@ -51,6 +52,7 @@ const schema = yup.object().shape({
 });
 
 function AddProduct() {
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const [variants, setVariants] = useState([]);
 
@@ -94,7 +96,7 @@ function AddProduct() {
     };
 
     const handleVariantChange = (index, field, value) => {
-        const updatedVariants = variants.map((variant, idx) => 
+        const updatedVariants = variants.map((variant, idx) =>
             idx === index ? { ...variant, [field]: value } : variant
         );
         setVariants(updatedVariants);
@@ -121,7 +123,23 @@ function AddProduct() {
         },
         validationSchema: schema,
         onSubmit: values => {
-            dispatch(createProduct(values));
+            dispatch(createProduct(values))
+                .unwrap()
+                .then(() => {
+                    Swal.fire({
+                        title: "Thêm thành công!",
+                        text: "Thêm sản phẩm: " + values.title,
+                        icon: "success",
+                        confirmButtonText: "OK",
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        title: "Thêm thất bại!",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                });
         },
     });
 
@@ -130,28 +148,10 @@ function AddProduct() {
             setVariants(formik.values.variants);
         }
     }, [formik.values.variants]);
-    
-    const {createdProduct, isLoading, isError, isSuccess, message, isCreate } = useSelector(
+
+    const { createdProduct } = useSelector(
         (state) => state.product
     );
-    useEffect(() => {
-        if (!isLoading && isSuccess && isCreate) {
-          Swal.fire({
-            title: "Thêm thành công!",
-            text: "Thêm sản phẩm: " + createdProduct.title,
-            icon: "success",
-            confirmButtonText: "OK",
-          });
-        } 
-
-        else if (isError && !isSuccess) {
-          Swal.fire({
-            title: "Thêm thất bại!",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-        }
-      }, [isSuccess, isError, isLoading, message, isCreate]);
 
     return (
         <div>
@@ -293,7 +293,12 @@ function AddProduct() {
                     ) : null}
                 </div>
                 <div className='bg-white border-1 p-5 text-center'>
-                    <Dropzone onDrop={acceptedFiles => dispatch(uploadImage(acceptedFiles))}>
+                    <Dropzone onDrop={acceptedFiles => {
+                        setLoading(true); dispatch(uploadImage(acceptedFiles)).unwrap()
+                            .finally(() => {
+                                setLoading(false);
+                            });
+                    }}>
                         {({ getRootProps, getInputProps }) => (
                             <section className="dropzone-container">
                                 <div {...getRootProps()} className="dropzone">
@@ -303,12 +308,17 @@ function AddProduct() {
                             </section>
                         )}
                     </Dropzone>
+                    {loading && (
+                        <div className="spinner-container">
+                            <ClipLoader size={50} color={"#ffd333"} loading={loading} />
+                        </div>
+                    )}
                 </div>
                 <div className='showimages d-flex flex-wrap gap-3'>
                     {uploadState.map((i, j) => (
                         <div className='position-relative image-container' key={j}>
                             <button type='button' onClick={() => dispatch(deleteImage(i.public_id))} className='btn-close position-absolute' style={{ top: "5px", right: "5px" }}></button>
-                            <img src={i.url} alt="no_image" width={200} height={200} className='image-preview'/>
+                            <img src={i.url} alt="no_image" width={200} height={200} className='image-preview' />
                         </div>
                     ))}
                 </div>

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import brandService from "./brandService";
 
 export const getBrands = createAsyncThunk(
@@ -12,8 +12,57 @@ export const getBrands = createAsyncThunk(
     }
 )
 
+export const getBrand = createAsyncThunk(
+    "brand/get-brand",
+    async (id, thunkAPI) => {
+        try {
+            return await brandService.getBrand(id);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
+export const createBrand = createAsyncThunk(
+    "brand/create-brand",
+    async (category, thunkAPI) => {
+        try {
+            return await brandService.createBrand(category);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
+export const deleteBrand = createAsyncThunk(
+    "brand/delete-brand",
+    async (id, thunkAPI) => {
+        try {
+            return await brandService.deleteBrand(id);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
+export const updateBrand = createAsyncThunk(
+    "brand/update-brand",
+    async (brand, thunkAPI) => {
+        try {
+            return await brandService.updateBrand(brand);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
+export const resetState = createAction("Reset_all");
+
 const initialState = {
     brands: [],
+    createdBrand: "",
+    updatedBrand: "",
+    brandName: "",
     isError: false,
     isLoading: false,
     isSuccess: false,
@@ -40,7 +89,55 @@ export const brandSlice = createSlice({
                 state.isError = true;
                 state.isSuccess = false;
                 state.message = action.error;
-            });
+            })
+            .addCase(createBrand.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(createBrand.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isError = false;
+                state.isSuccess = true;
+                state.createdBrand = action.payload;
+                state.message = "Brand created successfully!";
+            })
+            .addCase(createBrand.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+                state.message = action.error;
+            })
+            .addCase(updateBrand.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(updateBrand.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isError = false;
+                state.isSuccess = true;
+                state.updatedBrand = action.payload;
+                state.message = "Brand updated successfully!";
+            })
+            .addCase(updateBrand.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+                state.message = action.error;
+            })
+            .addCase(getBrand.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(getBrand.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isError = false;
+                state.isSuccess = true;
+                state.brandName = action.payload.title;
+            })
+            .addCase(getBrand.rejected, (state, action) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+                state.message = action.error;
+            })
+            .addCase(resetState, () => initialState);
     }
 });
 
