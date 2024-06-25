@@ -278,7 +278,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
         await user.save({ validateBeforeSave: true });
 
         // Tạo dữ liệu email
-        const resetURL = `Chào, Vui lòng theo dõi liên kết này để đặt lại mật khẩu của bạn. Liên kết này có giá trị đến 10 phút kể từ bây giờ. <a href='http://localhost:5000/api/user/reset-password/${token}'>Liên kết ở đây</a>`;
+        const resetURL = `Chào, Vui lòng theo dõi liên kết này để đặt lại mật khẩu của bạn. Liên kết này có giá trị đến 10 phút kể từ bây giờ. <a href='http://localhost:3000/reset-password/${token}'>Liên kết ở đây</a>`;
         const data = {
             to: email,
             text: 'Chào bạn',
