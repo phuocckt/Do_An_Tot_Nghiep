@@ -1,0 +1,56 @@
+.login,
+.signup{
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: black;
+    padding-top: 120px;
+}
+.login-container,
+.signup-container{
+    width: 600px;
+    height: 400px;
+    background-color: white;
+    margin: auto;
+    padding: 30px 60px;
+}
+.login h1,
+.signup h1{
+    font-family: 'Lobster', sans-serif;
+}
+.login form,
+.signup form{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 20px 0;
+}
+.login form input,
+.signup form input{
+    width: 100%;
+    height: 50px;
+    padding: 20px;
+    outline: none;
+}
+.login button,
+.signup button{
+    width: 100%;
+    height: 50px;
+    border: none;
+    background-color: #131921;
+    color: white;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+.login p,
+.signup p{
+    margin: 10px 0;
+}
+.signup{
+    height: 100vh;
+}
+.signup-container{
+    height: 450px;
+}

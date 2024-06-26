@@ -1,0 +1,117 @@
+h5,h3, p{
+    margin: 0;
+}
+.cart{
+    display: flex;
+    padding: 2em 3em;
+    gap: 25px;
+}
+.cart-products{
+    width: 60%;
+}
+
+.delivery{
+    background-color: gray;
+    color: white;
+    padding: 10px 20px;
+}
+.cart-card{
+    width: 100%;
+    display: grid;
+    grid-template-columns: 200px auto;
+    gap: 20px;
+    border-bottom: 1px solid gray;
+    padding: 25px 0;
+}
+.cart-product-info{
+    background-color: white;
+    padding: 10px;
+    border-radius: 1em;
+}
+.cart .product-img{
+    width: 100%;
+}
+.cart-product-content{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+.cart .cart-product-select{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 0 2em;
+}
+.cart .cart-product-select .size select{
+    padding: 0 7px;
+    border-radius: 2em;
+    border: 1px solid black;
+    box-shadow: 0 2px;
+    letter-spacing: 1px;
+    text-align: center;
+    outline: none;
+}
+.cart .cart-product-select .quantity input{
+    padding: 0 7px;
+    border-radius: 2em;
+    border: 1px solid black;
+    box-shadow: 0 2px;
+    letter-spacing: 1px;
+    text-align: center;
+}
+.cart .cart-product-select .action-delete{
+    cursor: pointer;
+}
+.cart .cart-product-select .action-delete:hover{
+    color: red;
+}
+/* invoice */
+.cart-invoice{
+    width: 40%;
+}
+.subtotal,
+.invoice-delivery,
+.total{
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.invoice-delivery,
+.total{
+    border-bottom: 1px solid gray;
+    padding-bottom: 20px;
+}
+.invoice-action button{
+    display: block;
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    padding: 1em 2em;
+    border-radius: 2em;
+    font-weight: bold;
+    box-shadow: 0 4px;
+    letter-spacing: 1px;
+ }
+ .invoice-action button:active{
+    box-shadow: none;
+    transform: translateY(4%);
+}
+@media screen and (max-width: 1050px) {
+    .cart{
+        display: block;
+    }
+    .cart-products{
+        width: 100%;
+    }
+    .cart-invoice{
+        width: 100%;
+    }
+    .cart-card{
+        display: block;
+    }
+    .cart .cart-product-select{
+        padding: 0;
+    }
+}

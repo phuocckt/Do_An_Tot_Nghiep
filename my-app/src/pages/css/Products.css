@@ -1,0 +1,118 @@
+.blink{
+    color: red;
+    animation: blink 2s infinite;
+    font-size: 60px;
+}
+@keyframes blink {
+    100%{
+        color: black;
+
+    }
+}
+.filters{
+    padding: 2em 3.5em;
+    display: flex;
+    justify-content: space-between;
+    /* position: fixed; */
+    top: 11em;
+    z-index: 9999;
+    background-color: #F6F5F2;
+    width: 100%;
+    box-shadow: 0px 10px 5px gray;
+}
+.sortby{
+    padding: 0.5em 2.2em;
+    border: 1px solid gray;
+    border-radius: 1.5em;
+    background-color: white;
+    letter-spacing: 1px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0 4px gray;
+    z-index: 9999 !important;
+    position: relative;
+}
+.sortby:hover{
+    background-color: white;
+    border: 1px solid gray;
+}
+.sortby-items{
+    padding: 0.5em 1.5em;
+    border: 1px solid gray;
+    border-radius: 1.5em;
+    background-color: white;
+    letter-spacing: 1px;
+    font-weight: bold;
+    transform: translateY(4%)!important;
+    padding-top: 2.2em;
+    text-align: center;
+}
+.sortby-item{
+    border-bottom: 1px solid gray;
+    background-color: white;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+.sortby-item:last-child{
+    border: none;
+}
+.sortby-item:hover{
+    background-color: #EEEEEE;
+}
+.products{
+    padding: 20px;
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: left;
+    margin-left: 30px;
+    /* margin-top: 100px; */
+}
+.btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active {
+    background-color: white;
+    border-color: gray;
+    box-shadow: none;
+}
+.brand button{
+    padding: .5em 1.5em;
+    border-radius: 2em;
+    border: 1px solid gray;
+    background-color: white;
+    font-weight: bold;
+    box-shadow: 0 4px gray;
+    margin-right: 1em;
+}
+.brand button:active{
+    box-shadow: none;
+    transform: translateY(4%);
+}
+.no-data{
+    width: 100%;
+}
+.search{
+    display: block;
+    padding: .5em 1.5em;
+    border-radius: 2em;
+    border: 1px solid gray;
+    background-color: white;
+    box-shadow: 0 4px gray;
+    margin-right: 1em;
+    font-weight: 500;
+    width: 15em;
+}
+.search::placeholder{
+    color: black;
+}
+.search:focus{
+    box-shadow: none;
+    outline: none;
+    transform: translateY(4%);
+}
+.search:focus::placeholder{
+    color: gray;
+}
+.brand .active-button{
+    color: red;
+    box-shadow: none;
+    transform: translateY(4%);
+}

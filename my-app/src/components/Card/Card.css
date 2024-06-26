@@ -1,0 +1,88 @@
+:root{
+    --spacing: 30px;
+    --columns: 4;
+}
+.card-product{
+    width: calc(calc(100% / var(--columns) - var(--spacing)));
+    border-radius: 1em;
+    border: 1px solid gray;
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+    padding: .5em;
+    padding-bottom: 2.5em;
+    transition: .3s;
+}
+.card-product:hover{
+    box-shadow: 5px 10px 5px gray;
+    transform: translate(-5px, -10px);
+}
+.card-image{
+    width: 100%;
+    border-radius: 1em;
+    transition: .3s;  
+    padding: 0.5em;
+}
+.card-image:hover{
+    transform: scale(102%);
+}
+.card-product .favorite{
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 1.5em;
+    left: 1.5em;
+    color: white;
+    background-color: gray;
+    border-radius: 2em;
+    padding: 5px 12px;
+    gap: 5px;
+    cursor: pointer;
+}
+.card-product .active-favorite{
+    background-color: white;
+    color: gray;
+    border: 1px solid gray;
+}
+.card-product .brand{
+    background-color: white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1em 2em 0.5em 1.2em;
+    font-weight: bold;
+    border-bottom-left-radius: 1em;
+}
+.card-info{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding:.5em 1em 0 1em;
+}
+.card-info .name{
+    font-weight: bold;  
+    padding: 0 0 1em 1em;
+}
+.card-info .star{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    gap: .2em;
+}
+@media screen and (max-width: 1350px) {
+    :root{
+        --columns: 3;
+    }
+}
+@media screen and (max-width: 1024px) {
+    :root{
+        --columns: 2;
+    }
+}
+@media screen and (max-width: 700px) {
+    :root{
+        --columns: 1;
+    }
+}
