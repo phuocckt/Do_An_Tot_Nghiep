@@ -10,6 +10,16 @@ function Cart() {
     const dispatch = useDispatch();  
     const cartState = useSelector((state) => state.auth.carts);
 
+    // Định dạng số tiền theo định dạng tiền tệ Việt Nam
+  const CurrencyFormatter = ({ amount }) => {
+    const formatter = new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    });
+  
+    return <span>{formatter.format(amount)}</span>;
+  };
+
     useEffect(() => {
         dispatch(getCart());
     }, [dispatch]);
@@ -57,7 +67,7 @@ function Cart() {
                                         </Link>
                                         <div className="cart-product-content">
                                             <h5 className="cart-product-name">{item.product.title}</h5>
-                                            <div className="cart-product-price">{item.price} đ</div>
+                                            <div className="cart-product-price"><CurrencyFormatter amount={item.price}/>/1</div>
                                         </div>
                                         <div className="cart-product-select">
                                             <div className="size">
@@ -80,7 +90,7 @@ function Cart() {
                 <div className="invoice-info">
                     <div className="subtotal">
                         <p>Subtotal</p>
-                        <p>{cartState ? cartState.cartTotal : 0} đ</p>
+                        <p><CurrencyFormatter amount={cartState ? cartState.cartTotal : 0}/></p>
                     </div>
                     <div className="invoice-delivery">
                         <p>Estimated Delivery & Handling</p>
@@ -88,7 +98,7 @@ function Cart() {
                     </div>
                     <div className="total">
                         <p>Total</p>
-                        <p>{cartState ? cartState.cartTotal : 0} đ</p>
+                        <p><CurrencyFormatter amount={cartState ? cartState.cartTotal : 0}/></p>
                     </div>
                 </div>
                 <div className="invoice-action">

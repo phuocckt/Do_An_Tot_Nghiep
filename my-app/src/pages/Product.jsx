@@ -17,6 +17,14 @@ function ProductDetail() {
     const { id } = useParams();
     const dispatch = useDispatch();
     
+    const CurrencyFormatter = ({ amount }) => {
+        const formatter = new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+        });
+        return <span>{formatter.format(amount)}</span>;
+    };
+
     useEffect(() => {
         dispatch(getProducts());
         dispatch(getProduct(id));
@@ -35,12 +43,12 @@ function ProductDetail() {
             _id: id,
             count: 1,
             size: '',
-            price: productState.price || 0  // Default to 0 if price is not available
+            price: productState?.price || 0  // Default to 0 if price is not available
         },
         validationSchema: schema, 
         onSubmit: values => {
             values.size = selectedSize;  // Set the selected size before submitting
-            values.price = productState.price;  // Ensure price is included in the form data
+            values.price = productState?.price;  // Ensure price is included in the form data
             const cartData = {
                 cart: [
                     {
@@ -58,7 +66,7 @@ function ProductDetail() {
                         title: "Sản phẩm đã thêm!",
                         html: `
                             <p>Sản phẩm ${productState.title} đã được thêm vào giỏ hàng</p>
-                            <a class="btn btn-success" href="http://localhost:3000/cart">Xem giỏ hàng</a>
+                            <a class="btn btn-success" href="/cart">Xem giỏ hàng</a>
                         `,
                         icon: "success",
                         showCancelButton: false,
@@ -73,6 +81,7 @@ function ProductDetail() {
                     });
                 });
         },
+        enableReinitialize: true  // This will reinitialize formik state when productState changes
     });
 
     const handleChange = (item) => () => {
@@ -91,6 +100,11 @@ function ProductDetail() {
     const handleClick = () => {
         setActive(!active);
         setUlrImage(null);
+    }
+
+    // Render loading state while productState is being fetched
+    if (!productState) {
+        return <div>Loading...</div>;
     }
 
     return (
@@ -115,7 +129,7 @@ function ProductDetail() {
             <div className="product-info">
                 <div className="product-content">
                     <h3 className="pb-3">{productState.title}</h3>
-                    <p name="price">{productState.price}đ</p>
+                    <p name="price"><CurrencyFormatter amount={productState.price}/></p>
                     <div className="product-color">
                         {productsState
                             .filter(item => item.title === productState.title)

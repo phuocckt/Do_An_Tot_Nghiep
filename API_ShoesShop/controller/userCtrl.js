@@ -642,6 +642,7 @@ const uploadAvatar = asyncHandler(async (req, res) => {
     }
 });
 
+
 module.exports = { 
     createUser, 
     loginUserCtrl, 

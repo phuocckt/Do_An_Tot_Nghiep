@@ -127,7 +127,7 @@ const updateData = () =>{
         </div>
 
         <div className="products">
-            {sortProducts.length > 0 ? (
+            {sortProducts?.length > 0 ? (
             sortProducts.map(item => (
                 <Card product={item} />
             ))

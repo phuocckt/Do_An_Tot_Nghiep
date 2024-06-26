@@ -19,13 +19,19 @@ function Layout(){
     const userId = userData?._id;
 
     const handleLogout = () =>{
-        dispatch(logout());
         Swal.fire({
-            title: "Đăng xuất thành công!",
-            icon: "success",
-            confirmButtonText: "OK",
+            title: 'Bạn có chắc chắn muốn đăng xuất không?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Có',
+            cancelButtonText: 'Không',
+          }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(logout());
+                Swal.fire('Đã đăng xuất!');
+                navigate("/");
+            }
           });
-        navigate("/");
     }
 
     useEffect(() => {
@@ -53,7 +59,7 @@ function Layout(){
                         <Link to='/'><li>HOME</li></Link>
                         <Link to='/products'><li>PRODUCTS</li></Link>
                         <Link to='/account'><li>INFO</li></Link>
-                        <Link to='/cart'><li>CART</li></Link>
+                        <a href='/cart'><li>CART</li></a>
                         {
                             userId == null || user == null? (<><Link to='/login'><li>LOGIN</li></Link>
                         <Link to='/register'><li>REGISTER</li></Link></>):(<><Link to='/'><li onClick={handleLogout}>LOGOUT</li></Link></>)
