@@ -270,7 +270,13 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
     try {
         const token = await user.createPasswordResetToken(); // Tạo mã thông báo để đặt lại mật khẩu
         user.passwordResetToken = token; // Đặt mã thông báo đặt lại
-        user.passwordResetExpires = Date.now() + 10 * 60 * 1000; // Đặt thời gian hết hạn (10 phút)
+        // Lấy ngày và thời gian hiện tại
+        let currentDate = new Date();
+        
+        // Thêm 7 giờ cho múi giờ UTC+7
+        currentDate.setHours(currentDate.getHours() + 7);
+
+        user.passwordResetExpires = currentDate.getTime() + 10 * 60 * 1000; // Đặt thời gian hết hạn (10 phút)
 
         // Đảm bảo không có trường không hợp lệ nào xuất hiện trước khi lưu
         user.address = user.address || ''; // Đặt địa chỉ thành chuỗi trống nếu nó rỗng hoặc không xác định
@@ -312,20 +318,32 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
 */
 
 // đặt lại mật khẩu
-const resetPassword = asyncHandler (async (req, res) => {
+const resetPassword = asyncHandler(async (req, res) => {
     const { password } = req.body;
     const { token } = req.params;
-    //tạo một đối tượng băm với thuật toán sha256, cập nhật dữ liệu cần băm với giá trị của token và mã hóa dữ liệu băm dưới dạng hex.
+
+    // Tạo mã băm với thuật toán sha256
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    // Tạo ngày hiện tại với múi giờ UTC+7
+    let currentDate = new Date(); 
+    currentDate.setHours(currentDate.getHours() + 7); // Chuyển đổi sang UTC+7
+
+    // Tìm user với token và thời gian hết hạn phải lớn hơn thời điểm hiện tại
     const user = await User.findOne({
-        passwordResetToken: hashedToken, // kiểm tra giá trị hashedToken có trùng khớp không
-        passwordResetExpires: { $gt: Date.now() } //giá trị của passwordResetExpires phải lớn hơn thời điểm hiện tại.
+        passwordResetToken: hashedToken,
+        passwordResetExpires: { $gte: currentDate.getTime() }
     });
-    if (!user) throw new Error("Token Expired, Please try again later");
+
+    if (!user) {
+        throw new Error("Token Expired, Please try again later");
+    }
+
+    // Thiết lập lại mật khẩu và xoá thông tin reset mật khẩu
     user.password = password;
-    //Đặt giá trị của passwordResetToken và passwordResetExpires về undefined để xoá thông tin về việc reset mật khẩu.
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
+
     await user.save();
     res.json(user);
 });
@@ -352,44 +370,80 @@ const saveAddress = asyncHandler(async (req, res) => {
 const userCart = asyncHandler(async (req, res) => {
     const { cart } = req.body;
     const { _id } = req.user;
-    try {
-        let products = [];
-        const user = await User.findById(_id);
-        const alreadyExistCart = await Cart.findOne({ orderby: user._id });
-        if (alreadyExistCart) {
-            await Cart.deleteOne({ orderby: user._id });
-        }
-        for (let i = 0; i < cart.length; i++) {
-            let object = {};
-            let existingProduct = products.find(p => p.product.toString() === cart[i]._id &&
-            p.color === cart[i].color &&
-            p.size === cart[i].size);
 
-            if (existingProduct) {
-                // If the product already exists in the cart, update the count
-                existingProduct.count += cart[i].count;
-            } else {
-                // If the product is new, add it to the products array
-                object.product = cart[i]._id;
-                object.count = cart[i].count;
-                object.color = cart[i].color;
-                object.size = cart[i].size;
-                let getPrice = await Product.findById(cart[i]._id).select("price").exec();
-                object.price = getPrice.price;
-                products.push(object);
+    try {
+        let existingCart = await Cart.findOne({ orderby: _id });
+        
+        if (existingCart) {
+            // If cart exists, update it
+            for (let i = 0; i < cart.length; i++) {
+                const { _id: productId, size, count } = cart[i];
+                let found = false;
+
+                // Check if product with same title and size exists in cart
+                for (let j = 0; j < existingCart.products.length; j++) {
+                    if (existingCart.products[j].product.toString() === productId && 
+                        existingCart.products[j].size === size) {
+                        // Update count if product with same title and size exists
+                        existingCart.products[j].count += count;
+                        found = true;
+                        break;
+                    }
+                }
+
+                // If product with same title and size not found, add new product to cart
+                if (!found) {
+                    const getProduct = await Product.findById(productId).select('price').exec();
+                    const productPrice = getProduct.price;
+                    existingCart.products.push({
+                        product: productId,
+                        size,
+                        count,
+                        price: productPrice
+                    });
+                }
             }
+
+            // Calculate total cart amount
+            let cartTotal = 0;
+            existingCart.products.forEach(item => {
+                cartTotal += item.price * item.count;
+            });
+
+            // Update cart total and save
+            existingCart.cartTotal = cartTotal;
+            await existingCart.save();
+
+            res.json(existingCart);
+        } else {
+            // If cart does not exist, create new cart
+            let products = [];
+            for (let i = 0; i < cart.length; i++) {
+                const { _id: productId, size, count } = cart[i];
+                const getProduct = await Product.findById(productId).select('price').exec();
+                const productPrice = getProduct.price;
+                products.push({
+                    product: productId,
+                    size,
+                    count,
+                    price: productPrice
+                });
+            }
+
+            // Calculate total cart amount
+            let cartTotal = 0;
+            products.forEach(item => {
+                cartTotal += item.price * item.count;
+            });
+
+            // Save new cart
+            let newCart = await new Cart({
+                products,
+                cartTotal,
+                orderby: _id
+            }).save();
         }
-        let cartTotal = 0;
-        for (let i = 0; i < products.length; i++) {
-            cartTotal += products[i].price * products[i].count;
-        }
-        let newCart = await new Cart({
-            products,
-            cartTotal,
-            orderby: user._id
-        }).save();
-        res.json(newCart);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -406,9 +460,39 @@ const UserCart = asyncHandler(async (req, res) => {
 
 const emptyCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
+    const { id } = req.params;
     try {
         const user = await User.findOne({ _id });
-        const cart = await Cart.findOneAndDelete({ orderby: user._id });
+        const cart = await Cart.findOne({ orderby: user._id });
+
+        if (!cart) {
+            return res.status(404).json({ message: "Cart not found" });
+        }
+
+        // Find the index of the product in the products array
+        const productIndex = cart.products.findIndex(
+            (product) => product.product.toString() === id
+        );
+
+        if (productIndex === -1) {
+            return res.status(404).json({ message: "Product not found in cart" });
+        }
+
+        // Remove the product from the products array
+        cart.products.splice(productIndex, 1);
+
+        // Recalculate cartTotal after removing the product
+        let cartTotal = 0;
+        cart.products.forEach((product) => {
+            cartTotal += product.price * product.count;
+        });
+
+        // Update cartTotal in the cart document
+        cart.cartTotal = cartTotal;
+
+        // Save the updated cart
+        await cart.save();
+
         res.json(cart);
     } catch (error) {
         throw new Error(error);

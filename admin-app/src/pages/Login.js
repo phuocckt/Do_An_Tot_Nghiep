@@ -25,7 +25,7 @@ const Login = () => {
       email: '',
       password: ''
     },
-    validationSchema: schema,
+    validationSchema: schema, 
     onSubmit: values => {
       dispatch(login(values))
     },
