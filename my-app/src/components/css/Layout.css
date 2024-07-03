@@ -64,3 +64,16 @@ footer .input-group-text{
     padding: 8px 17px;
     font-weight: bold;
 }
+/* /// */
+.quantity-cart{
+    color: white;
+    position: absolute;
+    top: 35%;
+    right: 35%;
+    font-size: .7em;
+}
+@media screen and (max-width: 990px) {
+    .quantity-cart{
+        display: none;
+    }
+}

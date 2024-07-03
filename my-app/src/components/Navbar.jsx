@@ -1,62 +1,49 @@
-import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import Headroom from 'react-headroom';// fix nav on top
+import { CiShoppingCart, CiUser } from "react-icons/ci";
+import Headroom from 'react-headroom';
+import './css/Layout.css'
+import { Link } from 'react-router-dom';
 
+function Header() {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userId = user?._id;
 
-function NavScrollExample() {
   return (
-    <>
-    {/* <Headroom> */}
-    <Navbar expand="lg" data-bs-theme="dark" className='bg-dark opacity-75' sticky='top'>
-      <Container fluid>
-        <Navbar.Brand href="#">Navbar scroll</Navbar.Brand>
-        <Navbar.Toggle aria-controls="navbarScroll" />
-        <Navbar.Collapse id="navbarScroll">
-          <Nav
-            className="me-auto my-2 my-lg-0"
-            style={{ maxHeight: '100px' }}
-            navbarScroll
-          >
-            <Nav.Link href="#action1">Home</Nav.Link>
-            <Nav.Link href="#action2">Link</Nav.Link>
-            <NavDropdown title="Link" id="navbarScrollingDropdown">
-              <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action4">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action5">
-                Something else here
-              </NavDropdown.Item>
-            </NavDropdown>
-            <Nav.Link href="#" disabled>
-              Link
-            </Nav.Link>
-          </Nav>
-          <Form className="d-flex">
-            <Form.Control
-              type="search"
-              placeholder="Search"
-              className="me-2"
-              aria-label="Search"
-            />
-            <Button variant="outline-success">Search</Button>
-          </Form>
-        </Navbar.Collapse>
-        {/* <Container>
-      <div style={{ backgroundImage: `url(../hinh/bg-nav.png)`, backgroundSize: 'cover', backgroundPosition: 'center', height: '90vh' }}></div>
-      </Container> */}
-      </Container>
-      
-    </Navbar>
-    {/* </Headroom> */}
+    <Headroom>
+      <Navbar collapseOnSelect expand="lg" style={{backgroundColor: '#111126',fontWeight:'bold'}}>
+        <Container>
+          <Navbar.Brand href="/" className='text-light'>SHOES SHOP</Navbar.Brand>
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Collapse id="responsive-navbar-nav" className='justify-content-end'>
+            
+            <Nav className='align-items-center'>
+              <Nav.Link className='text-light' href="/">TRANG CHỦ</Nav.Link>
+              <Nav.Link className='text-light' href="/products">SẢN PHẨM</Nav.Link>
+              <Nav.Link className='text-light position-relative' href="/cart">
+                <CiShoppingCart className='fs-1'/>
+                <span className='quantity-cart'>{'00' || '00'}</span>
+              </Nav.Link>
+              <Nav.Link>
+                {
+                    userId == null || user == null?(
+                      <Link className='text-light' to='/login'>ĐĂNG NHẬP</Link>
+                    ):(
+                      <Link className='text-light d-flex align-items-center' to='/account'>
+                        <CiUser className='fs-2'/>
+                        <span>{user.lastname}</span>
+                      </Link>
+                    )
+                }
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </Headroom>
     
-    </>
   );
 }
 
-export default NavScrollExample;
+export default Header;

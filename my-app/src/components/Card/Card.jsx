@@ -1,27 +1,63 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Card.css';
 import { FaHeart, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { SiNike } from "react-icons/si";
-import { Link } from 'react-router-dom';
-import Product from '../../pages/Product';
-
-
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addWishlist } from '../../features/product/productSlice';
+import { useFormik } from 'formik';
 
 function CardProduct(props) {
   const product = props.product;
+  const users = props.users;
+  const dispatch = useDispatch();
   const [activeFavorite, setActiveFavorite] = useState(false);
+  const [quantity, setQuantity] = useState(0);
 
-  const handleClick = () => {
-    setActiveFavorite(!activeFavorite);
-  }
+  // console.log("user",users)
+  
+
+  const formik = useFormik({
+    initialValues: {
+      prodId: ''
+    },
+    onSubmit: values => {
+      dispatch(addWishlist(values));
+    },
+  });
+  //dem so luot tim
+  const countHearts = (id) => {
+    let count = 0;
+    users.forEach(user => {
+      user.wishlist.forEach(item => {
+        if (item === id) {
+          count += 1;
+        }
+      });
+    });
+    return count;
+  };
+  
+  
+    useEffect(() => {
+      const newQuantity = countHearts(product._id);
+      setQuantity(newQuantity);
+      // countHearts(product._id);
+    }, [product._id, users]);
+
   // Định dạng số tiền theo định dạng tiền tệ Việt Nam
   const CurrencyFormatter = ({ amount }) => {
     const formatter = new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
     });
-  
+
     return <span>{formatter.format(amount)}</span>;
+  };
+
+  const handleFavoriteClick = () => {
+    formik.setFieldValue('prodId', product._id); // Set prodId
+    formik.handleSubmit(); // Submit form
   };
 
   return (
@@ -30,7 +66,12 @@ function CardProduct(props) {
         <img className='card-image' src={product.image[0].url} alt="Ảnh sản phẩm"/>
       </Link>
 
-      <div className={activeFavorite ? 'favorite active-favorite' : 'favorite'} onClick={handleClick}><FaHeart className={activeFavorite ? 'text-danger' : ''}/>22</div> 
+      <form onSubmit={formik.handleSubmit}>
+        <div name="prodId" value={formik.values.prodId}></div> 
+        <button type='button' onClick={handleFavoriteClick} className={activeFavorite ? 'favorite active-favorite' : 'favorite'}>
+          <FaHeart className={activeFavorite ? 'text-danger' : ''}/><span>{quantity}</span>
+        </button>
+      </form>
 
       <div className='brand d-flex align-items-center'><SiNike className='me-1'/>{product.brand.title}</div>
 
@@ -38,7 +79,6 @@ function CardProduct(props) {
         <div className='name truncated-text'>{product.title}</div>
         <div className='d-flex justify-content-between'>
           <h5 className='price'><CurrencyFormatter amount={product.price}/></h5>
-          {/* <h6 className='pb-3'>{props.product.priceOld}</h6> */}
           <ul className='star text-warning'>
             <li><FaStar/></li>
             <li><FaStar/></li>

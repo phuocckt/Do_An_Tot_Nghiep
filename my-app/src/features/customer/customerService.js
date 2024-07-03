@@ -6,8 +6,14 @@ const getUsers = async () => {
     return res.data;
 }
 
+const getUser = async (id) => {
+    const res = await axios.get(`${base_url}user/${id}`);
+    return res.data;
+}
+
 const customerService = {
-    getUsers
+    getUsers,
+    getUser
 }
 
 export default customerService;

@@ -10,9 +10,14 @@ const getProduct = async (id) => {
     const res = await axios.get(`${base_url}products/${id}`);
     return res.data;
 }
+const addWishlist = async (data) => {
+    const res = await axios.put(`${base_url}products/wishlist`, data, config);
+    return res.data;
+}
 const productService = {
     getProducts,
-    getProduct
+    getProduct,
+    addWishlist
 }
 
 export default productService;

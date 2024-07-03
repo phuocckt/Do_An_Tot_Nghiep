@@ -35,6 +35,7 @@
     color: white;
     background-color: gray;
     border-radius: 2em;
+    border: none;
     padding: 5px 12px;
     gap: 5px;
     cursor: pointer;
