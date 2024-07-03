@@ -7,25 +7,30 @@ import { getBrands} from '../features/brand/brandSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from "react";
 import { SiNike, SiAdidas, SiJordan } from "react-icons/si";
+import { getUsers } from "../features/customer/customerSlice";
 
 function Products() {
     const productState = useSelector((state) => state.product.products);
     const brandState = useSelector((state) => state.brand.brands);
+    const userState = useSelector((state) => state.customer.customers);
   
     const [sortProducts, setSortProducts] = useState([]);
     const [brandCurrent, setBrandCurrent] = useState("all");
     const [activeButton, setActiveButton] = useState(null);
-    
-  const dispatch = useDispatch();  
-  const [query, setQuery] = useState('');
+    const [query, setQuery] = useState('');
+
+    const dispatch = useDispatch();  
+  
 
   useEffect(() => {
     dispatch(getProducts());
     dispatch(getBrands());
+    dispatch(getUsers())
   }, [dispatch]);
   useEffect(() => {
     setSortProducts(productState)
   },[productState])
+  
 //   hien icon theo brand
 const iconMap = {
     Nike: SiNike,
@@ -129,7 +134,7 @@ const updateData = () =>{
         <div className="products">
             {sortProducts?.length > 0 ? (
             sortProducts.map(item => (
-                <Card product={item} />
+                <Card product={item} users={userState}/>
             ))
             ) : (
                 <img className="no-data" src="../hinh/nodata.png" alt="no data" />

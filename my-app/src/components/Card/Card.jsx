@@ -1,17 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Card.css';
 import { FaHeart, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { SiNike } from "react-icons/si";
-import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { addWishlist } from '../../features/product/productSlice';
 import { useFormik } from 'formik';
 
 function CardProduct(props) {
   const product = props.product;
-  const user = props.users;
+  const users = props.users;
   const dispatch = useDispatch();
   const [activeFavorite, setActiveFavorite] = useState(false);
+  const [quantity, setQuantity] = useState(0);
+
+  // console.log("user",users)
+  
 
   const formik = useFormik({
     initialValues: {
@@ -19,9 +23,27 @@ function CardProduct(props) {
     },
     onSubmit: values => {
       dispatch(addWishlist(values));
-      setActiveFavorite(!activeFavorite);
     },
   });
+  //dem so luot tim
+  const countHearts = (id) => {
+    let count = 0;
+    users.forEach(user => {
+      user.wishlist.forEach(item => {
+        if (item === id) {
+          count += 1;
+        }
+      });
+    });
+    return count;
+  };
+  
+  
+    useEffect(() => {
+      const newQuantity = countHearts(product._id);
+      setQuantity(newQuantity);
+      // countHearts(product._id);
+    }, [product._id, users]);
 
   // Định dạng số tiền theo định dạng tiền tệ Việt Nam
   const CurrencyFormatter = ({ amount }) => {
@@ -47,7 +69,7 @@ function CardProduct(props) {
       <form onSubmit={formik.handleSubmit}>
         <div name="prodId" value={formik.values.prodId}></div> 
         <button type='button' onClick={handleFavoriteClick} className={activeFavorite ? 'favorite active-favorite' : 'favorite'}>
-          <FaHeart className={activeFavorite ? 'text-danger' : ''}/>
+          <FaHeart className={activeFavorite ? 'text-danger' : ''}/><span>{quantity}</span>
         </button>
       </form>
 

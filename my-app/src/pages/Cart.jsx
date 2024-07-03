@@ -61,10 +61,10 @@ function Cart() {
                         <div className="cart-card d-block">
                             {cartState.products.map(item => (
                                 <div key={item.product._id} className="cart-item">
-                                    <div className="cart-product-info">
                                         <Link to={`/product/${item.product._id}`}>
-                                            <img className='product-img' width={100} height={100} src={item.product.image[0].url} alt="Product" />
+                                            <img className='product-img' width={150} height={200} src={item.product.image[0].url} alt="Product" />
                                         </Link>
+                                    <div className="cart-product-info w-100">
                                         <div className="cart-product-content">
                                             <h5 className="cart-product-name">{item.product.title}</h5>
                                             <div className="cart-product-price"><CurrencyFormatter amount={item.price}/>/1</div>

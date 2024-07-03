@@ -15,6 +15,12 @@ h5,h3, p{
     color: white;
     padding: 10px 20px;
 }
+.cart-item{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid gray;
+}
 .cart-card{
     width: 100%;
     display: grid;
