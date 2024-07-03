@@ -4,10 +4,13 @@ import Navbar from 'react-bootstrap/Navbar';
 import { CiShoppingCart, CiUser } from "react-icons/ci";
 import Headroom from 'react-headroom';
 import './css/Layout.css'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 function Header() {
-  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+  const user = useSelector( state => state.auth.user);
   const userId = user?._id;
 
   return (

@@ -13,6 +13,7 @@ const { sendEmail } = require("./emailCtrl");
 const crypto = require("crypto");
 const uniqid = require('uniqid');
 const { cloudinaryUploadImg } = require("../utils/cloudinary");
+const bcrypt = require('bcryptjs');
 
 //đăng kí user
 const createUser = asyncHandler(async (req, res) => {
@@ -122,7 +123,7 @@ const getallUsers = asyncHandler(async (req, res) => {
 const getAUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
     try {
-        const getUser = await User.findById(id);
+        const getUser = await User.findById(id).populate("wishlist").exec();
         res.json(getUser);
     } catch(error) {
         throw new Error(error);
@@ -182,7 +183,8 @@ const updateAUser = asyncHandler(async (req, res) => {
             firstname: req?.body?.firstname,
             lastname: req?.body?.lastname,
             email: req?.body?.email,
-            mobile: req?.body?.mobile
+            mobile: req?.body?.mobile,
+            address:req?.body?.address
             },
             {
                 new: true
@@ -247,15 +249,29 @@ const unBlockUser = asyncHandler(async (req, res) => {
 // thay đổi mật khẩu
 const updatePassword = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-    const password = req.body.password;
-    //validateMongodbId(_id);
+    const { oldPassword, newPassword } = req.body;
+
     const user = await User.findById(_id);
-    if (password) {
-        user.password = password; // gán giá trị password vào password trong user
-        const updatePassword = await user.save(); //lưu
-        res.json(updatePassword);
+    if (!user) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    // Kiểm tra xem mật khẩu cũ có đúng không
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+        res.status(400);
+        throw new Error('Mật khẩu cũ không đúng');
+    }
+
+    // Nếu mật khẩu cũ đúng, cập nhật mật khẩu mới
+    if (newPassword) {
+        user.password = newPassword;
+        const updatedUser = await user.save();
+        res.json(updatedUser);
     } else {
-        res.json(user);
+        res.status(400);
+        throw new Error('Mật khẩu mới không được bỏ trống');
     }
 });
 

@@ -1,18 +1,24 @@
 import "./css/Account.css";
 import { logout } from '../features/auth/authSlice';
 import Swal from 'sweetalert2';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Row from 'react-bootstrap/Row';
+import { useEffect } from "react";
+import { getOrders } from "../features/order/orderSlice";
 
 function Account() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
+  useEffect(() => {
+    dispatch(getOrders());
+  },[dispatch]);
+  const orderState = useSelector(state => state.order.orders);
 
   const handleLogout = () =>{
     Swal.fire({
@@ -57,6 +63,18 @@ function Account() {
                       <Button variant=""></Button>
                     </div>
                     <div className="p-5 pt-3">
+                      {
+                        orderState.map(item => {
+                          return (
+                            <p>{item._id}</p>
+                            // item.products.map(i => {
+                            //   return(
+                            //     <p>{i.product.title}</p>
+                            //   )
+                            // })
+                          )
+                        })
+                      }
                         <p className="mb-3">Bạn chưa có lịch sử mua hàng</p>
                         <Link to='/cart'><Button variant="success">Kiểm tra giỏ hàng</Button></Link>
                     </div>

@@ -21,7 +21,7 @@ router.get('/all-orders-user', authMiddleware, getAllOrders);
 router.get('/refresh', handleRefreshToken);
 router.get('/logout', logout);
 router.get('/carts', authMiddleware, UserCart);
-router.get('/:id', authMiddleware, isAdmin, getAUser);
+router.get('/:id', authMiddleware, getAUser);
 router.delete('/empty-cart/:id', authMiddleware, emptyCart);
 router.delete('/:id', deleteAUser);
 router.put('/edit-user', authMiddleware, updateAUser);

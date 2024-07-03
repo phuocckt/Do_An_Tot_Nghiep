@@ -4,7 +4,7 @@ import { FaHeart, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { SiNike } from "react-icons/si";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { addWishlist } from '../../features/product/productSlice';
+import { addWishlist, getProducts } from '../../features/product/productSlice';
 import { useFormik } from 'formik';
 
 function CardProduct(props) {

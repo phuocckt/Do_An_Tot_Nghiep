@@ -1,5 +1,6 @@
 import axios from "axios";
 import { base_url } from "../../utils/base_url";
+import { config } from "../../utils/axiosconfig";
 
 const getUsers = async () => {
     const res = await axios.get(`${base_url}user/all-users`);
@@ -7,13 +8,25 @@ const getUsers = async () => {
 }
 
 const getUser = async (id) => {
-    const res = await axios.get(`${base_url}user/${id}`);
+    const res = await axios.get(`${base_url}user/${id}`, config);
+    return res.data;
+}
+
+const updateUser = async (data) => {
+    const res = await axios.put(`${base_url}user/edit-user`, data, config);
+    return res.data;
+}
+
+const updatePassword = async (data) => {
+    const res = await axios.put(`${base_url}user/password`, data, config);
     return res.data;
 }
 
 const customerService = {
     getUsers,
-    getUser
+    getUser,
+    updateUser,
+    updatePassword
 }
 
 export default customerService;

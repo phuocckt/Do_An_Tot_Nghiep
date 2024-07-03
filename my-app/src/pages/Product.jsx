@@ -70,14 +70,18 @@ function ProductDetail() {
                         `,
                         icon: "success",
                         showCancelButton: false,
-                        showConfirmButton: false,
+                        showConfirmButton: false
                     });
                 })
                 .catch(() => {
                     Swal.fire({
-                        title: "Thêm thất bại!",
+                        title: "Vui lòng đăng nhập",
+                        html: `
+                            <a class="btn btn-warning" href="/login">Đăng nhập</a>
+                        `,
                         icon: "error",
-                        confirmButtonText: "OK",
+                        showCancelButton: false,
+                        showConfirmButton: false
                     });
                 });
         },
@@ -168,6 +172,7 @@ function ProductDetail() {
                                 />
                                 {formik.errors.count && formik.touched.count && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.count}</p>}
                             </div>
+                            <p>{productState.quantity}</p>
                             <button type="submit">Add to Bag</button>
                         </form>
                         <button className={activeFavorite ? 'active-favorite' : 'favorite'} onClick={handleClickFavorite}>
