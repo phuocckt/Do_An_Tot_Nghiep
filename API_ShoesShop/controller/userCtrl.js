@@ -522,7 +522,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
     res.json(totalAfterDiscount);
 });
 
-const createOrder = asyncHandler(async (req, res) => {
+const createCashOrder = asyncHandler(async (req, res) => {
     const { COD, couponApplied } = req.body;
     const { _id } = req.user;
     try {
@@ -545,12 +545,12 @@ const createOrder = asyncHandler(async (req, res) => {
                 id: uniqid(),
                 method: "COD",
                 amount: finalAmount,
-                status: "Cash on Delivery",
+                status: "Pending",
                 created: Date.now(),
                 currency: "vnd"
             },
             orderby: user._id,
-            orderStatus: "Cash on Delivery"
+            orderStatus: "Pending"
         }).save();
 
         let update = userCart.products.map( item => {
@@ -563,6 +563,62 @@ const createOrder = asyncHandler(async (req, res) => {
         });
         const updated = await Product.bulkWrite(update, {});
         await Cart.deleteOne({ orderby: user._id });
+        res.json(newOrder);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+const createOnOrder = asyncHandler(async (req, res) => {
+    const { Bank, couponApplied, paymentConfirmed } = req.body; // Assume paymentConfirmed indicates if the payment was successful
+    const { _id } = req.user;
+    try {
+        if (!Bank) throw new Error("Create online order failed");
+        const user = await User.findById(_id);
+        const userCart = await Cart.findOne({ orderby: user._id });
+        let finalAmount = couponApplied && userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
+
+        // Check stock availability for each product in the cart
+        for (let item of userCart.products) {
+            let product = await Product.findById(item.product._id);
+            if (!product) throw new Error(`Product with ID ${item.product._id} not found`);
+            if (product.quantity < item.count) {
+                throw new Error(`Insufficient stock for product ${product.title}`);
+            }
+        }
+
+        // Determine the initial order status based on payment confirmation
+        let orderStatus = paymentConfirmed ? "Pending" : "Unpaid";
+
+        // Create the new order
+        let newOrder = await new Order({
+            products: userCart.products,
+            paymentIntent: {
+                id: uniqid(),
+                method: "Bank",
+                amount: finalAmount,
+                status: paymentConfirmed ? "Paid" : "Unpaid",
+                created: Date.now(),
+                currency: "vnd"
+            },
+            orderby: user._id,
+            orderStatus: orderStatus
+        }).save();
+
+        // Update product stock quantities and sold counts
+        let update = userCart.products.map(item => {
+            return {
+                updateOne: {
+                    filter: { _id: item.product._id },
+                    update: { $inc: { quantity: -item.count, sold: +item.count } }
+                }
+            };
+        });
+        await Product.bulkWrite(update, {});
+
+        // Clear the user's cart
+        await Cart.deleteOne({ orderby: user._id });
+
         res.json(newOrder);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -592,21 +648,29 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
     const { id }  = req.params;
     const { status } = req.body;
     try {
-        const updateOrderStatus = await Order.findByIdAndUpdate(
-            id,
-            {
-                orderStatus: status,
-                paymentIntent: {
-                    status: status
-                }
-            },
-            {
-                new: true
+        const order = await Order.findById(id).populate('products.product');
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Update product quantities and sold counts if the order is cancelled
+        if (status === "Cancelled" && order.orderStatus !== "Cancelled") {
+            for (const item of order.products) {
+                const product = item.product;
+                product.quantity += item.count;
+                product.sold -= item.count;
+                await product.save();
             }
-        );
-        res.json(updateOrderStatus)
+        }
+
+        // Update the order status
+        order.orderStatus = status;
+        order.paymentIntent.status = status;
+        await order.save();
+
+        res.json(order);
     } catch (error) {
-        throw new Error(error);
+        res.status(500).json({ message: error.message });
     }
 });
 
@@ -662,7 +726,8 @@ module.exports = {
     UserCart,
     emptyCart,
     applyCoupon,
-    createOrder,
+    createCashOrder,
+    createOnOrder,
     getOrders,
     getAllOrders,
     updateOrderStatus,

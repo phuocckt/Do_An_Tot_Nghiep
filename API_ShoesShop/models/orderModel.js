@@ -16,9 +16,9 @@ var orderSchema = new mongoose.Schema({
     paymentIntent: {},
     orderStatus: {
         type: String,
-        default: "Not Processed",
+        default: "Pending",
         enum: [
-            "Not Processed",
+            "Unpaid",
             "Pending",
             "Shipping",
             "Cancelled",
