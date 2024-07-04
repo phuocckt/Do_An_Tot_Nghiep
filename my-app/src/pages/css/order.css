@@ -1,15 +1,15 @@
 .order-item {
     border: 1px solid #ddd;
-    padding: 20px;
-    margin: 20px;
+    padding: 1em 3em;
+    padding-top: 3em;
     background-color: #fff;
     border-radius: 5px;
+    margin-bottom: 2em;
 }
 
 .product-details {
     display: flex;
     align-items: center;
-    margin-top: 20px;
 }
 
 .product-image {
@@ -51,16 +51,15 @@
 }
 
 .discounted-price {
-    color: #f30;
+    color: gray;
     font-weight: bold;
-    font-size: 1.5em;
+    font-size: 1.2em;
 }
 
 .order-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
     border-top: 1px solid #ddd;
     padding-top: 10px;
 }
@@ -81,4 +80,7 @@
 .star-rating {
     display: flex;
     gap: 10px;
+}
+.star{
+    cursor: pointer;
 }

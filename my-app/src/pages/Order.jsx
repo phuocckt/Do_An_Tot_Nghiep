@@ -12,6 +12,8 @@ import "./css/order.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { rating } from "../features/product/productSlice";
+import { CurrencyFormatter } from "../components/CurrencyFormatter";
+import { FaStar } from "react-icons/fa";
 
 function Account() {
   const dispatch = useDispatch();
@@ -19,6 +21,11 @@ function Account() {
   const user = useSelector((state) => state.auth.user);
   const [showModal, setShowModal] = useState(false);
   const [currentProdId, setCurrentProdId] = useState(""); // State for storing current product ID
+  const [stars, setStars] = useState(null);
+  const [hover, setHover] = useState(null);
+  const evaluate ={
+    
+  }
 
   useEffect(() => {
     dispatch(getOrders());
@@ -76,14 +83,6 @@ function Account() {
     },
   });
 
-  const formatCurrency = (numb) =>
-    Number(numb).toLocaleString("vi", {
-      style: "currency",
-      currency: "vnd",
-      minimumFractionDigits: 1,
-      maximumFractionDigits: 2,
-    });
-
   return (
     <>
       <div className="account">
@@ -116,14 +115,14 @@ function Account() {
               <Button variant=""></Button>
               <Button variant=""></Button>
             </div>
-            <div className="p-5 pt-3">
+            <div className="pt-3">
               {orderState.map((item) => {
                 return (
                   <div className="order-item" key={item._id}>
                     <div className="product-details d-block">
                       {item.products.map((i) => {
                         return (
-                          <div className="d-flex" key={i.product._id}>
+                          <div className="d-flex mb-3" key={i.product._id}>
                             <img
                               src={i.product.image[0].url}
                               alt="product"
@@ -131,24 +130,24 @@ function Account() {
                             />
                             <div className="product-info">
                               <h3>{i.product.title}</h3>
-                              <p>Kích thước: {i.size}</p>
-                              <p>x{i.count}</p>
-                              {item.orderStatus == "Delivered" ? (
+                              <p>Kích thước: <span className="fw-bold">{i.size}</span></p>
+                              <p>Số lượng: <span className="fw-bold">x{i.count}</span></p>
+                              {item.orderStatus == "Pending" ? (
                                 <button
-                                  className="btn btn-danger"
+                                  className="btn btn-warning"
                                   onClick={() => {
                                     setShowModal(true);
                                     setCurrentProdId(i.product._id);
                                   }}
                                 >
-                                  Đánh Giá
+                                  Đánh giá
                                 </button>
                               ) : (
                                 ""
                               )}
                               {i.product.ratings?.map((rat) => {
                                 return rat.postedby == user._id ? (
-                                  <p>Bạn đã đánh giá sản phẩm này.</p>
+                                  <p className="fst-italic text-danger">Sản phẩm đã được bạn đánh giá {rat.star} sao.</p>
                                 ) : (
                                   ""
                                 );
@@ -157,13 +156,13 @@ function Account() {
                             <div className="product-price">
                               {i.product.priceOld != null ? (
                                 <span className="original-price">
-                                  {formatCurrency(i.product.priceOld)}
+                                  <CurrencyFormatter amount={i.product.priceOld}/>
                                 </span>
                               ) : (
                                 <span className="original-price"></span>
                               )}
                               <span className="discounted-price">
-                                {formatCurrency(i.product.price)}
+                                <CurrencyFormatter amount={i.product.price}/>/1
                               </span>
                             </div>
                           </div>
@@ -173,12 +172,12 @@ function Account() {
 
                     <div className="order-footer">
                       <span>
-                        Thành tiền: {formatCurrency(item.paymentIntent.amount)}
+                        Thành tiền: <CurrencyFormatter className="text-danger fw-bold fs-4" amount={item.paymentIntent.amount}/>
                       </span>
                       <span></span>
                       {item.orderStatus == "Pending" ||
                       item.orderStatus == "Unpaid" ? (
-                        <button className="btn btn-return-refund">
+                        <button className="btn btn-danger">
                           Hủy đơn hàng
                         </button>
                       ) : (
@@ -206,7 +205,7 @@ function Account() {
                 onChange={formik.handleChange}
               />
               <Form.Label>Đánh giá sao</Form.Label>
-              <div className="star-rating">
+              {/* <div className="star-rating">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Form.Check
                     inline
@@ -219,10 +218,34 @@ function Account() {
                     onChange={formik.handleChange}
                   />
                 ))}
+              </div> */}
+              <div className="star-rating">
+                {[...Array(5)].map((star, index) => {
+                  const currentRating = index + 1;
+                  return(
+                    <>
+                      <label>
+                        <input 
+                          type="radio" 
+                          name="star" 
+                          value={stars} 
+                          checked={formik.values.star == stars} 
+                          onChange={formik.handleChange}
+                          className="d-none"
+                          onClick={()=>setStars(currentRating)}
+                        />
+                        <FaStar 
+                          className="fs-2 mb-2 star" 
+                          color={currentRating <= (hover || stars) ? '#ffc107' : '#e4e5e9'}
+                          onMouseEnter={()=>setHover(currentRating)}
+                          onMouseLeave={()=>setHover(null)}
+                        />
+                      </label>
+                    </>
+                  )
+                })}
               </div>
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.star}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.star}</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group controlId="formComment">
@@ -235,13 +258,9 @@ function Account() {
                 onChange={formik.handleChange}
                 isInvalid={formik.errors.comment}
               />
-              <Form.Control.Feedback type="invalid">
-                {formik.errors.comment}
-              </Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">{formik.errors.comment}</Form.Control.Feedback>
             </Form.Group>
-            <Button type="submit" variant="primary" className="mt-3">
-              Gửi đánh giá
-            </Button>
+            <Button type="submit" variant="primary" className="mt-3">Gửi đánh giá</Button>
           </Form>
         </Modal.Body>
       </Modal>

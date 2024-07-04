@@ -8,21 +8,12 @@ import Swal from "sweetalert2";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { createOrder } from "../features/order/orderSlice";
+import { CurrencyFormatter } from "../components/CurrencyFormatter";
 
 function Cart() {
   const dispatch = useDispatch();
   const cartState = useSelector((state) => state.auth.carts);
   const user = useSelector(state => state.auth.user);
-
-  // Định dạng số tiền theo định dạng tiền tệ Việt Nam
-  const CurrencyFormatter = ({ amount }) => {
-    const formatter = new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-
-    return <span>{formatter.format(amount)}</span>;
-  };
 
   useEffect(() => {
     dispatch(getCart());
