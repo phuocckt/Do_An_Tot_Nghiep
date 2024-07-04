@@ -1,5 +1,5 @@
 const express = require("express");
-const { createUser, loginUserCtrl, getallUsers, getAUser, deleteAUser, updateAUser, blockUser, unBlockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, saveAddress, userCart, UserCart, emptyCart, applyCoupon, createCashOrder ,getOrders, updateOrderStatus, getAllOrders, uploadAvatar, createOnOrder} = require("../controller/userCtrl");
+const { createUser, loginUserCtrl, getallUsers, getAUser, deleteAUser, updateAUser, blockUser, unBlockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, saveAddress, userCart, UserCart, emptyCart, applyCoupon, createCashOrder ,getOrders, updateOrderStatus, getAllOrders, uploadAvatar, createOnOrder, getOrdersByUser} = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const { uploadPhoto } = require("../middlewares/uploadImages");
 const router =  express.Router();
@@ -18,6 +18,7 @@ router.post('/cart/online-order', authMiddleware, createOnOrder);
 router.get('/all-users', getallUsers);
 router.get('/all-orders', authMiddleware, getOrders);
 router.get('/all-orders-user', authMiddleware, getAllOrders);
+router.get('/orders-user', authMiddleware, getOrdersByUser);
 router.get('/refresh', handleRefreshToken);
 router.get('/logout', logout);
 router.get('/carts', authMiddleware, UserCart);

@@ -12,6 +12,7 @@ import { createOrder } from "../features/order/orderSlice";
 function Cart() {
   const dispatch = useDispatch();
   const cartState = useSelector((state) => state.auth.carts);
+  const user = useSelector(state => state.auth.user);
 
   // Định dạng số tiền theo định dạng tiền tệ Việt Nam
   const CurrencyFormatter = ({ amount }) => {
@@ -38,7 +39,17 @@ function Cart() {
     },
     validationSchema: schema,
     onSubmit: (values) => {
-        dispatch(createOrder(values))
+      if (!user.address) {
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Người dùng chưa nhập địa chỉ.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      dispatch(createOrder(values))
         .unwrap()
         .then(() => {
           Swal.fire({
@@ -173,12 +184,12 @@ function Cart() {
                 Thanh toán bằng tiền mặt khi nhận hàng
               </label>
               <input
-                  type="hidden"
-                  name="couponApplied"
-                  placeholder="Mã giảm giá"
-                  value={formik.values.couponApplied}
-                  onChange={formik.handleChange}
-                />
+                type="hidden"
+                name="couponApplied"
+                placeholder="Mã giảm giá"
+                value={formik.values.couponApplied}
+                onChange={formik.handleChange}
+              />
             </div>
             <button type="submit">Đặt hàng</button>
           </form>

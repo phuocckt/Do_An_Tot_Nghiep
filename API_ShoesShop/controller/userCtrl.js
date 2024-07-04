@@ -659,6 +659,15 @@ const getAllOrders = asyncHandler(async (req, res) => {
         throw new Error(error);
     }
 });
+const getOrdersByUser = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const getAllOrders = await Order.find({ orderby: _id }).populate("products.product").populate("orderby").exec();
+        res.json(getAllOrders);
+    } catch(error) {
+        throw new Error(error);
+    }
+});
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
     const { id }  = req.params;
@@ -748,5 +757,6 @@ module.exports = {
     getOrders,
     getAllOrders,
     updateOrderStatus,
-    uploadAvatar
+    uploadAvatar,
+    getOrdersByUser
 };

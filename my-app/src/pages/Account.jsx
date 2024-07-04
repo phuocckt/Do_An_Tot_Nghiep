@@ -55,7 +55,7 @@ function Account() {
     lastname: yup.string().required('Lastname is required'),
     email: yup.string().required('Email is required').email('Invalid email format'),
     mobile: yup.string().required('Mobile is required').matches(/^[0-9]+$/, 'Chỉ được nhập kí tự số'),
-    address: yup.string().required('Address is required')
+    address: yup.string()
   });
 
   const formik = useFormik({
@@ -206,7 +206,6 @@ function Account() {
                 <Form.Group as={Col} md="12" controlId="validationCustom01">
                   <Form.Label>Địa chỉ</Form.Label>
                   <Form.Control
-                    required
                     type="text"
                     name="address"
                     placeholder="Địa chỉ"

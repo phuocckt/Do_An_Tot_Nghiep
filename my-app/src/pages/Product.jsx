@@ -8,6 +8,8 @@ import { addToCart } from '../features/auth/authSlice';
 import * as yup from 'yup';
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
+import Comment from '../components/Comment/Comment';
+
 
 function ProductDetail() {
     const [active, setActive] = useState(false);
@@ -112,77 +114,82 @@ function ProductDetail() {
     }
 
     return (
-        <div className="product-detail">
-            <div className="product-images">
-                <div className="images">
+        <>
+            <div className="product-detail">
+                <div className="product-images">
+                    <div className="images">
+                        {productState.image?.map(item => (
+                            <img key={item.url} onClick={handleChange(item)} className='product-img' src={item.url} alt="Ảnh sản phẩm" />
+                        ))}
+                    </div>
+                    <div className="main-image">
+                        <img className='product-img' src={urlImage || productState.image?.[0].url} alt="Ảnh sản phẩm" />
+                    </div>
+                </div>
+
+                <div className="image-carousel">
                     {productState.image?.map(item => (
                         <img key={item.url} onClick={handleChange(item)} className='product-img' src={item.url} alt="Ảnh sản phẩm" />
                     ))}
                 </div>
-                <div className="main-image">
-                    <img className='product-img' src={urlImage || productState.image?.[0].url} alt="Ảnh sản phẩm" />
+
+                <div className="product-info">
+                    <div className="product-content">
+                        <h3 className="pb-3">{productState.title}</h3>
+                        <p name="price"><CurrencyFormatter amount={productState.price}/></p>
+                        <div className="product-color">
+                            {productsState
+                                .filter(item => item.title === productState.title)
+                                .map(item => (
+                                    <Link key={item._id} to={`/product/${item._id}`}>
+                                        <img onClick={handleClick} className='product-img' src={item.image?.[0].url} alt="Ảnh sản phẩm" />
+                                    </Link>
+                                ))
+                            }
+                        </div>
+                        <div className="product-action">
+                            <form onSubmit={formik.handleSubmit}>
+                                <div className="product-size">
+                                    <h5 className="mb-3">Select Size</h5>
+                                    {productState.variants?.map(variant => (
+                                        <span 
+                                            key={variant.size._id} 
+                                            className={selectedSize === variant.size.title ? 'active-color' : ''} 
+                                            onClick={() => handleSizeClick(variant.size.title)}
+                                        >
+                                            {variant.size.title}
+                                        </span>
+                                    ))}
+                                </div>
+                                {formik.errors.size && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.size}</p>}
+                                <div className="product-count">
+                                    <label htmlFor="count">Quantity</label>
+                                    <input
+                                        id="count"
+                                        name="count"
+                                        type="number"
+                                        value={formik.values.count}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        min="1"
+                                    />
+                                    {formik.errors.count && formik.touched.count && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.count}</p>}
+                                </div>
+                                <p>{productState.quantity}</p>
+                                <button type="submit">Add to Bag</button>
+                            </form>
+                            <button className={activeFavorite ? 'active-favorite' : 'favorite'} onClick={handleClickFavorite}>
+                                Favorite {activeFavorite ? <FaHeart className="text-danger" /> : <FaRegHeart />}
+                            </button>
+                        </div>
+                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Delectus voluptatibus sed molestias exercitationem quas soluta consequatur eius aliquid rerum. Eius quas aperiam iste ipsam, ipsa illum excepturi deleniti voluptates numquam?</p>
+                    </div>
                 </div>
             </div>
 
-            <div className="image-carousel">
-                {productState.image?.map(item => (
-                    <img key={item.url} onClick={handleChange(item)} className='product-img' src={item.url} alt="Ảnh sản phẩm" />
-                ))}
-            </div>
-
-            <div className="product-info">
-                <div className="product-content">
-                    <h3 className="pb-3">{productState.title}</h3>
-                    <p name="price"><CurrencyFormatter amount={productState.price}/></p>
-                    <div className="product-color">
-                        {productsState
-                            .filter(item => item.title === productState.title)
-                            .map(item => (
-                                <Link key={item._id} to={`/product/${item._id}`}>
-                                    <img onClick={handleClick} className='product-img' src={item.image?.[0].url} alt="Ảnh sản phẩm" />
-                                </Link>
-                            ))
-                        }
-                    </div>
-                    <div className="product-action">
-                        <form onSubmit={formik.handleSubmit}>
-                            <div className="product-size">
-                                <h5 className="mb-3">Select Size</h5>
-                                {productState.variants?.map(variant => (
-                                    <span 
-                                        key={variant.size._id} 
-                                        className={selectedSize === variant.size.title ? 'active-color' : ''} 
-                                        onClick={() => handleSizeClick(variant.size.title)}
-                                    >
-                                        {variant.size.title}
-                                    </span>
-                                ))}
-                            </div>
-                            {formik.errors.size && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.size}</p>}
-                            <div className="product-count">
-                                <label htmlFor="count">Quantity</label>
-                                <input
-                                    id="count"
-                                    name="count"
-                                    type="number"
-                                    value={formik.values.count}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    min="1"
-                                />
-                                {formik.errors.count && formik.touched.count && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.count}</p>}
-                            </div>
-                            <p>{productState.quantity}</p>
-                            <button type="submit">Add to Bag</button>
-                        </form>
-                        <button className={activeFavorite ? 'active-favorite' : 'favorite'} onClick={handleClickFavorite}>
-                            Favorite {activeFavorite ? <FaHeart className="text-danger" /> : <FaRegHeart />}
-                        </button>
-                    </div>
-                    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Delectus voluptatibus sed molestias exercitationem quas soluta consequatur eius aliquid rerum. Eius quas aperiam iste ipsam, ipsa illum excepturi deleniti voluptates numquam?</p>
-                </div>
-            </div>
-        </div>
+            <Comment product={productState}/>
+        </>
+        
     );
 }
 

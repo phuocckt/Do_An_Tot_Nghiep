@@ -1,0 +1,84 @@
+.order-item {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+}
+
+.product-details {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.product-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-right: 20px;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-info h3 {
+    margin: 0;
+    font-size: 1.2em;
+}
+
+.product-info p {
+    margin: 5px 0;
+}
+
+.btn-return {
+    margin-top: 10px;
+    border: none;
+    background-color: #f8f8f8;
+    color: #000;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.product-price {
+    text-align: right;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.discounted-price {
+    color: #f30;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+.order-footer .btn {
+    border: none;
+    background-color: #f30;
+    color: #fff;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.order-footer .btn-return-refund {
+    background-color: #ddd;
+    color: #000;
+}
+
+.star-rating {
+    display: flex;
+    gap: 10px;
+}
