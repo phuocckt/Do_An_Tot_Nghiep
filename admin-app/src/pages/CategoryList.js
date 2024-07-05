@@ -127,7 +127,7 @@ const Category = () => {
   };
   return (
     <div>
-      <h3>Category</h3>
+      <h3>Loại sản phẩm</h3>
       <div>
         <Table columns={columns} dataSource={data} />
       </div>

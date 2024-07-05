@@ -1,5 +1,6 @@
 const { generateToken } = require("../config/jwtToken");
 const User = require("../models/userModel");
+const Size = require("../models/sizeModel");
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 const Coupon = require("../models/couponModel");
@@ -30,11 +31,11 @@ const createUser = asyncHandler(async (req, res) => {
 
 //đăng nhập
 const loginUserCtrl = asyncHandler(async (req, res) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     // xem thử tài khoản người dùng có tồn tại hay không
     const findUser = await User.findOne({ email }); // tìm kiếm email trong cơ sở dữ liệu
     //Kiểm tra xem tài khoản người dùng có tồn tại và mật khẩu có khớp không
-    if(findUser && (await findUser.isPasswordMatched(password))){ //isPasswordMatched dùng để so sánh mật khẩu
+    if (findUser && (await findUser.isPasswordMatched(password))) { //isPasswordMatched dùng để so sánh mật khẩu
         //Nếu tài khoản và mật khẩu hợp lệ, tạo một token làm mới để cập nhật cho việc xác thực sau này
         const refreshToken = await generateRefreshToken(findUser?._id);
         //Cập nhật token mới vào cơ sở dữ liệu cho người dùng đăng nhập.
@@ -48,9 +49,9 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
             }
         );
         //Gửi một cookie chứa refresh token cho client với thời gian sống là 72 giờ
-        res.cookie("refreshToken", refreshToken,{
+        res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            maxAge: 72 * 60 * 60 *1000
+            maxAge: 72 * 60 * 60 * 1000
         });
         //Gửi phản hồi JSON chứa thông tin người dùng và một token được tạo để sử dụng trong các yêu cầu sau này.
         res.json({
@@ -63,19 +64,19 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
             images: findUser?.images,
             token: generateToken(findUser?._id)
         });
-    } else{
+    } else {
         throw new Error("Invalid Credentials");
     }
 });
 
 // admin đăng nhập
 const loginAdmin = asyncHandler(async (req, res) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     // xem thử tài khoản người dùng có tồn tại hay không
     const findAdmin = await User.findOne({ email }); // tìm kiếm email trong cơ sở dữ liệu
-    if(findAdmin.role !=='admin') throw new Error("Not Authorised");
+    if (findAdmin.role !== 'admin') throw new Error("Not Authorised");
     //Kiểm tra xem tài khoản người dùng có tồn tại và mật khẩu có khớp không
-    if(findAdmin && (await findAdmin.isPasswordMatched(password))){ //isPasswordMatched dùng để so sánh mật khẩu
+    if (findAdmin && (await findAdmin.isPasswordMatched(password))) { //isPasswordMatched dùng để so sánh mật khẩu
         //Nếu tài khoản và mật khẩu hợp lệ, tạo một token làm mới để cập nhật cho việc xác thực sau này
         const refreshToken = await generateRefreshToken(findAdmin?._id);
         //Cập nhật token mới vào cơ sở dữ liệu cho người dùng đăng nhập.
@@ -89,9 +90,9 @@ const loginAdmin = asyncHandler(async (req, res) => {
             }
         );
         //Gửi một cookie chứa refresh token cho client với thời gian sống là 72 giờ
-        res.cookie("refreshToken", refreshToken,{
+        res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            maxAge: 72 * 60 * 60 *1000
+            maxAge: 72 * 60 * 60 * 1000
         });
         //Gửi phản hồi JSON chứa thông tin người dùng và một token được tạo để sử dụng trong các yêu cầu sau này.
         res.json({
@@ -104,17 +105,17 @@ const loginAdmin = asyncHandler(async (req, res) => {
             images: findAdmin?.images,
             token: generateToken(findAdmin?._id)
         });
-    } else{
+    } else {
         throw new Error("Invalid Credentials");
     }
 });
 
 //lấy tất cả user
 const getallUsers = asyncHandler(async (req, res) => {
-    try{
+    try {
         const getUsers = await User.find();
         res.json(getUsers);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -125,12 +126,12 @@ const getAUser = asyncHandler(async (req, res) => {
     try {
         const getUser = await User.findById(id).populate("wishlist").exec();
         res.json(getUser);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
 
-const handleRefreshToken = asyncHandler(async(req, res) => {
+const handleRefreshToken = asyncHandler(async (req, res) => {
     const cookie = req.cookies; //lấy cookie từ request gửi từ client
     //Kiểm tra xem có tồn tại refreshToken trong cookies hay không
     if (!cookie?.refreshToken) throw new Error("No Refresh Token in Cookies");
@@ -177,21 +178,21 @@ const logout = asyncHandler(async (req, res) => {
 // sửa 1 user
 const updateAUser = asyncHandler(async (req, res) => {
     const { _id } = req.user;
-    try{
+    try {
         const getUser = await User.findByIdAndUpdate( // cập nhật thông tin người dùng nếu _id tồn tại
-            _id,{
+            _id, {
             firstname: req?.body?.firstname,
             lastname: req?.body?.lastname,
             email: req?.body?.email,
             mobile: req?.body?.mobile,
-            address:req?.body?.address
-            },
+            address: req?.body?.address
+        },
             {
                 new: true
             }
         );
         res.json(getUser);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -203,7 +204,7 @@ const deleteAUser = asyncHandler(async (req, res) => {
     try {
         const getUser = await User.findByIdAndDelete(id);
         res.json(getUser);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -211,7 +212,7 @@ const deleteAUser = asyncHandler(async (req, res) => {
 const blockUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
     //
-    try{
+    try {
         const block = await User.findByIdAndUpdate(
             id,
             {
@@ -222,7 +223,7 @@ const blockUser = asyncHandler(async (req, res) => {
             }
         );
         res.json(block);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -230,7 +231,7 @@ const blockUser = asyncHandler(async (req, res) => {
 const unBlockUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
     //
-    try{
+    try {
         const unblock = await User.findByIdAndUpdate(
             id,
             {
@@ -241,7 +242,7 @@ const unBlockUser = asyncHandler(async (req, res) => {
             }
         );
         res.json(unblock);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -288,7 +289,7 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
         user.passwordResetToken = token; // Đặt mã thông báo đặt lại
         // Lấy ngày và thời gian hiện tại
         let currentDate = new Date();
-        
+
         // Thêm 7 giờ cho múi giờ UTC+7
         currentDate.setHours(currentDate.getHours() + 7);
 
@@ -338,17 +339,17 @@ const resetPassword = asyncHandler(async (req, res) => {
     const { password } = req.body;
     const { token } = req.params;
 
-    // Tạo mã băm với thuật toán sha256
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     // Tạo ngày hiện tại với múi giờ UTC+7
-    let currentDate = new Date(); 
+    let currentDate = new Date();
     currentDate.setHours(currentDate.getHours() + 7); // Chuyển đổi sang UTC+7
+    const timestamp = currentDate.getTime();
+    const date = new Date(timestamp);
 
     // Tìm user với token và thời gian hết hạn phải lớn hơn thời điểm hiện tại
     const user = await User.findOne({
-        passwordResetToken: hashedToken,
-        passwordResetExpires: { $gte: currentDate.getTime() }
+        passwordResetToken: token,
+        passwordResetExpires: { $gt: date }
     });
 
     if (!user) {
@@ -371,14 +372,14 @@ const saveAddress = asyncHandler(async (req, res) => {
         const saveAddress = await User.findByIdAndUpdate(
             _id,
             {
-                address:req?.body?.address
+                address: req?.body?.address
             },
             {
                 new: true
             }
         );
         res.json(saveAddress);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -389,7 +390,7 @@ const userCart = asyncHandler(async (req, res) => {
 
     try {
         let existingCart = await Cart.findOne({ orderby: _id });
-        
+
         if (existingCart) {
             // If cart exists, update it
             for (let i = 0; i < cart.length; i++) {
@@ -398,7 +399,7 @@ const userCart = asyncHandler(async (req, res) => {
 
                 // Check if product with same title and size exists in cart
                 for (let j = 0; j < existingCart.products.length; j++) {
-                    if (existingCart.products[j].product.toString() === productId && 
+                    if (existingCart.products[j].product.toString() === productId &&
                         existingCart.products[j].size === size) {
                         // Update count if product with same title and size exists
                         existingCart.products[j].count += count;
@@ -527,7 +528,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
         orderby: user._id,
     }).populate("products.product");
     let totalAfterDiscount = (
-        cartTotal - 
+        cartTotal -
         (cartTotal * validCoupon.discount) / 100
     ).toFixed(2);
     await Cart.findOneAndUpdate(
@@ -557,7 +558,7 @@ const createCashOrder = asyncHandler(async (req, res) => {
 
         let newOrder = await new Order({
             products: userCart.products,
-            paymentIntent:{
+            paymentIntent: {
                 id: uniqid(),
                 method: "COD",
                 amount: finalAmount,
@@ -569,11 +570,11 @@ const createCashOrder = asyncHandler(async (req, res) => {
             orderStatus: "Pending"
         }).save();
 
-        let update = userCart.products.map( item => {
+        let update = userCart.products.map(item => {
             return {
                 updateOne: {
                     filter: { _id: item.product._id },
-                    update: { $inc: { quantity: -item.count, sold: +item.count }}
+                    update: { $inc: { quantity: -item.count, sold: +item.count } }
                 }
             };
         });
@@ -646,7 +647,7 @@ const getOrders = asyncHandler(async (req, res) => {
     try {
         const getOrders = await Order.findOne({ orderby: _id }).populate("products.product").exec();
         res.json(getOrders);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -655,7 +656,7 @@ const getAllOrders = asyncHandler(async (req, res) => {
     try {
         const getAllOrders = await Order.find().populate("products.product").populate("orderby").exec();
         res.json(getAllOrders);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
@@ -664,26 +665,42 @@ const getOrdersByUser = asyncHandler(async (req, res) => {
     try {
         const getAllOrders = await Order.find({ orderby: _id }).populate("products.product").populate("orderby").exec();
         res.json(getAllOrders);
-    } catch(error) {
+    } catch (error) {
         throw new Error(error);
     }
 });
 
 const updateOrderStatus = asyncHandler(async (req, res) => {
-    const { id }  = req.params;
+    const { id } = req.params;
     const { status } = req.body;
     try {
-        const order = await Order.findById(id).populate('products.product');
+        const order = await Order.findById(id).populate({
+            path: 'products.product',
+            populate: {
+                path: 'variants.size',
+                model: 'Size'
+            }
+        });
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
-
+        
         // Update product quantities and sold counts if the order is cancelled
-        if (status === "Cancelled" && order.orderStatus !== "Cancelled") {
+        if (status === "Cancelled" && order.orderStatus === "Cancelled") {
             for (const item of order.products) {
                 const product = item.product;
+                const size = item.size;
+                
+                // Find the variant with the correct size and update its quantity
+                const variant = product.variants.find(v => v.size && v.size.title === size);
+                if (variant) {
+                    variant.quantity += item.count;
+                }
+                
+                // Update overall product quantity and sold count
                 product.quantity += item.count;
                 product.sold -= item.count;
+                
                 await product.save();
             }
         }
@@ -701,7 +718,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
 
 const uploadAvatar = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    try {  
+    try {
         const uploader = (path) => cloudinaryUploadImg(path, "images");
         const urls = [];
         const files = req.files;
@@ -709,7 +726,7 @@ const uploadAvatar = asyncHandler(async (req, res) => {
             const { path } = file;
             const newpath = await uploader(path);
             console.log(newpath);
-            urls.push(newpath);        
+            urls.push(newpath);
         }
         const images = urls.map((file) => {
             return file;
@@ -732,12 +749,12 @@ const uploadAvatar = asyncHandler(async (req, res) => {
 });
 
 
-module.exports = { 
-    createUser, 
-    loginUserCtrl, 
-    getallUsers, 
-    getAUser, 
-    deleteAUser, 
+module.exports = {
+    createUser,
+    loginUserCtrl,
+    getallUsers,
+    getAUser,
+    deleteAUser,
     updateAUser,
     blockUser,
     unBlockUser,

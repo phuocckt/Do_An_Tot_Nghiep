@@ -1,7 +1,12 @@
-import React from 'react'
-import { GoArrowDownRight, GoArrowUpRight } from "react-icons/go";
+import React, { useEffect, useState } from 'react';
+import { GoArrowDownRight, GoArrowUpRight } from 'react-icons/go';
 import { Column } from '@ant-design/plots';
 import { Table } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUsers } from '../features/customer/customerSlice';
+import { getProducts } from '../features/product/productSlice';
+import { getOrders } from '../features/order/orderSlice';
+
 const columns = [
   {
     title: 'No.',
@@ -20,74 +25,87 @@ const columns = [
     dataIndex: 'status',
   },
 ];
+
 const data1 = [];
 for (let i = 1; i < 46; i++) {
   data1.push({
     key: i,
     name: `Edward King ${i}`,
-    product: "Jogger",
+    product: 'Jogger',
     status: `Delivering`,
   });
 }
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getUsers());
+    dispatch(getProducts());
+    dispatch(getOrders());
+  }, []);
+
+  const customerState = useSelector((state) => state.customer.customers);
+  const productsState = useSelector((state) => state.product.products);
+  const ordersState = useSelector((state) => state.order.orders);
+
+  const [selectedDay, setSelectedDay] = useState('1');
+  const [selectedMonth, setSelectedMonth] = useState('1');
+  const [selectedYear, setSelectedYear] = useState('2022'); // Change default year as needed
+
+  // Function to handle changes in select boxes
+  const handleSelectChange = (value, type) => {
+    if (type === 'day') {
+      setSelectedDay(value);
+    } else if (type === 'month') {
+      setSelectedMonth(value);
+    } else if (type === 'year') {
+      setSelectedYear(value);
+    }
+  };
+
+  // Logic to calculate and filter data based on selected date
+  const filteredOrders = ordersState.filter((order) => {
+    const orderDate = new Date(order.createdAt);
+    const orderDay = orderDate.getDate().toString();
+    const orderMonth = (orderDate.getMonth() + 1).toString();
+    const orderYear = orderDate.getFullYear().toString();
+
+    return (
+      orderDay === selectedDay &&
+      orderMonth === selectedMonth &&
+      orderYear === selectedYear
+    );
+  });
+
+  // Initial data with all months and sales set to 0
   const data = [
-    {
-      type: 'January',
-      sales: 38,
-    },
-    {
-      type: 'February',
-      sales: 52,
-    },
-    {
-      type: 'March',
-      sales: 61,
-    },
-    {
-      type: 'April',
-      sales: 145,
-    },
-    {
-      type: 'May',
-      sales: 48,
-    },
-    {
-      type: 'Jun',
-      sales: 38,
-    },
-    {
-      type: 'July',
-      sales: 35,
-    },
-    {
-      type: 'August',
-      sales: 67,
-    },
-    {
-      type: 'September',
-      sales: 72,
-    },
-    {
-      type: 'October',
-      sales: 34,
-    },
-    {
-      type: 'November',
-      sales: 82,
-    },
-    {
-      type: 'December',
-      sales: 65,
-    },
+    { type: 'January', sales: 0 },
+    { type: 'February', sales: 0 },
+    { type: 'March', sales: 0 },
+    { type: 'April', sales: 0 },
+    { type: 'May', sales: 0 },
+    { type: 'June', sales: 0 },
+    { type: 'July', sales: 0 },
+    { type: 'August', sales: 0 },
+    { type: 'September', sales: 0 },
+    { type: 'October', sales: 0 },
+    { type: 'November', sales: 0 },
+    { type: 'December', sales: 0 },
   ];
+
+  // Calculate sales for each month from filtered orders
+  filteredOrders.forEach((order) => {
+    const monthIndex = new Date(order.createdAt).getMonth();
+    data[monthIndex].sales += order.products.reduce((total, product) => {
+      return total + (product.count * product.product.price);
+    }, 0);
+  });
+
   const config = {
-    data,
+    data: data,
     xField: 'type',
     yField: 'sales',
-    color: ({ type }) => {
-      return "#ffd333";
-    },
+    color: ({ type }) => '#ffd333',
     label: {
       position: 'middle',
       style: {
@@ -109,54 +127,69 @@ const Dashboard = () => {
         alias: 'Income',
       },
     },
-  }
+  };
+
   return (
     <div>
-      <h3 className='mb-4'>Dashboard</h3>
+      <h3 className='mb-4'>Thống kê</h3>
       <div className='d-flex justify-content-between align-items-center gap-3'>
         <div className='d-flex justify-content-between align-items-end flex-grow-1 bg-white p-3 rounded-3'>
           <div>
-            <p className='desc'>Total</p>
-            <h4 className='mb-0 sub-title'>$1100</h4>
-          </div>
-          <div className='d-flex flex-column align-items-end'>
-            <h6 className='green'><GoArrowUpRight />36%</h6>
-            <p className='mb-0 desc'>Compared to April 2022</p>
+            <p className='desc'>Tổng hạch hàng</p>
+            <h4 className='mb-0 sub-title'>{customerState.length} người dùng</h4>
           </div>
         </div>
         <div className='d-flex justify-content-between align-items-end flex-grow-1 bg-white p-3 rounded-3'>
           <div>
-            <p className='desc'>Total</p>
-            <h4 className='mb-0 sub-title'>$1100</h4>
-          </div>
-          <div className='d-flex flex-column align-items-end'>
-            <h6 className='red'><GoArrowDownRight />36%</h6>
-            <p className='mb-0 desc'>Compared to April 2022</p>
+            <p className='desc'>Tổng sản phẩm</p>
+            <h4 className='mb-0 sub-title'>{productsState.length} sản phẩm</h4>
           </div>
         </div>
         <div className='d-flex justify-content-between align-items-end flex-grow-1 bg-white p-3 rounded-3'>
           <div>
-            <p className='desc'>Total</p>
-            <h4 className='mb-0 sub-title'>$1100</h4>
-          </div>
-          <div className='d-flex flex-column align-items-end'>
-            <h6 className='red'><GoArrowDownRight />36%</h6>
-            <p className='mb-0 desc'>Compared to April 2022</p>
+            <p className='desc'>Tổng số hóa đơn</p>
+            <h4 className='mb-0 sub-title'>{ordersState.length} hóa đơn</h4>
           </div>
         </div>
       </div>
       <div className='mt-4'>
-        <h3 className='mb-4'>Income Statics</h3>
-      </div>
-      <div>
+        <h3 className='mb-4'>Thống kê thu nhập</h3>
+        <div className='mb-3'>
+          <select
+            value={selectedDay}
+            onChange={(e) => handleSelectChange(e.target.value, 'day')}
+          >
+            {[...Array(31)].map((_, index) => (
+              <option key={index + 1} value={index + 1}>
+                {index + 1}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedMonth}
+            onChange={(e) => handleSelectChange(e.target.value, 'month')}
+          >
+            {[...Array(12)].map((_, index) => (
+              <option key={index + 1} value={index + 1}>
+                {index + 1}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedYear}
+            onChange={(e) => handleSelectChange(e.target.value, 'year')}
+          >
+            {[...Array(new Date().getFullYear() - 2019)].map((_, index) => (
+              <option key={2020 + index} value={2020 + index}>
+                {2020 + index}
+              </option>
+            ))}
+          </select>
+        </div>
         <Column {...config} />
       </div>
-      <div className='mt-4'>
-        <h3 className='mb-4'>Recent Orders</h3>
-          <div><Table columns={columns} dataSource={data1} /></div>
-      </div>
     </div>
-  )
-}
+  );
+};
 
 export default Dashboard;

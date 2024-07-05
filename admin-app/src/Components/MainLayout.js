@@ -65,81 +65,81 @@ const MainLayout = () => {
             {
               key: '',
               icon: <AiOutlineDashboard className='fs-4' />,
-              label: 'Dashboard',
+              label: 'Thống kế',
             },
             {
               key: 'customers',
               icon: <CiUser className='fs-4' />,
-              label: 'Customers',
+              label: 'Khách hàng',
             },
             {
               key: 'Product Management',
               icon: <AiOutlineShoppingCart className='fs-4' />,
-              label: 'Product Management',
+              label: 'Quản lí sản phẩm',
               children: [
                 {
                   key: 'add-product',
                   icon: <BsCartPlus className='fs-4' />,
-                  label: 'Add Product',
+                  label: 'Thêm sản phẩm',
                 },
                 {
                   key: 'product',
                   icon: <CiViewList className='fs-4' />,
-                  label: 'Product List',
+                  label: 'Danh sách sản phẩm',
                 },
                 {
                   key: 'add-brand',
                   icon: <BsCartPlus className='fs-4' />,
-                  label: 'Add Brand',
+                  label: 'Thêm thương hiệu',
                 },
                 {
                   key: 'brand-list',
                   icon: <SiBrandfolder className='fs-4' />,
-                  label: 'Brand List',
+                  label: 'Danh sách thương hiệu',
                 },
                 {
                   key: 'add-category',
                   icon: <BsCartPlus className='fs-4' />,
-                  label: 'Add Category',
+                  label: 'Thêm loại sản phẩm',
                 },
                 {
                   key: 'category-list',
                   icon: <BiCategoryAlt className='fs-4' />,
-                  label: 'Category List',
+                  label: 'Danh sách loại sản phẩm',
                 },
                 {
                   key: 'add-size',
                   icon: <BsCartPlus className='fs-4' />,
-                  label: 'Add Size',
+                  label: 'Thêm kích thước',
                 },
                 {
                   key: 'size-list',
                   icon: <BiFontSize className='fs-4' />,
-                  label: 'Size List',
+                  label: 'Danh sách kích thước',
                 }
               ]
             },
             {
               key: 'Marketing',
               icon: <ImBullhorn className='fs-4' />,
-              label: 'Marketing',
+              label: 'Khuyến mãi',
               children: [
                 {
                   key: 'add-coupon',
                   icon: <BsCartPlus className='fs-4' />,
-                  label: 'Add Coupon',
+                  label: 'Thêm mã khuyến mãi',
                 },
                 {
                   key: 'coupon-list',
                   icon: <RiCoupon2Fill className='fs-4' />,
-                  label: 'Coupon List',
+                  label: 'Danh sách mã khuyến mãi',
                 }
               ]
             },
             {
               key: 'orders',
               icon: <FaClipboardList className='fs-4' />,
-              label: 'Orders',
+              label: 'Đơn hàng',
             }
           ]}
         />
@@ -180,14 +180,14 @@ const MainLayout = () => {
                     style={{ height: "auto", lineHeight: "20px"}}
                     to="profile"  
                   >
-                    View Profile
+                    Xem thông tin cá nhân
                   </Link>  
                   <Link 
                     className='dropdown-item py-1 mb-1'
                     style={{ height: "auto", lineHeight: "20px"}}
                     onClick={handleLogout}
                   >
-                    Signout
+                    Đăng xuất
                   </Link> 
                 </li>
               </div>

@@ -80,7 +80,7 @@ const Coupons = () => {
     };
     return (
         <div>
-            <h3>Sizes</h3>
+            <h3>Mã giảm giá</h3>
             <div>
                 <Table columns={columns} dataSource={data} />
             </div>

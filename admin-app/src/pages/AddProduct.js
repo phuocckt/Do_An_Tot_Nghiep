@@ -20,35 +20,35 @@ import ClipLoader from 'react-spinners/ClipLoader';
 const { Option } = Select;
 
 const schema = yup.object().shape({
-    title: yup.string().required('Title is required'),
+    title: yup.string().required('Tên sản phẩm không được để trống'),
     description: yup.string(),
     priceOld: yup.number()
-        .typeError('Price must be a number')
-        .positive('Price must be a positive number')
-        .integer('Price must be an integer'),
+        .typeError('Giá tiền không được để trống')
+        .positive('Giá tiền chỉ được nhập số')
+        .integer('Giá tiền phải là số nguyên'),
     price: yup.number()
-        .required('Price is required')
-        .typeError('Price must be a number')
-        .positive('Price must be a positive number')
-        .integer('Price must be an integer'),
-    brand: yup.string().required('Brand is required'),
-    category: yup.string().required('Category is required'),
+        .required('Giá tiền không được để trống')
+        .typeError('Giá tiền chỉ được nhập số')
+        .positive('Giá tiền phải là số dương')
+        .integer('Giá tiền phải là số nguyên'),
+    brand: yup.string().required('Vui lòng chọn thương hiệu'),
+    category: yup.string().required('Vui lòng chọn loại sản phẩm'),
     variants: yup.array().of(
         yup.object().shape({
-            size: yup.string().required('Size is required'),
+            size: yup.string().required('Vui lòng chọn kích thước'),
             quantity: yup.number()
-                .required('Quantity is required')
-                .typeError('Quantity must be a number')
-                .positive('Quantity must be a positive number')
-                .integer('Quantity must be an integer')
+                .required('Số lượng không được để trống')
+                .typeError('Số lượng phải là số')
+                .positive('Số lượng bắt buộc là số dương')
+                .integer('Sô lượng phải là số nguyên')
         })
-    ).min(1, 'At least one variant is required').required('Variants are required'),
-    image: yup.array().min(1, 'Image is required').required('Image is required'),
+    ).min(1, 'Cần có ít nhất một biến thể').required('Biến thể không được để trống'),
+    image: yup.array().min(1, 'Vui lòng nhập ảnh').required('Vui lòng nhập ảnh'),
     quantity: yup.number()
-        .typeError('Quantity must be a number')
-        .positive('Quantity must be a positive number')
-        .integer('Quantity must be an integer')
-        .required('Total quantity is required')
+        .required('Số lượng không được để trống')
+        .typeError('Số lượng phải là số')
+        .positive('Số lượng bắt buộc là số dương')
+        .integer('Sô lượng phải là số nguyên')
 });
 
 function AddProduct() {

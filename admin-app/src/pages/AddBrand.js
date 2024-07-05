@@ -40,7 +40,7 @@ function AddBrand() {
     });
     return (
         <div>
-            <h3 className='mb-4 title'>Add Brand</h3>
+            <h3 className='mb-4 title'>Thêm thương hiệu</h3>
             <div className=''>
                 <form onSubmit={formik.handleSubmit}>
                     <CustomerInput

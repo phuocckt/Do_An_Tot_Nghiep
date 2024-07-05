@@ -130,7 +130,7 @@ const Brand = () => {
 
   return (
     <div>
-      <h3>Brands</h3>
+      <h3>Thương hiệu</h3>
       <div>
         <Table columns={columns} dataSource={data} />
       </div>

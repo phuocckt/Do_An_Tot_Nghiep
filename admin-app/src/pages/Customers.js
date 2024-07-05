@@ -41,7 +41,7 @@ for (let i = 0; i < customerState.length; i++) {
 }
   return (
     <div>
-      <h3>Customers</h3>
+      <h3>Khách hàng</h3>
       <div>
         <Table columns={columns} dataSource={data} />
       </div>
