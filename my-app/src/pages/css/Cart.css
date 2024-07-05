@@ -4,7 +4,12 @@ h5,h3, p{
 .cart{
     display: flex;
     padding: 2em 3em;
-    gap: 25px;
+    gap: 3em;
+}
+.right-cart{
+    background-color: gray;
+    padding: 2em 1em;
+    color: white;
 }
 .cart-products{
     width: 60%;
@@ -26,7 +31,7 @@ h5,h3, p{
     display: grid;
     grid-template-columns: 200px auto;
     gap: 20px;
-    border-bottom: 1px solid gray;
+    /* border-bottom: 1px solid gray; */
     padding: 25px 0;
 }
 .cart-product-info{
@@ -35,7 +40,9 @@ h5,h3, p{
     border-radius: 1em;
 }
 .cart .product-img{
-    width: 100%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
 }
 .cart-product-content{
     display: flex;

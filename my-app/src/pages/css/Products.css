@@ -27,9 +27,8 @@
     background-color: white;
     letter-spacing: 1px;
     font-weight: bold;
-    text-transform: uppercase;
     box-shadow: 0 4px gray;
-    z-index: 9999 !important;
+    z-index: 9999!important;
     position: relative;
 }
 .sortby:hover{
@@ -37,11 +36,10 @@
     border: 1px solid gray;
 }
 .sortby-items{
-    padding: 0.5em 1.5em;
+    padding: 0.5em 1.6em;
     border: 1px solid gray;
     border-radius: 1.5em;
     background-color: white;
-    letter-spacing: 1px;
     font-weight: bold;
     transform: translateY(4%)!important;
     padding-top: 2.2em;

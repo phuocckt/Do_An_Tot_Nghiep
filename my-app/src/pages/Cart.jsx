@@ -85,11 +85,11 @@ function Cart() {
   return (
     <div className="cart">
       <div className="cart-products">
-        <div className="delivery">
+        {/* <div className="delivery">
           <h5>FREE DELIVERY</h5>
           <p>Applies to orders of 5.000.000₫ or more.</p>
-        </div>
-        <h3 className="py-3">Giỏ hàng</h3>
+        </div> */}
+        <h3 className="py-3 right-cart">Giỏ hàng</h3>
         {!cartState || !cartState.products ? (
           <p>Giỏ hàng đang trống...</p>
         ) : (
@@ -99,7 +99,7 @@ function Cart() {
                 <div key={item.product._id} className="cart-item">
                   <Link to={`/product/${item.product._id}`}>
                     <img
-                      className="product-img"
+                      className="product-img me-3"
                       width={150}
                       height={200}
                       src={item.product.image[0].url}
@@ -111,7 +111,7 @@ function Cart() {
                       <h5 className="cart-product-name">
                         {item.product.title}
                       </h5>
-                      <div className="cart-product-price">
+                      <div className="cart-product-price text-danger">
                         <CurrencyFormatter amount={item.price} />
                         /1
                       </div>
@@ -119,12 +119,12 @@ function Cart() {
                     <div className="cart-product-select">
                       <div className="size">
                         <label style={{ color: "black" }}>
-                          Size: {item.size}
+                          Kích thước: <span className="fw-bold">{item.size}</span>
                         </label>
                       </div>
                       <div className="quantity ms-3">
                         <label style={{ color: "black" }}>
-                          Quantity: {item.count}
+                          Số lượng: <span className="fw-bold">x{item.count}</span>
                         </label>
                       </div>
                       <button
@@ -142,45 +142,52 @@ function Cart() {
         )}
       </div>
       <div className="cart-invoice">
-        <h3 className="py-4">Summary</h3>
+        <h3 className="py-3">Thông tin thanh toán</h3>
         <div className="invoice-info">
           <div className="subtotal">
-            <p>Subtotal</p>
+            <p>Tổng tiền:</p>
             <p>
               <CurrencyFormatter amount={cartState ? cartState.cartTotal : 0} />
             </p>
           </div>
-          <div className="invoice-delivery">
-            <p>Estimated Delivery & Handling</p>
-            <p>Free</p>
+          <div className="invoice-delivery align-items-center">
+            <p>Voucher giảm giá:</p>
+            <input type="text" className="py-1 px-2" placeholder="Nhập voucher"/>
           </div>
           <div className="total">
-            <p>Total</p>
+            <p>Thành tiền:</p>
             <p>
               <CurrencyFormatter amount={cartState ? cartState.cartTotal : 0} />
             </p>
           </div>
         </div>
         <div className="invoice-action">
+          <p className="fw-bold mb-1">Hình thức thanh toán:</p>
           <form onSubmit={formik.handleSubmit}>
-            <div className="payment-method">
-              <label>
+            <div className="payment-method mb-3 ps-3">
+              <div>
                 <input
                   type="radio"
                   name="COD"
                   value={true}
                   checked={formik.values.COD === true}
                   onChange={() => formik.setFieldValue('COD', true)}
+                  className="me-2"
                 />
-                Thanh toán bằng tiền mặt khi nhận hàng
-              </label>
-              <input
-                type="hidden"
-                name="couponApplied"
-                placeholder="Mã giảm giá"
-                value={formik.values.couponApplied}
-                onChange={formik.handleChange}
-              />
+                <span>Thanh toán khi nhận hàng</span>
+              </div>
+              <div className="d-none">
+                <input
+                  type="radio"
+                  name="couponApplied"
+                  placeholder="Mã giảm giá"
+                  value={formik.values.couponApplied}
+                  onChange={formik.handleChange}
+                  className="me-2"
+                />
+                Thanh toán trước bằng ngân hàng
+              </div>
+              
             </div>
             <button type="submit">Đặt hàng</button>
           </form>

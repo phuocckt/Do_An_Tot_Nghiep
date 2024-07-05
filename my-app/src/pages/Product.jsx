@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./css/ProductDetail.css";
 import { FaChevronDown, FaChevronUp, FaRegHeart, FaHeart } from "react-icons/fa";
-import { getProduct, getProducts } from '../features/product/productSlice';
+import { addWishlist, getProduct, getProducts } from '../features/product/productSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from "react-router-dom";
 import { addToCart } from '../features/auth/authSlice';
@@ -9,6 +9,8 @@ import * as yup from 'yup';
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
 import Comment from '../components/Comment/Comment';
+import { CurrencyFormatter } from "../components/CurrencyFormatter";
+import { getUser } from "../features/customer/customerSlice";
 
 
 function ProductDetail() {
@@ -17,23 +19,43 @@ function ProductDetail() {
     const [urlImage, setUlrImage] = useState(null);
     const [selectedSize, setSelectedSize] = useState(null);  // State to track selected size
     const { id } = useParams();
+    const user = useSelector( state => state.auth.user);
+    const user2 = useSelector( state => state.customer.customer);
     const dispatch = useDispatch();
     
-    const CurrencyFormatter = ({ amount }) => {
-        const formatter = new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-        });
-        return <span>{formatter.format(amount)}</span>;
-    };
-
     useEffect(() => {
         dispatch(getProducts());
         dispatch(getProduct(id));
+        // dispatch(getUser(user._id));
     }, [dispatch, id]);
 
     const productState = useSelector((state) => state.product.product);
     const productsState = useSelector((state) => state.product.products);
+
+    const [value, setValue] = useState(0);
+
+  const increment = () => {
+    setValue(prevValue => (prevValue < productState.quantity ? prevValue + 1 : productState.quantity));
+  };
+
+  const decrement = () => {
+    setValue(prevValue => (prevValue > 0 ? prevValue - 1 : 0));
+  };
+
+    const formikFavorite = useFormik({
+    initialValues: {
+      prodId: ''
+    },
+    onSubmit: values => {
+      dispatch(addWishlist(values));
+    },
+  });
+
+  const handleFavoriteClick = () => {
+    formikFavorite.setFieldValue('prodId', productState._id);
+    formikFavorite.handleSubmit(); 
+    setActiveFavorite(!activeFavorite);
+  };
 
     const schema = yup.object().shape({
         size: yup.string().required('Size is required'),
@@ -94,9 +116,9 @@ function ProductDetail() {
         setUlrImage(item.url);
     }
 
-    const handleClickFavorite = () => {
-        setActiveFavorite(!activeFavorite);
-    }
+    // const handleClickFavorite = () => {
+    //     setActiveFavorite(!activeFavorite);
+    // }
 
     const handleSizeClick = (size) => {
         setSelectedSize(size);  // Set the selected size
@@ -135,8 +157,9 @@ function ProductDetail() {
 
                 <div className="product-info">
                     <div className="product-content">
-                        <h3 className="pb-3">{productState.title}</h3>
-                        <p name="price"><CurrencyFormatter amount={productState.price}/></p>
+                        <h2 className="pb-3">{productState.title}</h2>
+                        <p name="price">Giá: <CurrencyFormatter className="fw-bold text-danger" amount={productState.price}/></p>
+                        <p className="mt-3">Màu sắc:</p>
                         <div className="product-color">
                             {productsState
                                 .filter(item => item.title === productState.title)
@@ -149,8 +172,8 @@ function ProductDetail() {
                         </div>
                         <div className="product-action">
                             <form onSubmit={formik.handleSubmit}>
-                                <div className="product-size">
-                                    <h5 className="mb-3">Select Size</h5>
+                                <div className="product-size m-0">
+                                    <p>Kích thước:</p>
                                     {productState.variants?.map(variant => (
                                         <span 
                                             key={variant.size._id} 
@@ -161,8 +184,8 @@ function ProductDetail() {
                                         </span>
                                     ))}
                                 </div>
-                                {formik.errors.size && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.size}</p>}
-                                <div className="product-count">
+                                {formik.errors.size && <p style={{ color: "red", fontSize: "13px" }} className="error m-0">{formik.errors.size}</p>}
+                                {/* <div className="product-count">
                                     <label htmlFor="count">Quantity</label>
                                     <input
                                         id="count"
@@ -174,15 +197,37 @@ function ProductDetail() {
                                         min="1"
                                     />
                                     {formik.errors.count && formik.touched.count && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.count}</p>}
+                                </div> */}
+                                <p>Số lượng:</p>
+                                <div className="input-number mb-4">
+                                    <div className="btn-decrement" onClick={decrement}>-</div>
+                                    <input
+                                        id="count"
+                                        name="count"
+                                        type="text"
+                                        // value={formik.values.count}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                         className="number-input"
+                                         value={value}
+                                        readOnly
+                                        min="1"
+                                    />
+                                    <div className="btn-increment" onClick={increment}>+</div>
+                                    {formik.errors.count && formik.touched.count && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.count}</p>}
                                 </div>
-                                <p>{productState.quantity}</p>
-                                <button type="submit">Add to Bag</button>
+                                {/* <p>{productState.quantity}</p> */}
+                                <button type="submit">Thêm vào giỏ hàng</button>
                             </form>
-                            <button className={activeFavorite ? 'active-favorite' : 'favorite'} onClick={handleClickFavorite}>
-                                Favorite {activeFavorite ? <FaHeart className="text-danger" /> : <FaRegHeart />}
-                            </button>
+                            <form action="" onSubmit={formikFavorite.handleSubmit}>
+                                <div name="prodId" value={formikFavorite.values.prodId}></div>
+                                <button type="submit" className={activeFavorite ? 'active-favorite' : 'favorite'} onClick={handleFavoriteClick}>
+                                    Yêu thích {activeFavorite ? <FaHeart className="text-danger" /> : <FaRegHeart />}
+                                </button>
+                            </form>
+                            
                         </div>
-                        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Delectus voluptatibus sed molestias exercitationem quas soluta consequatur eius aliquid rerum. Eius quas aperiam iste ipsam, ipsa illum excepturi deleniti voluptates numquam?</p>
+                        <p>{productState.description}</p>
                     </div>
                 </div>
             </div>
