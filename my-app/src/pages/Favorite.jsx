@@ -8,6 +8,8 @@ import { useEffect } from "react";
 import { getUser } from "../features/customer/customerSlice";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { addWishlist, getProduct } from "../features/product/productSlice";
+import { useFormik } from "formik";
 
 
 function Account() {
@@ -23,6 +25,22 @@ function Account() {
     }
   }, [dispatch, userId]);
   const userState = useSelector((state) => state.customer.customer);
+
+  const formikFavorite = useFormik({
+    initialValues: {
+      prodId: ''
+    },
+    onSubmit: values => {
+      dispatch(addWishlist(values));
+    },
+  });
+
+  const handleFavoriteClick = (id) => {
+    formikFavorite.values.prodId = id;
+    setTimeout(() => {
+      dispatch(getUser(userId));
+    }, 300);
+  };
 
   const handleLogout = () =>{
     Swal.fire({
@@ -71,7 +89,12 @@ function Account() {
                                       <h6 className="m-0">{item.title}</h6>
                                       <p className="text-danger"><CurrencyFormatter amount={item.price}/></p>
                                       <div className="action d-flex justify-content-between mt-2">
-                                        <form action="" className="ms-2 del"><RiDeleteBin5Line className="fs-5"/></form>
+                                        <form className="ms-2 del" onSubmit={formikFavorite.handleSubmit}>
+                                            <input type="hidden" name="prodId" value={formikFavorite.values.prodId}/>
+                                            <button type="submit" onClick={()=>handleFavoriteClick(item._id)} className="del">
+                                              <RiDeleteBin5Line className="fs-5"/>
+                                            </button>
+                                        </form>
                                         <Link to={`/product/${item._id}`}>See more</Link>
                                       </div>
                                     </div>

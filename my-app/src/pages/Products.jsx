@@ -70,7 +70,6 @@ function Products() {
   
 // search theo ten
 const handleChangeSearch = (e) =>{
-    
     setQuery(e.target.value)
     filterSearch(e.target.value);
 }

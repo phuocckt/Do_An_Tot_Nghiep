@@ -92,6 +92,17 @@ export const deleteCart = createAsyncThunk(
     }
 )
 
+export const applyCoupon = createAsyncThunk(
+    "auth/apply-coupon",
+    async (data, thunkAPI) => {
+        try {
+            return await authService.applyCoupon(data);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
 export const authSlice = createSlice({
     name: "auth",
     initialState,

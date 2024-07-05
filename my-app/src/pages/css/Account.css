@@ -93,6 +93,7 @@
 }
 .card-favorite .content .action .del{
     cursor: pointer;
+    border: none;
 }
 .card-favorite .content .action .del:hover{
     color: red;

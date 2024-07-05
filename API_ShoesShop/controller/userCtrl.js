@@ -533,7 +533,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
     ).toFixed(2);
     await Cart.findOneAndUpdate(
         { orderby: user._id },
-        { totalAfterDiscount },
+        { cartTotal: totalAfterDiscount },
         { new: true }
     );
     res.json(totalAfterDiscount);

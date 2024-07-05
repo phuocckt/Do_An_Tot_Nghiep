@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import "./css/Cart.css";
-import { deleteCart, getCart } from "../features/auth/authSlice";
+import { applyCoupon, deleteCart, getCart } from "../features/auth/authSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
@@ -53,6 +53,26 @@ function Cart() {
         .catch(() => {
           Swal.fire({
             title: "Đặt hàng thất bại!",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        });
+    },
+  });
+
+  const formikCoupon = useFormik({
+    initialValues: {
+      coupon: '',
+    },
+    onSubmit: (values) => {
+      dispatch(applyCoupon(values))
+        .unwrap()
+        .then(() => {
+          dispatch(getCart())
+        })
+        .catch(() => {
+          Swal.fire({
+            title: "Mã không tồn tại!",
             icon: "error",
             confirmButtonText: "OK",
           });
@@ -144,15 +164,25 @@ function Cart() {
       <div className="cart-invoice">
         <h3 className="py-3">Thông tin thanh toán</h3>
         <div className="invoice-info">
-          <div className="subtotal">
+          {/* <div className="subtotal">
             <p>Tổng tiền:</p>
             <p>
-              <CurrencyFormatter amount={cartState ? cartState.cartTotal : 0} />
+              <CurrencyFormatter amount={cartState ? cartState.products.price : 0} />
             </p>
-          </div>
+          </div> */}
           <div className="invoice-delivery align-items-center">
             <p>Voucher giảm giá:</p>
-            <input type="text" className="py-1 px-2" placeholder="Nhập voucher"/>
+            <form className="d-flex" onSubmit={formikCoupon.handleSubmit}>
+              <input 
+                name="coupon" 
+                type="text" 
+                value={formikCoupon.values.coupon} 
+                className="py-2 px-2" 
+                placeholder="Nhập voucher"
+                onChange={formikCoupon.handleChange}
+              />
+              <button className="btn btn-secondary ms-2 py-2" type="submit">Áp mã</button>
+            </form>
           </div>
           <div className="total">
             <p>Thành tiền:</p>

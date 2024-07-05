@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 function Header() {
   const navigate = useNavigate();
   const user = useSelector( state => state.auth.user);
+  const cart = useSelector( state => state.auth.carts);
   const userId = user?._id;
 
   return (
@@ -26,7 +27,7 @@ function Header() {
               <Nav.Link className='text-light' href="/products">SẢN PHẨM</Nav.Link>
               <Nav.Link className='text-light position-relative' href="/cart">
                 <CiShoppingCart className='fs-1'/>
-                <span className='quantity-cart'>{'00' || '00'}</span>
+                <span className='quantity-cart'>{cart.products?.length}</span>
               </Nav.Link>
               <Nav.Link>
                 {

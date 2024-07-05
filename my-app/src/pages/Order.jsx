@@ -25,6 +25,8 @@ function Account() {
   const [stars, setStars] = useState(null);
   const [hover, setHover] = useState(null);
   const [info, setInfo] = useState([]);
+  const [sortOders, setSortOders] = useState([]);
+
   const evaluate ={
     1: "Rất tệ",
     2: "Tệ",
@@ -37,6 +39,18 @@ function Account() {
     dispatch(getOrders());
   }, [dispatch]);
   const orderState = useSelector((state) => state.order.orders);
+  // sap xep theo trang thai hoa don
+  const handleClick = (name) =>{
+   if(name === "All"){
+       setSortOders(orderState);
+   }
+   else{
+       let order = orderState.filter(item => {
+           return item.orderStatus === name;
+       })
+       setSortOders(order)
+   } 
+ }
 
   const handleLogout = () => {
     Swal.fire({
@@ -77,6 +91,9 @@ function Account() {
             confirmButtonText: "OK",
           });
           setShowModal(false);
+          setTimeout(() => {
+            dispatch(getOrders());
+          }, 300);
         })
         .catch((error) => {
           Swal.fire({
@@ -116,15 +133,15 @@ function Account() {
           <div className="content">
             <h4>Đơn hàng của bạn</h4>
             <div className="order-status">
-              <Button variant="dark">Tất cả</Button>
-              <Button variant="success">Đã mua</Button>
-              <Button variant="danger">Đã hủy</Button>
-              <Button variant="primary">Đang giao</Button>
-              <Button variant=""></Button>
-              <Button variant=""></Button>
+              <Button variant="dark" onClick={()=>handleClick('All')}>Tất cả</Button>
+              <Button variant="success" onClick={()=>handleClick('Unpaid')}>Unpaid</Button>
+              <Button variant="danger" onClick={()=>handleClick('Pending')}>Pending</Button>
+              <Button variant="primary" onClick={()=>handleClick('Shipping')}>Shipping</Button>
+              <Button variant="warning" onClick={()=>handleClick('Cancelled')}>Cancelled</Button>
+              <Button variant="secondary" onClick={()=>handleClick('Delivered')}>Delivered</Button>
             </div>
             <div className="pt-3">
-              {orderState.map((item) => {
+              {sortOders.map((item) => {
                 return (
                   <div className="order-item" key={item._id}>
                     {/* <div className="time"><FormattedDate timestamp={item.createdAt}/></div> */}
@@ -144,7 +161,7 @@ function Account() {
                               <h3>{i.product.title}</h3>
                               <p>Kích thước: <span className="fw-bold">{i.size}</span></p>
                               <p>Số lượng: <span className="fw-bold">x{i.count}</span></p>
-                              {item.orderStatus == "Pending" ? (
+                              {item.orderStatus == "Delivered" ? (
                                 <button
                                   className="btn btn-warning"
                                   onClick={() => {
@@ -188,7 +205,6 @@ function Account() {
                       <span>
                         Thành tiền: <CurrencyFormatter className="text-danger fw-bold fs-4" amount={item.paymentIntent.amount}/>
                       </span>
-                      <span></span>
                       {item.orderStatus == "Pending" ||
                       item.orderStatus == "Unpaid" ? (
                         <button className="btn btn-danger">

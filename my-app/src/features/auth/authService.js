@@ -46,6 +46,11 @@ const deleteCart = async (id) => {
     return res.data;
 }
 
+const applyCoupon = async (data) => {
+    const res = await axios.post(`${base_url}user/cart/apply-coupon`, data, config);
+    return res.data;
+}
+
 const authService = {
     login,
     register,
@@ -53,7 +58,8 @@ const authService = {
     resetPassword,
     getCart,
     addToCart,
-    deleteCart
+    deleteCart,
+    applyCoupon
 }
 
 export default authService;
