@@ -59,6 +59,44 @@
     margin-left: 30px;
     border: none;
 }
+.card-favorite{
+    border: 1px solid gray;
+    border-radius: 1em;
+    width: 210px;
+    height: 300px;
+    overflow: hidden;
+}
+.card-favorite img{
+    width: 210px;
+    height: 200px;
+    object-fit: cover;
+    transition: .2s;
+}
+.card-favorite img:hover{
+    transform: scale(105%);
+}
+.card-favorite .content{
+    padding: 0 1em;
+    padding-bottom: 1em;
+    white-space: nowrap;    
+    overflow: hidden;   
+    text-overflow: ellipsis;
+}
+.card-favorite .content .action a{
+    border: 1px solid gray;
+    color: black;
+    padding: .2em 1em;
+    border-radius: .5em;
+}
+.card-favorite .content .action a:hover{
+    background-color: #eee;
+}
+.card-favorite .content .action .del{
+    cursor: pointer;
+}
+.card-favorite .content .action .del:hover{
+    color: red;
+}
 /* order */
 .account-content .order-status button{
     margin-right: 1em;

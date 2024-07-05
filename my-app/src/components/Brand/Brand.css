@@ -1,0 +1,25 @@
+.brand-list{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3em;
+}
+.brand-item{
+    border: 2px solid gray;
+    text-align: center;
+    width: 200px;
+    height: 200px;
+}
+.brand-item p{
+    font-size: 100px;
+    transition: .5s;
+}
+.brand-item:hover p{
+    transform: scale(150%) translateY(-20%);
+}
+.brand-item:hover div{
+    font-weight: bold;
+}
+.brand-item:hover{
+    border: none;
+}

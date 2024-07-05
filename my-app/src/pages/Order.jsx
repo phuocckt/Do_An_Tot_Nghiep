@@ -13,6 +13,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { rating } from "../features/product/productSlice";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
+import FormattedDate from "../components/FormattedDate";
 import { FaStar } from "react-icons/fa";
 
 function Account() {
@@ -23,8 +24,13 @@ function Account() {
   const [currentProdId, setCurrentProdId] = useState(""); // State for storing current product ID
   const [stars, setStars] = useState(null);
   const [hover, setHover] = useState(null);
+  const [info, setInfo] = useState([]);
   const evaluate ={
-    
+    1: "Rất tệ",
+    2: "Tệ",
+    3: "Khá",
+    4: "Tốt",
+    5: "Rất tốt"
   }
 
   useEffect(() => {
@@ -88,7 +94,9 @@ function Account() {
       <div className="account">
         <div className="account-info">
           <h3 className="mb-3">Thông tin tài khoản</h3>
-          <img src="../hinh/user-none.jpg" alt="" />
+          {
+            user.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" fluid/>)
+          }
           <h3>{user?.firstname + " " + user?.lastname}</h3>
           <button onClick={handleLogout}>Đăng xuất</button>
         </div>
@@ -119,15 +127,19 @@ function Account() {
               {orderState.map((item) => {
                 return (
                   <div className="order-item" key={item._id}>
+                    {/* <div className="time"><FormattedDate timestamp={item.createdAt}/></div> */}
                     <div className="product-details d-block">
                       {item.products.map((i) => {
                         return (
                           <div className="d-flex mb-3" key={i.product._id}>
-                            <img
-                              src={i.product.image[0].url}
-                              alt="product"
-                              className="product-image"
-                            />
+                            <Link to={`/product/${i.product._id}`}>
+                              <img
+                                src={i.product.image[0].url}
+                                alt="product"
+                                className="product-image"
+                              />
+                            </Link>
+                            
                             <div className="product-info">
                               <h3>{i.product.title}</h3>
                               <p>Kích thước: <span className="fw-bold">{i.size}</span></p>
@@ -138,6 +150,8 @@ function Account() {
                                   onClick={() => {
                                     setShowModal(true);
                                     setCurrentProdId(i.product._id);
+                                    setInfo([i.product.image[0].url,i.product.title]);
+                                    setStars(null);
                                   }}
                                 >
                                   Đánh giá
@@ -193,7 +207,10 @@ function Account() {
       </div>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Đánh giá</Modal.Title>
+          <Modal.Title className="d-flex">
+            <img src={info[0]} alt="" width={'50px'} height={'50px'}/>
+            <p className="ms-3 fs-5">{info[1]}</p>
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={formik.handleSubmit}>
@@ -204,63 +221,53 @@ function Account() {
                 value={formik.values.prodId}
                 onChange={formik.handleChange}
               />
-              <Form.Label>Đánh giá sao</Form.Label>
-              {/* <div className="star-rating">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Form.Check
-                    inline
-                    key={star}
-                    type="radio"
-                    label={star}
-                    name="star"
-                    value={star}
-                    checked={formik.values.star == star}
-                    onChange={formik.handleChange}
-                  />
-                ))}
-              </div> */}
-              <div className="star-rating">
-                {[...Array(5)].map((star, index) => {
-                  const currentRating = index + 1;
+              <Form.Label className="fw-bold">Đánh giá: </Form.Label>
+              {stars && evaluate[stars] && (
+                  <span className="evaluation ms-2">( {evaluate[stars]} )</span>
+                )}
+              <div className="star-rating justify-content-center">
+                {[1, 2, 3, 4, 5].map((star) => {
                   return(
                     <>
                       <label>
                         <input 
                           type="radio" 
                           name="star" 
-                          value={stars} 
-                          checked={formik.values.star == stars} 
+                          value={star} 
+                          checked={formik.values.star == star} 
                           onChange={formik.handleChange}
                           className="d-none"
-                          onClick={()=>setStars(currentRating)}
+                          onClick={()=>setStars(star)}
                         />
                         <FaStar 
-                          className="fs-2 mb-2 star" 
-                          color={currentRating <= (hover || stars) ? '#ffc107' : '#e4e5e9'}
-                          onMouseEnter={()=>setHover(currentRating)}
+                          className="fs-3 mb-2 star" 
+                          color={star <= (hover || stars) ? '#ffc107' : '#e4e5e9'}
+                          onMouseEnter={()=>setHover(star)}
                           onMouseLeave={()=>setHover(null)}
                         />
                       </label>
                     </>
                   )
                 })}
+                
+                
               </div>
               <Form.Control.Feedback type="invalid">{formik.errors.star}</Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group controlId="formComment">
-              <Form.Label>Bình luận</Form.Label>
+              <Form.Label className="fw-bold">Bình luận:</Form.Label>
               <Form.Control
                 as="textarea"
                 name="comment"
-                placeholder="Hãy bình luận theo cách của bạn!"
+                placeholder="Hãy bình luận theo cách của bạn !"
                 value={formik.values.comment}
                 onChange={formik.handleChange}
                 isInvalid={formik.errors.comment}
               />
               <Form.Control.Feedback type="invalid">{formik.errors.comment}</Form.Control.Feedback>
             </Form.Group>
-            <Button type="submit" variant="primary" className="mt-3">Gửi đánh giá</Button>
+            <Button type="submit" variant="warning" className="mt-3">Gửi đánh giá</Button>
           </Form>
         </Modal.Body>
       </Modal>

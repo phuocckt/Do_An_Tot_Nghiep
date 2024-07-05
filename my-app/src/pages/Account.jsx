@@ -137,7 +137,7 @@ function Account() {
         <div className="account-info">
           <h3 className="mb-3">Thông tin tài khoản</h3>
           {
-            user.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" style={{ width: '150px' }} fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" style={{ width: '150px' }} fluid/>)
+            user.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" fluid/>)
           }
           <h3>{user?.firstname + ' ' + user?.lastname}</h3>
           <button onClick={handleLogout}>Đăng xuất</button>
@@ -228,7 +228,7 @@ function Account() {
         <Modal.Body>
           <Form onSubmit={passwordFormik.handleSubmit}>
             <Form.Group controlId="formOldPassword">
-              <Form.Label>Mật khẩu cũ</Form.Label>
+              <Form.Label className="fw-bold">Mật khẩu cũ:</Form.Label>
               <Form.Control
                 type="password"
                 name="oldPassword"
@@ -243,7 +243,7 @@ function Account() {
             </Form.Group>
 
             <Form.Group controlId="formNewPassword">
-              <Form.Label>Mật khẩu mới</Form.Label>
+              <Form.Label className="fw-bold mt-4">Mật khẩu mới:</Form.Label>
               <Form.Control
                 type="password"
                 name="newPassword"
@@ -256,7 +256,7 @@ function Account() {
                 {passwordFormik.errors.newPassword}
               </Form.Control.Feedback>
             </Form.Group>
-            <Button type="submit" variant="primary" className="mt-3">Đổi mật khẩu</Button>
+            <Button type="submit" variant="warning" className="mt-3">Đổi mật khẩu</Button>
           </Form>
         </Modal.Body>
       </Modal>

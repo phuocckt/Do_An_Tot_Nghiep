@@ -6,7 +6,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { useEffect } from "react";
 import { getUser } from "../features/customer/customerSlice";
-import Card from '../components/Card/Card';
+import { CurrencyFormatter } from "../components/CurrencyFormatter";
+import { RiDeleteBin5Line } from "react-icons/ri";
+
 
 function Account() {
   const dispatch = useDispatch();
@@ -44,7 +46,7 @@ function Account() {
             <div className="account-info">
                 <h3 className="mb-3">Thông tin tài khoản</h3>
                 {
-                  user.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" style={{ width: '150px' }} fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" style={{ width: '150px' }} fluid/>)
+                  user.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" fluid/>)
                 }
                 <h3>{user?.firstname + ' ' + user?.lastname}</h3>
                 <button onClick={handleLogout}>Đăng xuất</button>
@@ -62,7 +64,21 @@ function Account() {
                         {userState !== null ? (
                             userState.wishlist?.map(item => {
                               return (
-                                <img className='product-img' src={item.image?.[0].url} alt="Ảnh sản phẩm" width={50} height={50} />
+                                <>
+                                  <div className="card-favorite">
+                                    <img className='product-img' src={item.image?.[0].url} alt="Ảnh sản phẩm"/>
+                                    <div className="content">
+                                      <h6 className="m-0">{item.title}</h6>
+                                      <p className="text-danger"><CurrencyFormatter amount={item.price}/></p>
+                                      <div className="action d-flex justify-content-between mt-2">
+                                        <form action="" className="ms-2 del"><RiDeleteBin5Line className="fs-5"/></form>
+                                        <Link to={`/product/${item._id}`}>See more</Link>
+                                      </div>
+                                    </div>
+                                    
+                                  </div>
+                                </>
+                                
                               )
                             })
                         ) : (
