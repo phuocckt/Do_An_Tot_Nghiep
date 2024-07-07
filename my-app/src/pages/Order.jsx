@@ -15,6 +15,7 @@ import { rating } from "../features/product/productSlice";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import FormattedDate from "../components/FormattedDate";
 import { FaStar } from "react-icons/fa";
+import { getUser } from "../features/customer/customerSlice";
 
 function Account() {
   const dispatch = useDispatch();
@@ -38,6 +39,7 @@ function Account() {
   useEffect(() => {
     dispatch(getOrders());
   }, [dispatch]);
+
   const orderState = useSelector((state) => state.order.orders);
   // sap xep theo trang thai hoa don
   const handleClick = (name) =>{
@@ -134,11 +136,11 @@ function Account() {
             <h4>Đơn hàng của bạn</h4>
             <div className="order-status">
               <Button variant="dark" onClick={()=>handleClick('All')}>Tất cả</Button>
-              <Button variant="success" onClick={()=>handleClick('Unpaid')}>Unpaid</Button>
-              <Button variant="danger" onClick={()=>handleClick('Pending')}>Pending</Button>
-              <Button variant="primary" onClick={()=>handleClick('Shipping')}>Shipping</Button>
-              <Button variant="warning" onClick={()=>handleClick('Cancelled')}>Cancelled</Button>
-              <Button variant="secondary" onClick={()=>handleClick('Delivered')}>Delivered</Button>
+              <Button variant="success" onClick={()=>handleClick('Unpaid')}>Chưa thanh toán</Button>
+              <Button variant="danger" onClick={()=>handleClick('Pending')}>Đang xử lí</Button>
+              <Button variant="primary" onClick={()=>handleClick('Shipping')}>Đang giao hàng</Button>
+              <Button variant="warning" onClick={()=>handleClick('Cancelled')}>Đã hủy</Button>
+              <Button variant="secondary" onClick={()=>handleClick('Delivered')}>Đã giao hàng</Button>
             </div>
             <div className="pt-3">
               {sortOders.map((item) => {

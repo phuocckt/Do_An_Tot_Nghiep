@@ -43,7 +43,7 @@ function Login() {
     <>
         <div className='login'>
           <div className='login-container'>
-            <h1>Login</h1>
+            <h1>Đăng nhập</h1>
             <form onSubmit={formik.handleSubmit}>
             <input 
               type='email' 
@@ -58,7 +58,7 @@ function Login() {
 
                 <input 
               type='password' 
-              placeholder='Password' 
+              placeholder='Mật khẩu' 
               name='password'  
               onChange={formik.handleChange("password")}  
               value={formik.values.password}
@@ -67,10 +67,10 @@ function Login() {
                 <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.password}</p>
               ) : null}
 
-              <button type='submit'>Login</button>
+              <button type='submit'>Đăng nhập</button>
             </form>
-            <a className='text-dark' href='/forgot-password'>Forgot the password !</a>
-            <p>Don't have an account ? <Link to='/register' className='text-danger'>Signup here</Link></p>
+            <a className='text-primary' href='/forgot-password'>Quên mật khẩu !</a>
+            <p>Bạn chưa có tài khoản? <Link to='/register' className='text-danger'>Đăng kí ngay</Link></p>
           </div>   
         </div>
     </>

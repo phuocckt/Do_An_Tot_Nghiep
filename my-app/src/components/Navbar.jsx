@@ -27,7 +27,7 @@ function Header() {
               <Nav.Link className='text-light' href="/products">SẢN PHẨM</Nav.Link>
               <Nav.Link className='text-light position-relative' href="/cart">
                 <CiShoppingCart className='fs-1'/>
-                <span className='quantity-cart'>{cart.products?.length}</span>
+                <span className='quantity-cart'></span>
               </Nav.Link>
               <Nav.Link>
                 {

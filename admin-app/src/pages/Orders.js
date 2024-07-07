@@ -119,7 +119,7 @@ const Orders = () => {
       orderby: `${order.orderby.firstname} ${order.orderby.lastname}`,
       orderStatus: order.orderStatus,
       action: (
-        <Button onClick={() => showModal(order)} disabled={order.orderStatus === 'Cancelled'}>
+        <Button onClick={() => showModal(order)} disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered'}>
           <FiEdit />
         </Button>
       )

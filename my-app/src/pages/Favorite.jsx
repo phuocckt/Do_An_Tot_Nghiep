@@ -95,7 +95,7 @@ function Account() {
                                               <RiDeleteBin5Line className="fs-5"/>
                                             </button>
                                         </form>
-                                        <Link to={`/product/${item._id}`}>See more</Link>
+                                        <Link to={`/product/${item._id}`}>Xem chi tiết</Link>
                                       </div>
                                     </div>
                                     

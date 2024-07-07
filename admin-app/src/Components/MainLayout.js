@@ -73,6 +73,11 @@ const MainLayout = () => {
               label: 'Khách hàng',
             },
             {
+              key: 'employee',
+              icon: <CiUser className='fs-4' />,
+              label: 'Nhân viên',
+            },
+            {
               key: 'Product Management',
               icon: <AiOutlineShoppingCart className='fs-4' />,
               label: 'Quản lí sản phẩm',

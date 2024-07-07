@@ -28,9 +28,9 @@ export default function ProfilePage() {
                     <MDBCol>
                         <MDBBreadcrumb className="bg-light rounded-3 p-3 mb-4">
                             <MDBBreadcrumbItem>
-                                <Link to="/admin">Home</Link>
+                                <Link to="/admin">Trang chủ</Link>
                             </MDBBreadcrumbItem>
-                            <MDBBreadcrumbItem active>User Profile</MDBBreadcrumbItem>
+                            <MDBBreadcrumbItem active>Thông tin cá nhân</MDBBreadcrumbItem>
                         </MDBBreadcrumb>
                     </MDBCol>
                 </MDBRow>
@@ -45,7 +45,7 @@ export default function ProfilePage() {
                                     className="rounded-circle"
                                     style={{ width: '150px' }}
                                     fluid />
-                                <p className="text-muted mb-1">Admin Website</p>
+                                <p className="text-muted mb-1">Quản trị viên website</p>
                                 <p className="text-muted mb-4">{address}</p>
                             </MDBCardBody>
                         </MDBCard>
@@ -55,7 +55,7 @@ export default function ProfilePage() {
                             <MDBCardBody>
                                 <MDBRow>
                                     <MDBCol sm="3">
-                                        <MDBCardText>Full Name</MDBCardText>
+                                        <MDBCardText>Họ và tên</MDBCardText>
                                     </MDBCol>
                                     <MDBCol sm="9">
                                         <MDBCardText className="text-muted">{firstName + " " + lastName}</MDBCardText>
@@ -64,7 +64,7 @@ export default function ProfilePage() {
                                 <hr />
                                 <MDBRow>
                                     <MDBCol sm="3">
-                                        <MDBCardText>Email</MDBCardText>
+                                        <MDBCardText>Địa chỉ Email</MDBCardText>
                                     </MDBCol>
                                     <MDBCol sm="9">
                                         <MDBCardText className="text-muted">{email}</MDBCardText>
@@ -73,7 +73,7 @@ export default function ProfilePage() {
                                 <hr />
                                 <MDBRow>
                                     <MDBCol sm="3">
-                                        <MDBCardText>Phone</MDBCardText>
+                                        <MDBCardText>Số điện thoại</MDBCardText>
                                     </MDBCol>
                                     <MDBCol sm="9">
                                         <MDBCardText className="text-muted">{mobile}</MDBCardText>
@@ -82,7 +82,7 @@ export default function ProfilePage() {
                                 <hr />
                                 <MDBRow>
                                     <MDBCol sm="3">
-                                        <MDBCardText>Address</MDBCardText>
+                                        <MDBCardText>Địa chỉ</MDBCardText>
                                     </MDBCol>
                                     <MDBCol sm="9">
                                         <MDBCardText className="text-muted">{address}</MDBCardText>

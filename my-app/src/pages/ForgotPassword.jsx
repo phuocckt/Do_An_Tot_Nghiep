@@ -41,7 +41,7 @@ function Login() {
     <>
         <div className='login'>
           <div className='login-container'>
-            <h1>Forgot Password</h1>
+            <h1>Quên mật khẩu</h1>
             <form onSubmit={formik.handleSubmit}>
             <input 
               type='email' 
@@ -54,7 +54,7 @@ function Login() {
                 <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.email}</p>
               ) : null}
 
-              <button type='submit'>Send</button>
+              <button type='submit'>Gửi</button>
             </form>
           </div>   
         </div>

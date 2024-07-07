@@ -548,14 +548,24 @@ const createCashOrder = asyncHandler(async (req, res) => {
         const userCart = await Cart.findOne({ orderby: user._id });
         let finalAmount = couponApplied && userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
 
+        // Kiểm tra và cập nhật số lượng sản phẩm và các biến thể
         for (let item of userCart.products) {
             let product = await Product.findById(item.product._id);
             if (!product) throw new Error(`Product with ID ${item.product._id} not found`);
+
+            // Kiểm tra số lượng sản phẩm
             if (product.quantity < item.count) {
                 throw new Error(`Insufficient stock for product ${product.title}`);
             }
+
+            // Kiểm tra số lượng trong các biến thể
+            let variant = product.variants.find(variant => variant.size.title === item.size);
+            if (variant && variant.quantity < item.count) {
+                throw new Error(`Insufficient stock for product ${product.title} in size ${item.size}`);
+            }
         }
 
+        // Tạo đơn hàng mới
         let newOrder = await new Order({
             products: userCart.products,
             paymentIntent: {
@@ -570,21 +580,37 @@ const createCashOrder = asyncHandler(async (req, res) => {
             orderStatus: "Pending"
         }).save();
 
+        // Cập nhật số lượng sản phẩm và các biến thể
         let update = userCart.products.map(item => {
-            return {
+            let productUpdate = {
                 updateOne: {
                     filter: { _id: item.product._id },
                     update: { $inc: { quantity: -item.count, sold: +item.count } }
                 }
             };
-        });
+            let variantUpdate = {
+                updateOne: {
+                    filter: {
+                        _id: item.product._id,
+                        "variants.size.title": item.size
+                    },
+                    update: { $inc: { "variants.quantity": -item.count } },
+                }
+            };
+
+            return [productUpdate, variantUpdate];
+        }).flat();
+        
         const updated = await Product.bulkWrite(update, {});
+
+        // Xóa giỏ hàng sau khi tạo đơn hàng
         await Cart.deleteOne({ orderby: user._id });
         res.json(newOrder);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
+
 
 const createOnOrder = asyncHandler(async (req, res) => {
     const { Bank, couponApplied, paymentConfirmed } = req.body; // Assume paymentConfirmed indicates if the payment was successful
@@ -684,7 +710,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
         }
-        
+        order.orderStatus = status;
         // Update product quantities and sold counts if the order is cancelled
         if (status === "Cancelled" && order.orderStatus === "Cancelled") {
             for (const item of order.products) {
@@ -693,8 +719,10 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
                 
                 // Find the variant with the correct size and update its quantity
                 const variant = product.variants.find(v => v.size && v.size.title === size);
+                console.log(variant);
                 if (variant) {
                     variant.quantity += item.count;
+                    console.log(variant.quantity);
                 }
                 
                 // Update overall product quantity and sold count
@@ -706,7 +734,6 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
         }
 
         // Update the order status
-        order.orderStatus = status;
         order.paymentIntent.status = status;
         await order.save();
 

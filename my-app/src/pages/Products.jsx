@@ -25,33 +25,6 @@ function Products() {
     const [quantity, setQuantity] = useState(0);
 
     const dispatch = useDispatch();  
-
-    // const formik = useFormik({
-    //     initialValues: {
-    //       prodId: ''
-    //     },
-    //     onSubmit: values => {
-    //       dispatch(addWishlist(values));
-    //     },
-    //   });
-      //dem so luot tim
-    //   const countHearts = (id) => {
-    //     let count = 0;
-    //     userState.forEach(user => {
-    //       user.wishlist.forEach(item => {
-    //         if (item === id) {
-    //           count += 1;
-    //         }
-    //       });
-    //     });
-    //     setQuantity(count);
-    //   };
-      
-    
-    //   const handleFavoriteClick = () => {
-    //     formik.setFieldValue('prodId', productState._id); // Set prodId
-    //     formik.handleSubmit(); // Submit form
-    //   };
   
 
   useEffect(() => {
@@ -62,11 +35,6 @@ function Products() {
   useEffect(() => {
     setSortProducts(productState)
   },[productState])
-//   useEffect(() => {
-//     const newQuantity = countHearts(productState._id);
-//     setQuantity(newQuantity);
-//     // countHearts(product._id);
-//   }, [productState._id, userState, quantity]);
   
 // search theo ten
 const handleChangeSearch = (e) =>{

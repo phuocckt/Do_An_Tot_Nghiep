@@ -9,7 +9,6 @@ var orderSchema = new mongoose.Schema({
                 ref: "Product"
             },
             count: Number,
-            color: String,
             size: String
         }
     ],

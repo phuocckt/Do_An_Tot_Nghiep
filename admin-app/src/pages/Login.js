@@ -17,8 +17,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let schema = yup.object().shape({
-    email: yup.string().required('Email is required').email('Invalid email format'),
-    password: yup.string().required('Password is required')
+    email: yup.string().required('Email là bắt buộc').email('Sai định dạng Email'),
+    password: yup.string().required('Mật khẩu là bắt buộc')
   })
   const formik = useFormik({
     initialValues: {
@@ -58,25 +58,22 @@ const Login = () => {
           <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg" className="img-fluid" alt="Phone image" />
         </MDBCol>
         <MDBCol col='4' md='6'>
-          <h2 className='text-center'>Sign In Admin</h2>
+          <h2 className='text-center'>Đăng nhập Quản trị viên</h2>
           <div className='error text-center'>
-            {message.message === "Rejected" ? "You are not an Admin" : ""}
+            {message.message === "Rejected" ? "Bạn không phải là quản trị viên" : ""}
           </div>
           <form action='' onSubmit={formik.handleSubmit}>
-            <CustomerInput className='mb-4' type="text" name="email" label="Email Address" id="email" onChange={formik.handleChange("email")}
+            <CustomerInput className='mb-4' type="text" name="email" label="Địa chỉ Email" id="email" onChange={formik.handleChange("email")}
               value={formik.values.email} size='lg' />
             {formik.touched.email && formik.errors.email ? (
               <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.email}</p>
             ) : null}
-            <CustomerInput className='mb-4' type="password" name="password" label="Password" id="pass" onChange={formik.handleChange("password")}
+            <CustomerInput className='mb-4' type="password" name="password" label="Mật khẩu" id="pass" onChange={formik.handleChange("password")}
               value={formik.values.password} size='lg' />
             {formik.touched.password && formik.errors.password ? (
               <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.password}</p>
             ) : null}
-            <div className="d-flex justify-content-between mx-4 mb-4">
-              <a href="user/forgot-password">Forgot password?</a>
-            </div>
-            <button className='border-0 px-3 py-2 text-white fw-bold w-100 text-center text-decoration-none fs-5' style={{ background: 'blue' }} type="submit">LOGIN</button>
+            <button className='border-0 px-3 py-2 text-white fw-bold w-100 text-center text-decoration-none fs-5' style={{ background: 'blue' }} type="submit">ĐĂNG NHẬP</button>
           </form>
         </MDBCol>
       </MDBRow>

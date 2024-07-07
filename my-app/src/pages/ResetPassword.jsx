@@ -44,7 +44,7 @@ function Login() {
     <>
         <div className='login'>
           <div className='login-container'>
-            <h1>Reset Password</h1>
+            <h1>Đổi mật khẩu</h1>
             <form onSubmit={formik.handleSubmit}>
             <input 
               type='password' 
@@ -57,7 +57,7 @@ function Login() {
                 <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.password}</p>
               ) : null}
 
-              <button type='submit'>Reset</button>
+              <button type='submit'>Thay đổi</button>
             </form>
           </div>   
         </div>

@@ -9,6 +9,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { createOrder } from "../features/order/orderSlice";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
+import { getUser } from "../features/customer/customerSlice";
 
 function Cart() {
   const dispatch = useDispatch();
@@ -17,7 +18,10 @@ function Cart() {
 
   useEffect(() => {
     dispatch(getCart());
+    dispatch(getUser(user._id));
   }, [dispatch]);
+
+  const userState = useSelector(state => state.customer.customer);
 
   let schema = yup.object().shape({
     COD: yup.boolean().required("COD is required"),
@@ -30,7 +34,7 @@ function Cart() {
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      if (!user.address) {
+      if (!userState.address) {
         Swal.fire({
           title: "Lỗi!",
           text: "Người dùng chưa nhập địa chỉ.",
@@ -105,10 +109,6 @@ function Cart() {
   return (
     <div className="cart">
       <div className="cart-products">
-        {/* <div className="delivery">
-          <h5>FREE DELIVERY</h5>
-          <p>Applies to orders of 5.000.000₫ or more.</p>
-        </div> */}
         <h3 className="py-3 right-cart">Giỏ hàng</h3>
         {!cartState || !cartState.products ? (
           <p>Giỏ hàng đang trống...</p>
@@ -181,7 +181,7 @@ function Cart() {
                 placeholder="Nhập voucher"
                 onChange={formikCoupon.handleChange}
               />
-              <button className="btn btn-secondary ms-2 py-2" type="submit">Áp mã</button>
+              <button className="btn btn-secondary ms-2 py-2" type="submit">Áp dụng</button>
             </form>
           </div>
           <div className="total">

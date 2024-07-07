@@ -51,12 +51,12 @@ function Signup() {
     <>
         <div className='signup'>
           <div className='signup-container'>
-            <h1>Sign up</h1>
+            <h1>Đăng kí</h1>
             <form onSubmit={formik.handleSubmit}>
               
             <input 
               type='text' 
-              placeholder='Fisrtname' 
+              placeholder='Họ' 
               name='fisrtname'  
               onChange={formik.handleChange("firstname")}  
               value={formik.values.firstname}
@@ -67,7 +67,7 @@ function Signup() {
 
             <input 
               type='text' 
-              placeholder='Lastname' 
+              placeholder='Tên' 
               name='lastname'  
               onChange={formik.handleChange("lastname")}  
               value={formik.values.lastname}
@@ -78,7 +78,7 @@ function Signup() {
 
               <input 
                 type='text' 
-                placeholder='Phone' 
+                placeholder='Số điện thoại' 
                 name='mobile'  
                 onChange={formik.handleChange("mobile")}  
                 value={formik.values.mobile}
@@ -89,7 +89,7 @@ function Signup() {
 
                 <input 
                   type='email' 
-                  placeholder='Email address' 
+                  placeholder='Địa chỉ email' 
                   name='email'  
                   onChange={formik.handleChange("email")}  
                   value={formik.values.email}
@@ -100,7 +100,7 @@ function Signup() {
 
                 <input 
                   type='password' 
-                  placeholder='Enter the Password' 
+                  placeholder='Nhập password của bạn' 
                   name='password'  
                   onChange={formik.handleChange("password")} 
                   value={formik.values.password}
@@ -110,9 +110,9 @@ function Signup() {
               ) : null}
 
                 {/* <input type='password' placeholder='Enter the Repassword' name='Repassword'  required/> */}
-              <button type="submit">Sign up</button>
+              <button type="submit">Đăng kí</button>
             </form>
-            <p>Already have an account ? <Link to='/login' className='text-danger'>Login here</Link></p>
+            <p>Bạn đã có tài khoản ? <Link to='/login' className='text-danger'>Đăng nhập ngay</Link></p>
           </div>   
         </div>
     </>

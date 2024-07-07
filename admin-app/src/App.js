@@ -20,6 +20,7 @@ import ViewProfile from './pages/ViewProfile';
 import ProtectedRoute from './features/auth/ProtectedRoute';
 import AddCoupon from './pages/AddCoupon';
 import Coupons from './pages/CouponList';
+import Employee from './pages/Employee';
 
 const App = () => {
   return (
@@ -47,6 +48,7 @@ const App = () => {
             <Route path="coupon-list" element={<Coupons />} />
             <Route path="orders" element={<Orders />} />
             <Route path="customers" element={<Customers />} />
+            <Route path="employee" element={<Employee />} />
             <Route path="profile" element={<ViewProfile />} />
           </Route>
         </Routes>

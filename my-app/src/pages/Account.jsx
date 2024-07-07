@@ -20,25 +20,15 @@ function Account() {
 
   const [showModal, setShowModal] = useState(false);
 
-
   useEffect(() => {
-    if (user) {
-      navigate('/account')
-      formik.setValues({
-        firstname: user.firstname || '',
-        lastname: user.lastname || '',
-        email: user.email || '',
-        mobile: user.mobile || '',
-        address: user.address || ''
-      });
-    }
-  }, [user]);
-
+    dispatch(getUser(user._id));
+  },[])
+  const userState = useSelector(state => state.customer.customer);
   const handleLogout = () => {
     Swal.fire({
       title: 'Bạn muốn đăng xuất?',
       icon: 'warning',
-      showCancelButton: true,
+      showCancelButton: true, 
       confirmButtonText: 'Đăng xuất',
       cancelButtonText: 'Không',
     }).then((result) => {
@@ -60,12 +50,13 @@ function Account() {
 
   const formik = useFormik({
     initialValues: {
-      firstname: '',
-      lastname: '',
-      email: '',
-      mobile: '',
-      address: ''
+      firstname: userState.firstname || '',
+      lastname: userState.lastname || '',
+      email: userState.email || '',
+      mobile: userState.mobile || '',
+      address: userState.address || ''
     },
+    enableReinitialize: true,
     validationSchema: schema,
     onSubmit: values => {
         Swal.fire({
@@ -84,7 +75,9 @@ function Account() {
                     icon: "success",
                     confirmButtonText: "OK",
                   });
-                  navigate("/account");
+                  setTimeout(() => {
+                    dispatch(getUser(user._id));
+                  }, 200);
                 })
                 .catch(() => {
                   Swal.fire({

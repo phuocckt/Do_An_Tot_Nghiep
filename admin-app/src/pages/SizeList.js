@@ -132,7 +132,7 @@ const Sizes = () => {
 
   return (
     <div>
-      <h3>Sizes</h3>
+      <h3>Kích thước</h3>
       <div>
         <Table columns={columns} dataSource={data} />
       </div>

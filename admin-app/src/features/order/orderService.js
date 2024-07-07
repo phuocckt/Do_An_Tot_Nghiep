@@ -9,6 +9,7 @@ const getOrders = async () => {
 
 const updateOrderStatus = async (data) => {
     const res = await axios.put(`${base_url}user/order/update-order/${data.id}`,data.orderData, config);
+    console.log(res.data);
     return res.data;
 }
 

@@ -26,6 +26,7 @@ function ProductDetail() {
     dispatch(getProducts());
     dispatch(getProduct(id));
     dispatch(getUser(user._id));
+    setSelectedSize(null);
   }, [dispatch, id, user._id]);
 
   useEffect(() => {
@@ -136,7 +137,7 @@ function ProductDetail() {
 
   // Render loading state while productState is being fetched
   if (!productState) {
-    return <div>Loading...</div>;
+    return <div>Đang tải...</div>;
   }
 
   return (
