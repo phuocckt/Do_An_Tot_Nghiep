@@ -29,18 +29,16 @@ function Header() {
                 <CiShoppingCart className='fs-1'/>
                 <span className='quantity-cart'></span>
               </Nav.Link>
-              <Nav.Link>
                 {
                     userId == null || user == null?(
                       <Link className='text-light' to='/login'>ĐĂNG NHẬP</Link>
                     ):(
-                      <Link className='text-light d-flex align-items-center' to='/account'>
+                      <Nav.Link className='text-light d-flex align-items-center' href='/account'>
                         <CiUser className='fs-2'/>
                         <span>{user.lastname}</span>
-                      </Link>
+                      </Nav.Link>
                     )
                 }
-              </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

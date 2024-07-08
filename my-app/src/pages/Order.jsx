@@ -27,6 +27,7 @@ function Account() {
   const [hover, setHover] = useState(null);
   const [info, setInfo] = useState([]);
   const [sortOders, setSortOders] = useState([]);
+  const [colorActive, setColorActive] = useState('');
 
   const evaluate ={
     1: "Rất tệ",
@@ -39,10 +40,14 @@ function Account() {
   useEffect(() => {
     dispatch(getOrders());
   }, [dispatch]);
-
+  
   const orderState = useSelector((state) => state.order.orders);
+  useEffect(() => {
+    setSortOders(orderState)
+  },[orderState])
   // sap xep theo trang thai hoa don
   const handleClick = (name) =>{
+    setColorActive(name);
    if(name === "All"){
        setSortOders(orderState);
    }
@@ -135,12 +140,12 @@ function Account() {
           <div className="content">
             <h4>Đơn hàng của bạn</h4>
             <div className="order-status">
-              <Button variant="dark" onClick={()=>handleClick('All')}>Tất cả</Button>
-              <Button variant="success" onClick={()=>handleClick('Unpaid')}>Chưa thanh toán</Button>
-              <Button variant="danger" onClick={()=>handleClick('Pending')}>Đang xử lí</Button>
-              <Button variant="primary" onClick={()=>handleClick('Shipping')}>Đang giao hàng</Button>
-              <Button variant="warning" onClick={()=>handleClick('Cancelled')}>Đã hủy</Button>
-              <Button variant="secondary" onClick={()=>handleClick('Delivered')}>Đã giao hàng</Button>
+              <Button variant="secondary" onClick={()=>handleClick('All')} className={colorActive === 'All' ? 'bg-dark' : ''}>Tất cả</Button>
+              {/* <Button variant="secondary" onClick={()=>handleClick('Unpaid')} className={colorActive === 'Unpaid' ? 'bg-dark' : ''}>Chưa thanh toán</Button> */}
+              <Button variant="secondary" onClick={()=>handleClick('Pending')} className={colorActive === 'Pending' ? 'bg-dark' : ''}>Đang xử lí</Button>
+              <Button variant="secondary" onClick={()=>handleClick('Shipping')} className={colorActive === 'Shipping' ? 'bg-dark' : ''}>Đang giao hàng</Button>
+              <Button variant="secondary" onClick={()=>handleClick('Cancelled')} className={colorActive === 'Cancelled' ? 'bg-dark' : ''}>Đã hủy</Button>
+              <Button variant="secondary" onClick={()=>handleClick('Delivered')} className={colorActive === 'Delivered' ? 'bg-dark' : ''}>Đã giao hàng</Button>
             </div>
             <div className="pt-3">
               {sortOders.map((item) => {
