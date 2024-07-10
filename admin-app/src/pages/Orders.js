@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Table, Modal, Select, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getOrders, updateOrderStatus } from '../features/order/orderSlice';
-import { Link } from 'react-router-dom';
 import { FiEdit } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import { CiExport } from "react-icons/ci";
+import { CSVLink } from 'react-csv';
 
 const { Option } = Select;
 
@@ -126,9 +127,30 @@ const Orders = () => {
     };
   });
 
+  const dataExport = orderState.map((order, index) => {
+    const productNames = order.products.map(product => product.product.title).join(", ");
+    return {
+      'STT': index + 1,
+      'Tên sản phẩm': productNames,
+      'Địa chỉ': order.orderby.address,
+      'Số điện thoại':`${'Tel: '}${order.orderby.mobile}`,
+      'Người đặt': `${order.orderby.firstname} ${order.orderby.lastname}`,
+      'Trạng thái đơn hàng': order.orderStatus,
+    };
+  });
+
   return (
     <div>
-      <h3>Đơn hàng của khách</h3>
+      <div className='d-flex justify-content-between'>
+        <h3>Đơn hàng của khách</h3>
+        <CSVLink
+            data={dataExport} 
+            separator={","}
+            filename={"order.csv"}
+            className="btn btn-warning mb-2 d-flex align-items-center"
+        > <CiExport className='me-1'/> Export</CSVLink>
+      </div>
+      
       <Table columns={columns} dataSource={data} />
       <Modal title="Update Order Status" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <Select style={{ width: '100%' }} onChange={handleChange} value={newStatus}>
