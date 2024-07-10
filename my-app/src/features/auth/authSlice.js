@@ -9,6 +9,7 @@ const initialState = {
     user: getUserFromLocalStorage,
     carts: [],
     cart: "",
+    payment: "",
     isError: false,
     isLoading: false,
     isSuccess: false,
@@ -103,6 +104,17 @@ export const applyCoupon = createAsyncThunk(
     }
 )
 
+export const payment = createAsyncThunk(
+    "auth/payment",
+    async (data, thunkAPI) => {
+        try {
+            return await authService.payment(data);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
 export const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -162,6 +174,19 @@ export const authSlice = createSlice({
                 state.cart = action.payload;
             })
             .addCase(addToCart.rejected, (state) => {
+                state.isLoading = false;
+                state.isError = true;
+                state.isSuccess = false;
+            })
+            .addCase(payment.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(payment.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.isSuccess = true;
+                state.payment = action.payload;
+            })
+            .addCase(payment.rejected, (state) => {
                 state.isLoading = false;
                 state.isError = true;
                 state.isSuccess = false;

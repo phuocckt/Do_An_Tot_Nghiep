@@ -7,7 +7,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
-import { getOrders } from "../features/order/orderSlice";
+import { cancelOrder, getOrders } from "../features/order/orderSlice";
 import "./css/order.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -58,6 +58,26 @@ function Account() {
        setSortOders(order)
    } 
  }
+
+  const handleCancelOrder = (id) => {
+    dispatch(cancelOrder({ id: id, orderData: { status: "Cancelled" } }))
+    .unwrap()
+      .then(() => {
+        Swal.fire({
+          title: "Đã hủy đơn hàng!",
+          icon: "success",
+          confirmButtonText: "OK",
+        });
+        dispatch(getOrders());
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: "Có sự cố về đơn hàng. Không thể hủy!",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      });
+  }
 
   const handleLogout = () => {
     Swal.fire({
@@ -142,10 +162,10 @@ function Account() {
             <div className="order-status">
               <Button variant="secondary" onClick={()=>handleClick('All')} className={colorActive === 'All' ? 'bg-dark' : ''}>Tất cả</Button>
               {/* <Button variant="secondary" onClick={()=>handleClick('Unpaid')} className={colorActive === 'Unpaid' ? 'bg-dark' : ''}>Chưa thanh toán</Button> */}
-              <Button variant="secondary" onClick={()=>handleClick('Pending')} className={colorActive === 'Pending' ? 'bg-dark' : ''}>Đang xử lí</Button>
-              <Button variant="secondary" onClick={()=>handleClick('Shipping')} className={colorActive === 'Shipping' ? 'bg-dark' : ''}>Đang giao hàng</Button>
-              <Button variant="secondary" onClick={()=>handleClick('Cancelled')} className={colorActive === 'Cancelled' ? 'bg-dark' : ''}>Đã hủy</Button>
-              <Button variant="secondary" onClick={()=>handleClick('Delivered')} className={colorActive === 'Delivered' ? 'bg-dark' : ''}>Đã giao hàng</Button>
+              <Button variant="warning" onClick={()=>handleClick('Pending')} className={colorActive === 'Pending' ? 'bg-dark' : ''}>Đang xử lí</Button>
+              <Button variant="primary" onClick={()=>handleClick('Shipping')} className={colorActive === 'Shipping' ? 'bg-dark' : ''}>Đang giao hàng</Button>
+              <Button variant="danger" onClick={()=>handleClick('Cancelled')} className={colorActive === 'Cancelled' ? 'bg-dark' : ''}>Đã hủy</Button>
+              <Button variant="success" onClick={()=>handleClick('Delivered')} className={colorActive === 'Delivered' ? 'bg-dark' : ''}>Đã giao hàng</Button>
             </div>
             <div className="pt-3">
               {sortOders.map((item) => {
@@ -200,7 +220,7 @@ function Account() {
                                 <span className="original-price"></span>
                               )}
                               <span className="discounted-price">
-                                <CurrencyFormatter amount={i.product.price}/>/1
+                                <CurrencyFormatter amount={i.product.price}/>
                               </span>
                             </div>
                           </div>
@@ -210,13 +230,15 @@ function Account() {
 
                     <div className="order-footer">
                       <span>
-                        Thành tiền: <CurrencyFormatter className="text-danger fw-bold fs-4" amount={item.paymentIntent.amount}/>
+                        Thành tiền: <CurrencyFormatter className="text-danger fw-bold fs-4" amount={item.paymentIntent.amount}/><br></br>
+                        {item.paymentIntent.method=="VNPAY"?"Thanh toán bằng VNPAY":"Thanh toán bằng tiền mặt"}
                       </span>
-                      {item.orderStatus == "Pending" ||
-                      item.orderStatus == "Unpaid" ? (
-                        <button className="btn btn-danger">
+                      {item.orderStatus == "Pending" ? (
+                        <button className="btn btn-danger" onClick={()=>handleCancelOrder(item._id)}>
                           Hủy đơn hàng
                         </button>
+                      ) : item.orderStatus == "Cancelled" ? (
+                        <span>Đã hủy bởi bạn</span>
                       ) : (
                         ""
                       )}

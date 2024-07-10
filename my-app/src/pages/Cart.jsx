@@ -1,35 +1,69 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import "./css/Cart.css";
-import { applyCoupon, deleteCart, getCart } from "../features/auth/authSlice";
+import { applyCoupon, deleteCart, getCart, payment } from "../features/auth/authSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { createOrder } from "../features/order/orderSlice";
+import { createOrder, createPaymentOrder } from "../features/order/orderSlice";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import { getUser } from "../features/customer/customerSlice";
 
 function Cart() {
   const dispatch = useDispatch();
-  const cartState = useSelector((state) => state.auth.carts);
+  const location = useLocation();
   const user = useSelector(state => state.auth.user);
-
+  const paymentURL = useSelector(state => state.auth.payment);
+  
   useEffect(() => {
     dispatch(getCart());
     dispatch(getUser(user._id));
   }, [dispatch]);
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    if (queryParams.has('vnp_Amount')) {
+      const params = Object.fromEntries(queryParams.entries());
+      dispatch(createPaymentOrder(params));
+    }
+  }, [location.search, dispatch]);
+  
+  const cartState = useSelector((state) => state.auth.carts);
   const userState = useSelector(state => state.customer.customer);
 
   let schema = yup.object().shape({
     COD: yup.boolean().required("COD is required"),
   });
 
+  const paymentFormik = useFormik({
+    initialValues: {
+      orderType: "billpayment",
+      amount: cartState?.cartTotal || 0,
+      orderDescription: "paymentOrder",
+      language: "vn"
+    },
+    enableReinitialize: true,
+    onSubmit: values => {
+      dispatch(payment(values))
+        .unwrap()
+        .then(() => {
+          window.location.href = paymentURL;
+        })
+        .catch(() => {
+          Swal.fire({
+            title: "Thanh toán thất bại!",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        });
+    }
+  });
+
   const formik = useFormik({
     initialValues: {
-      COD: false,
+      COD: true,
       couponApplied: false,
     },
     validationSchema: schema,
@@ -52,7 +86,7 @@ function Cart() {
             icon: "success",
             confirmButtonText: "OK",
           });
-          dispatch(getCart())
+          dispatch(getCart());
         })
         .catch(() => {
           Swal.fire({
@@ -72,7 +106,7 @@ function Cart() {
       dispatch(applyCoupon(values))
         .unwrap()
         .then(() => {
-          dispatch(getCart())
+          dispatch(getCart());
         })
         .catch(() => {
           Swal.fire({
@@ -164,12 +198,6 @@ function Cart() {
       <div className="cart-invoice">
         <h3 className="py-3">Thông tin thanh toán</h3>
         <div className="invoice-info">
-          {/* <div className="subtotal">
-            <p>Tổng tiền:</p>
-            <p>
-              <CurrencyFormatter amount={cartState ? cartState.products.price : 0} />
-            </p>
-          </div> */}
           <div className="invoice-delivery align-items-center">
             <p>Voucher giảm giá:</p>
             <form className="d-flex" onSubmit={formikCoupon.handleSubmit}>
@@ -197,29 +225,23 @@ function Cart() {
             <div className="payment-method mb-3 ps-3">
               <div>
                 <input
-                  type="radio"
+                  type="hidden"
                   name="COD"
                   value={true}
                   checked={formik.values.COD === true}
                   onChange={() => formik.setFieldValue('COD', true)}
                   className="me-2"
                 />
-                <span>Thanh toán khi nhận hàng</span>
               </div>
-              <div className="d-none">
-                <input
-                  type="radio"
-                  name="couponApplied"
-                  placeholder="Mã giảm giá"
-                  value={formik.values.couponApplied}
-                  onChange={formik.handleChange}
-                  className="me-2"
-                />
-                Thanh toán trước bằng ngân hàng
-              </div>
-              
             </div>
-            <button type="submit">Đặt hàng</button>
+            <button type="submit">Thanh toán khi nhận hàng</button>
+          </form>
+          <form onSubmit={paymentFormik.handleSubmit}>
+            <input type="hidden" name="orderDescription" value={paymentFormik.values.orderDescription}/>
+            <input type="hidden" name="amount" value={paymentFormik.values.amount}/>
+            <input type="hidden" name="orderType" value={paymentFormik.values.orderType}/>
+            <input type="hidden" name="language" value={paymentFormik.values.language}/>
+            <button type="submit" name="redirect">Thanh toán trực tuyến</button>
           </form>
         </div>
       </div>

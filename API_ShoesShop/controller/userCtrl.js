@@ -15,6 +15,8 @@ const crypto = require("crypto");
 const uniqid = require('uniqid');
 const { cloudinaryUploadImg } = require("../utils/cloudinary");
 const bcrypt = require('bcryptjs');
+const qs = require('qs');
+const moment = require("moment");
 
 //đăng kí user
 const createUser = asyncHandler(async (req, res) => {
@@ -545,7 +547,13 @@ const createCashOrder = asyncHandler(async (req, res) => {
     try {
         if (!COD) throw new Error("Create cash order failed");
         const user = await User.findById(_id);
-        const userCart = await Cart.findOne({ orderby: user._id });
+        const userCart = await Cart.findOne({ orderby: user._id }).populate({
+            path: 'products.product',
+            populate: {
+                path: 'variants.size',
+                model: 'Size'
+            }
+        });
         let finalAmount = couponApplied && userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
 
         // Kiểm tra và cập nhật số lượng sản phẩm và các biến thể
@@ -588,19 +596,20 @@ const createCashOrder = asyncHandler(async (req, res) => {
                     update: { $inc: { quantity: -item.count, sold: +item.count } }
                 }
             };
-            let variantUpdate = {
-                updateOne: {
-                    filter: {
-                        _id: item.product._id,
-                        "variants.size.title": item.size
-                    },
-                    update: { $inc: { "variants.quantity": -item.count } },
-                }
-            };
+            const product = item.product;
+            const size = item.size;
 
-            return [productUpdate, variantUpdate];
+            const variant = product.variants.find(v => v.size && v.size.title === size);
+
+            if (variant) {
+                variant.quantity -= item.count;
+            }
+
+            product.save();
+
+
+            return productUpdate;
         }).flat();
-        
         const updated = await Product.bulkWrite(update, {});
 
         // Xóa giỏ hàng sau khi tạo đơn hàng
@@ -611,60 +620,245 @@ const createCashOrder = asyncHandler(async (req, res) => {
     }
 });
 
-
-const createOnOrder = asyncHandler(async (req, res) => {
-    const { Bank, couponApplied, paymentConfirmed } = req.body; // Assume paymentConfirmed indicates if the payment was successful
+const createPaymentOrder = asyncHandler(async (req, res) => {
+    const { vnp_Amount, vnp_OrderInfo, vnp_TxnRef, vnp_SecureHash, vnp_ResponseCode } = req.query;
     const { _id } = req.user;
-    try {
-        if (!Bank) throw new Error("Create online order failed");
-        const user = await User.findById(_id);
-        const userCart = await Cart.findOne({ orderby: user._id });
-        let finalAmount = couponApplied && userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
 
-        // Check stock availability for each product in the cart
+    try {
+        // Validate the payment
+        if (vnp_ResponseCode !== '00') {
+            throw new Error("Payment failed");
+        }
+
+        // Fetch user and cart details
+        const user = await User.findById(_id);
+        const userCart = await Cart.findOne({ orderby: user._id }).populate({
+            path: 'products.product',
+            populate: {
+                path: 'variants.size',
+                model: 'Size'
+            }
+        });
+        //let finalAmount = userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
+
+        // Check stock and update product quantities
         for (let item of userCart.products) {
             let product = await Product.findById(item.product._id);
             if (!product) throw new Error(`Product with ID ${item.product._id} not found`);
+
+            // Check product stock
             if (product.quantity < item.count) {
                 throw new Error(`Insufficient stock for product ${product.title}`);
             }
+
+            // Check variant stock
+            let variant = product.variants.find(variant => variant.size.title === item.size);
+            if (variant && variant.quantity < item.count) {
+                throw new Error(`Insufficient stock for product ${product.title} in size ${item.size}`);
+            }
         }
 
-        // Determine the initial order status based on payment confirmation
-        let orderStatus = paymentConfirmed ? "Pending" : "Unpaid";
-
-        // Create the new order
+        // Create new order
         let newOrder = await new Order({
             products: userCart.products,
             paymentIntent: {
-                id: uniqid(),
-                method: "Bank",
-                amount: finalAmount,
-                status: paymentConfirmed ? "Paid" : "Unpaid",
+                id: vnp_TxnRef,
+                method: "VNPAY",
+                amount: vnp_Amount / 100,
+                status: "Completed", // Assuming payment was successful
                 created: Date.now(),
                 currency: "vnd"
             },
             orderby: user._id,
-            orderStatus: orderStatus
+            orderStatus: "Pending"
         }).save();
 
-        // Update product stock quantities and sold counts
+        // Update product quantities and variants
         let update = userCart.products.map(item => {
-            return {
+            let productUpdate = {
                 updateOne: {
                     filter: { _id: item.product._id },
                     update: { $inc: { quantity: -item.count, sold: +item.count } }
                 }
             };
-        });
-        await Product.bulkWrite(update, {});
+            const product = item.product;
+            const size = item.size;
 
-        // Clear the user's cart
+            const variant = product.variants.find(v => v.size && v.size.title === size);
+
+            if (variant) {
+                variant.quantity -= item.count;
+            }
+
+            product.save();
+
+            return productUpdate;
+        }).flat();
+        const updated = await Product.bulkWrite(update, {});
+
+        // Delete cart after creating order
         await Cart.deleteOne({ orderby: user._id });
-
         res.json(newOrder);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+const createPayment = asyncHandler(async (req, res) => {
+    try {
+        var ipAddr = req.headers['x-forwarded-for'] ||
+            req.connection.remoteAddress ||
+            req.socket.remoteAddress ||
+            req.connection.socket.remoteAddress;
+
+        const dateFormat = (await import('dateformat')).default;
+
+
+        var tmnCode = "BPHR7PSX"
+        var secretKey = "UPMVCO3UUSB53D86YM1VH45WZ01NENQV"
+        var vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+        var returnUrl = "http://localhost:3000/cart"
+
+        let date = new Date();
+        // currentDate.setHours(currentDate.getHours() + 7); // Chuyển đổi sang UTC+7
+        // const timestamp = currentDate.getTime();
+
+        // Assuming 'date' is a valid Date object or timestamp
+        let ExpireDate = new Date(); // Create a new Date object from the input
+        // Add 10 minutes to the date
+        ExpireDate.setMinutes(ExpireDate.getMinutes() + 10);
+
+        // Convert the date to a string in ISO format and slice to get 'yyyy-mm-ddTHH:mm:ss'
+        let isoString =
+        ExpireDate.toISOString();
+
+        // Replace '-' and 'T' to get 'yyyymmddHHmmss' format
+        ExpireDate = isoString.replace(/-/g, '').replace(/T/g, '');
+
+        // Trim trailing zeros and ensure the format is consistent
+        ExpireDate = ExpireDate.slice(0, -2).padStart(14, '0'); // Pad with zeros if necessary
+
+        console.log(ExpireDate);
+
+        var vnp_ExpireDate = ExpireDate;
+        var createDate = moment(date).format('YYYYMMDDHHmmss');
+        var orderId = dateFormat(date, 'HHmmss');
+        var amount = req.body.amount;
+        // var bankCode = req.body.bankCode;
+
+        var orderInfo = req.body.orderDescription;
+        var orderType = req.body.orderType;
+        var locale = req.body.language;
+        if (locale === null || locale === '') {
+            locale = 'vn';
+        }
+        var currCode = 'VND';
+        var vnp_Params = {};
+        vnp_Params['vnp_Version'] = '2.1.0';
+        vnp_Params['vnp_Command'] = 'pay';
+        vnp_Params['vnp_TmnCode'] = tmnCode;
+        // vnp_Params['vnp_Merchant'] = '';
+        vnp_Params['vnp_Locale'] = locale;
+        vnp_Params['vnp_CurrCode'] = currCode;
+        vnp_Params['vnp_TxnRef'] = orderId;
+        vnp_Params['vnp_OrderInfo'] = orderInfo;;
+        vnp_Params['vnp_OrderType'] = orderType;
+        vnp_Params['vnp_Amount'] = amount * 100;
+        vnp_Params['vnp_ReturnUrl'] = returnUrl;
+        vnp_Params['vnp_IpAddr'] = '1.54.5.211';
+        vnp_Params['vnp_CreateDate'] = createDate;
+        // vnp_Params['vnp_ExpireDate'] = vnp_ExpireDate;
+        // if (bankCode !== null && bankCode !== '') {
+        //     vnp_Params['vnp_BankCode'] = bankCode;
+        // }
+
+        vnp_Params = sortObject(vnp_Params);
+
+        var signData = qs.stringify(vnp_Params, { encode: false });
+        var hmac = crypto.createHmac("sha512", secretKey);
+        console.log(hmac);
+        const signDataBytes = Buffer.from(signData, 'utf-8');
+        const signed = hmac.update(signDataBytes).digest("hex");
+        vnp_Params['vnp_SecureHash'] = signed;
+        vnpUrl += '?' + qs.stringify(vnp_Params, { encode: false });
+
+        res.json(vnpUrl)
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+function sortObject(obj) {
+	let sorted = {};
+	let str = [];
+	let key;
+	for (key in obj){
+		if (obj.hasOwnProperty(key)) {
+		str.push(encodeURIComponent(key));
+		}
+	}
+	str.sort();
+    for (key = 0; key < str.length; key++) {
+        sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+    }
+    return sorted;
+}
+
+
+const vnpayIpn = asyncHandler(async (req, res) => {
+    var vnp_Params = req.query;
+    var secureHash = vnp_Params['vnp_SecureHash'];
+
+    delete vnp_Params['vnp_SecureHash'];
+    delete vnp_Params['vnp_SecureHashType'];
+
+    vnp_Params = sortObject(vnp_Params);
+    var config = require('config');
+    var secretKey = config.get('vnp_HashSecret');
+    var querystring = require('qs');
+    var signData = querystring.stringify(vnp_Params, { encode: false });
+    var crypto = require("crypto");
+    var hmac = crypto.createHmac("sha512", secretKey);
+    var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+
+
+    if (secureHash === signed) {
+        var orderId = vnp_Params['vnp_TxnRef'];
+        var rspCode = vnp_Params['vnp_ResponseCode'];
+        //Kiem tra du lieu co hop le khong, cap nhat trang thai don hang va gui ket qua cho VNPAY theo dinh dang duoi
+        res.status(200).json({ RspCode: '00', Message: 'success' })
+    }
+    else {
+        res.status(200).json({ RspCode: '97', Message: 'Fail checksum' })
+    }
+})
+
+const vnpayReturn = asyncHandler(async (req, res) => {
+    var vnp_Params = req.query;
+
+    var secureHash = vnp_Params['vnp_SecureHash'];
+
+    delete vnp_Params['vnp_SecureHash'];
+    delete vnp_Params['vnp_SecureHashType'];
+
+    vnp_Params = sortObject(vnp_Params);
+
+    var config = require('config');
+    var tmnCode = config.get('vnp_TmnCode');
+    var secretKey = config.get('vnp_HashSecret');
+
+    var querystring = require('qs');
+    var signData = querystring.stringify(vnp_Params, { encode: false });
+    var crypto = require("crypto");
+    var hmac = crypto.createHmac("sha512", secretKey);
+    var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");
+
+    if (secureHash === signed) {
+        //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
+
+        res.render('success', { code: vnp_Params['vnp_ResponseCode'] })
+    } else {
+        res.render('success', { code: '97' })
     }
 });
 
@@ -716,7 +910,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
             for (const item of order.products) {
                 const product = item.product;
                 const size = item.size;
-                
+
                 // Find the variant with the correct size and update its quantity
                 const variant = product.variants.find(v => v.size && v.size.title === size);
                 console.log(variant);
@@ -724,11 +918,11 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
                     variant.quantity += item.count;
                     console.log(variant.quantity);
                 }
-                
+
                 // Update overall product quantity and sold count
                 product.quantity += item.count;
                 product.sold -= item.count;
-                
+
                 await product.save();
             }
         }
@@ -797,10 +991,13 @@ module.exports = {
     emptyCart,
     applyCoupon,
     createCashOrder,
-    createOnOrder,
+    createPaymentOrder,
     getOrders,
     getAllOrders,
     updateOrderStatus,
     uploadAvatar,
-    getOrdersByUser
+    getOrdersByUser,
+    createPayment,
+    vnpayIpn,
+    vnpayReturn
 };

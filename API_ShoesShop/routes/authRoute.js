@@ -1,5 +1,5 @@
 const express = require("express");
-const { createUser, loginUserCtrl, getallUsers, getAUser, deleteAUser, updateAUser, blockUser, unBlockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, saveAddress, userCart, UserCart, emptyCart, applyCoupon, createCashOrder ,getOrders, updateOrderStatus, getAllOrders, uploadAvatar, createOnOrder, getOrdersByUser} = require("../controller/userCtrl");
+const { createUser, loginUserCtrl, getallUsers, getAUser, deleteAUser, updateAUser, blockUser, unBlockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, saveAddress, userCart, UserCart, emptyCart, applyCoupon, createCashOrder ,getOrders, updateOrderStatus, getAllOrders, uploadAvatar, getOrdersByUser, createPayment, vnpayIpn, vnpayReturn, createPaymentOrder} = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const { uploadPhoto } = require("../middlewares/uploadImages");
 const router =  express.Router();
@@ -14,7 +14,10 @@ router.post('/admin-login', loginAdmin);
 router.post('/cart', authMiddleware, userCart);
 router.post('/cart/apply-coupon', authMiddleware, applyCoupon);
 router.post('/cart/cash-order', authMiddleware, createCashOrder);
-router.post('/cart/online-order', authMiddleware, createOnOrder);
+router.post('/cart/create_payment_url', authMiddleware, createPayment);
+router.get('/cart/payment-order', authMiddleware, createPaymentOrder);
+router.get('/cart/vnpay_ipn', vnpayIpn);
+router.get('/cart/vnpay_return', vnpayReturn);
 router.get('/all-users', getallUsers);
 router.get('/all-orders', authMiddleware, getOrders);
 router.get('/all-orders-user', authMiddleware, getAllOrders);

@@ -12,9 +12,22 @@ const createOrder = async (data) => {
     return res.data;
 }
 
+const createPaymentOrder = async (params) => {
+    const query = new URLSearchParams(params).toString();
+    const res = await axios.get(`${base_url}user/cart/payment-order?${query}`, config);
+    return res.data;
+}
+
+const cancelOrder = async (data) => {
+    const res = await axios.put(`${base_url}user/order/update-order/${data.id}`,data.orderData, config);
+    return res.data;
+}
+
 const orderService = {
     getOrders,
-    createOrder
+    createOrder,
+    createPaymentOrder,
+    cancelOrder
 }
 
 export default orderService;
