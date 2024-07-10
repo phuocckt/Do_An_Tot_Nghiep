@@ -1,0 +1,24 @@
+.account{
+    display: flex;
+    justify-content: start;
+    align-items: start;
+}
+.account-info{
+    text-align: center;
+    padding: 2em 3em;
+    min-width: 350px;
+    border-bottom: 2px solid gray;
+}
+.account-info img{
+    width: 200px;
+    border-radius: 50%;
+}
+.account-info button{
+    background-color: #C80036;
+    color: white;
+    border: none;
+    padding: 0.5em 1em;
+    font-weight: bold;
+    margin-top: 1em;
+    border-radius: .5em;
+}

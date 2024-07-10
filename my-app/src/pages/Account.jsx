@@ -1,5 +1,4 @@
 import "./css/Account.css";
-import { logout } from '../features/auth/authSlice';
 import Swal from 'sweetalert2';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,6 +11,7 @@ import { useFormik } from "formik";
 import * as yup from 'yup';
 import { getUser, updatePassword, updateUser } from "../features/customer/customerSlice";
 import { useEffect, useState } from "react";
+import Logout from "../components/Logout"
 
 function Account() {
   const dispatch = useDispatch();
@@ -24,21 +24,6 @@ function Account() {
     dispatch(getUser(user._id));
   },[])
   const userState = useSelector(state => state.customer.customer);
-  const handleLogout = () => {
-    Swal.fire({
-      title: 'Bạn muốn đăng xuất?',
-      icon: 'warning',
-      showCancelButton: true, 
-      confirmButtonText: 'Đăng xuất',
-      cancelButtonText: 'Không',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(logout());
-        Swal.fire('Đã đăng xuất!', '', 'success');
-        navigate("/");
-      }
-    });
-  }
 
   let schema = yup.object().shape({
     firstname: yup.string().required('Firstname is required'),
@@ -130,10 +115,10 @@ function Account() {
         <div className="account-info">
           <h3 className="mb-3">Thông tin tài khoản</h3>
           {
-            user.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" fluid/>)
+            user?.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" fluid/>)
           }
           <h3>{user?.firstname + ' ' + user?.lastname}</h3>
-          <button onClick={handleLogout}>Đăng xuất</button>
+          <button className="bg-danger"><Logout/></button>
         </div>
         <div className="account-content">
           <ul className="account-menu">

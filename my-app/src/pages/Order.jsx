@@ -1,5 +1,4 @@
 import "./css/Account.css";
-import { logout } from "../features/auth/authSlice";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,6 +15,7 @@ import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import FormattedDate from "../components/FormattedDate";
 import { FaStar } from "react-icons/fa";
 import { getUser } from "../features/customer/customerSlice";
+import Logout from "../components/Logout";
 
 function Account() {
   const dispatch = useDispatch();
@@ -27,41 +27,40 @@ function Account() {
   const [hover, setHover] = useState(null);
   const [info, setInfo] = useState([]);
   const [sortOders, setSortOders] = useState([]);
-  const [colorActive, setColorActive] = useState('');
+  const [colorActive, setColorActive] = useState("");
 
-  const evaluate ={
+  const evaluate = {
     1: "Rất tệ",
     2: "Tệ",
     3: "Khá",
     4: "Tốt",
-    5: "Rất tốt"
-  }
+    5: "Rất tốt",
+  };
 
   useEffect(() => {
     dispatch(getOrders());
   }, [dispatch]);
-  
+
   const orderState = useSelector((state) => state.order.orders);
   useEffect(() => {
-    setSortOders(orderState)
-  },[orderState])
+    setSortOders(orderState);
+  }, [orderState]);
   // sap xep theo trang thai hoa don
-  const handleClick = (name) =>{
+  const handleClick = (name) => {
     setColorActive(name);
-   if(name === "All"){
-       setSortOders(orderState);
-   }
-   else{
-       let order = orderState.filter(item => {
-           return item.orderStatus === name;
-       })
-       setSortOders(order)
-   } 
- }
+    if (name === "All") {
+      setSortOders(orderState);
+    } else {
+      let order = orderState.filter((item) => {
+        return item.orderStatus === name;
+      });
+      setSortOders(order);
+    }
+  };
 
   const handleCancelOrder = (id) => {
     dispatch(cancelOrder({ id: id, orderData: { status: "Cancelled" } }))
-    .unwrap()
+      .unwrap()
       .then(() => {
         Swal.fire({
           title: "Đã hủy đơn hàng!",
@@ -77,22 +76,6 @@ function Account() {
           confirmButtonText: "OK",
         });
       });
-  }
-
-  const handleLogout = () => {
-    Swal.fire({
-      title: "Bạn muốn đăng xuất ?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Đăng xuất",
-      cancelButtonText: "Không",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(logout());
-        Swal.fire("Đã đăng xuất !", "", "success");
-        navigate("/");
-      }
-    });
   };
 
   const Schema = yup.object().shape({
@@ -138,11 +121,25 @@ function Account() {
       <div className="account">
         <div className="account-info">
           <h3 className="mb-3">Thông tin tài khoản</h3>
-          {
-            user.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" fluid/>)
-          }
+          {user.images.length > 0 ? (
+            <img
+              src={user.images[0]?.url}
+              alt="no_image"
+              className="rounded-circle"
+              fluid
+            />
+          ) : (
+            <img
+              src="../hinh/user-none.jpg"
+              alt="no_image"
+              className="rounded-circle"
+              fluid
+            />
+          )}
           <h3>{user?.firstname + " " + user?.lastname}</h3>
-          <button onClick={handleLogout}>Đăng xuất</button>
+          <button className="bg-danger">
+            <Logout />
+          </button>
         </div>
         <div className="account-content">
           <ul className="account-menu">
@@ -160,12 +157,42 @@ function Account() {
           <div className="content">
             <h4>Đơn hàng của bạn</h4>
             <div className="order-status">
-              <Button variant="secondary" onClick={()=>handleClick('All')} className={colorActive === 'All' ? 'bg-dark' : ''}>Tất cả</Button>
+              <Button
+                variant="secondary"
+                onClick={() => handleClick("All")}
+                className={colorActive === "All" ? "bg-dark" : ""}
+              >
+                Tất cả
+              </Button>
               {/* <Button variant="secondary" onClick={()=>handleClick('Unpaid')} className={colorActive === 'Unpaid' ? 'bg-dark' : ''}>Chưa thanh toán</Button> */}
-              <Button variant="warning" onClick={()=>handleClick('Pending')} className={colorActive === 'Pending' ? 'bg-dark' : ''}>Đang xử lí</Button>
-              <Button variant="primary" onClick={()=>handleClick('Shipping')} className={colorActive === 'Shipping' ? 'bg-dark' : ''}>Đang giao hàng</Button>
-              <Button variant="danger" onClick={()=>handleClick('Cancelled')} className={colorActive === 'Cancelled' ? 'bg-dark' : ''}>Đã hủy</Button>
-              <Button variant="success" onClick={()=>handleClick('Delivered')} className={colorActive === 'Delivered' ? 'bg-dark' : ''}>Đã giao hàng</Button>
+              <Button
+                variant="warning"
+                onClick={() => handleClick("Pending")}
+                className={colorActive === "Pending" ? "bg-dark" : ""}
+              >
+                Đang xử lí
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() => handleClick("Shipping")}
+                className={colorActive === "Shipping" ? "bg-dark" : ""}
+              >
+                Đang giao hàng
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => handleClick("Cancelled")}
+                className={colorActive === "Cancelled" ? "bg-dark" : ""}
+              >
+                Đã hủy
+              </Button>
+              <Button
+                variant="success"
+                onClick={() => handleClick("Delivered")}
+                className={colorActive === "Delivered" ? "bg-dark" : ""}
+              >
+                Đã giao hàng
+              </Button>
             </div>
             <div className="pt-3">
               {sortOders.map((item) => {
@@ -183,18 +210,27 @@ function Account() {
                                 className="product-image"
                               />
                             </Link>
-                            
+
                             <div className="product-info">
                               <h3>{i.product.title}</h3>
-                              <p>Kích thước: <span className="fw-bold">{i.size}</span></p>
-                              <p>Số lượng: <span className="fw-bold">x{i.count}</span></p>
+                              <p>
+                                Kích thước:{" "}
+                                <span className="fw-bold">{i.size}</span>
+                              </p>
+                              <p>
+                                Số lượng:{" "}
+                                <span className="fw-bold">x{i.count}</span>
+                              </p>
                               {item.orderStatus == "Delivered" ? (
                                 <button
                                   className="btn btn-warning"
                                   onClick={() => {
                                     setShowModal(true);
                                     setCurrentProdId(i.product._id);
-                                    setInfo([i.product.image[0].url,i.product.title]);
+                                    setInfo([
+                                      i.product.image[0].url,
+                                      i.product.title,
+                                    ]);
                                     setStars(null);
                                   }}
                                 >
@@ -205,7 +241,10 @@ function Account() {
                               )}
                               {i.product.ratings?.map((rat) => {
                                 return rat.postedby == user._id ? (
-                                  <p className="fst-italic text-danger">Sản phẩm đã được bạn đánh giá {rat.star} sao.</p>
+                                  <p className="fst-italic text-danger">
+                                    Sản phẩm đã được bạn đánh giá {rat.star}{" "}
+                                    sao.
+                                  </p>
                                 ) : (
                                   ""
                                 );
@@ -214,13 +253,15 @@ function Account() {
                             <div className="product-price">
                               {i.product.priceOld != null ? (
                                 <span className="original-price">
-                                  <CurrencyFormatter amount={i.product.priceOld}/>
+                                  <CurrencyFormatter
+                                    amount={i.product.priceOld}
+                                  />
                                 </span>
                               ) : (
                                 <span className="original-price"></span>
                               )}
                               <span className="discounted-price">
-                                <CurrencyFormatter amount={i.product.price}/>
+                                <CurrencyFormatter amount={i.product.price} />
                               </span>
                             </div>
                           </div>
@@ -230,11 +271,21 @@ function Account() {
 
                     <div className="order-footer">
                       <span>
-                        Thành tiền: <CurrencyFormatter className="text-danger fw-bold fs-4" amount={item.paymentIntent.amount}/><br></br>
-                        {item.paymentIntent.method=="VNPAY"?"Thanh toán bằng VNPAY":"Thanh toán bằng tiền mặt"}
+                        Thành tiền:{" "}
+                        <CurrencyFormatter
+                          className="text-danger fw-bold fs-4"
+                          amount={item.paymentIntent.amount}
+                        />
+                        <br></br>
+                        {item.paymentIntent.method == "VNPAY"
+                          ? "Thanh toán bằng VNPAY"
+                          : "Thanh toán bằng tiền mặt"}
                       </span>
                       {item.orderStatus == "Pending" ? (
-                        <button className="btn btn-danger" onClick={()=>handleCancelOrder(item._id)}>
+                        <button
+                          className="btn btn-danger"
+                          onClick={() => handleCancelOrder(item._id)}
+                        >
                           Hủy đơn hàng
                         </button>
                       ) : item.orderStatus == "Cancelled" ? (
@@ -253,7 +304,7 @@ function Account() {
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title className="d-flex">
-            <img src={info[0]} alt="" width={'50px'} height={'50px'}/>
+            <img src={info[0]} alt="" width={"50px"} height={"50px"} />
             <p className="ms-3 fs-5">{info[1]}</p>
           </Modal.Title>
         </Modal.Header>
@@ -268,36 +319,38 @@ function Account() {
               />
               <Form.Label className="fw-bold">Đánh giá: </Form.Label>
               {stars && evaluate[stars] && (
-                  <span className="evaluation ms-2">( {evaluate[stars]} )</span>
-                )}
+                <span className="evaluation ms-2">( {evaluate[stars]} )</span>
+              )}
               <div className="star-rating justify-content-center">
                 {[1, 2, 3, 4, 5].map((star) => {
-                  return(
+                  return (
                     <>
                       <label>
-                        <input 
-                          type="radio" 
-                          name="star" 
-                          value={star} 
-                          checked={formik.values.star == star} 
+                        <input
+                          type="radio"
+                          name="star"
+                          value={star}
+                          checked={formik.values.star == star}
                           onChange={formik.handleChange}
                           className="d-none"
-                          onClick={()=>setStars(star)}
+                          onClick={() => setStars(star)}
                         />
-                        <FaStar 
-                          className="fs-3 mb-2 star" 
-                          color={star <= (hover || stars) ? '#ffc107' : '#e4e5e9'}
-                          onMouseEnter={()=>setHover(star)}
-                          onMouseLeave={()=>setHover(null)}
+                        <FaStar
+                          className="fs-3 mb-2 star"
+                          color={
+                            star <= (hover || stars) ? "#ffc107" : "#e4e5e9"
+                          }
+                          onMouseEnter={() => setHover(star)}
+                          onMouseLeave={() => setHover(null)}
                         />
                       </label>
                     </>
-                  )
+                  );
                 })}
-                
-                
               </div>
-              <Form.Control.Feedback type="invalid">{formik.errors.star}</Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.star}
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group controlId="formComment">
@@ -310,9 +363,13 @@ function Account() {
                 onChange={formik.handleChange}
                 isInvalid={formik.errors.comment}
               />
-              <Form.Control.Feedback type="invalid">{formik.errors.comment}</Form.Control.Feedback>
+              <Form.Control.Feedback type="invalid">
+                {formik.errors.comment}
+              </Form.Control.Feedback>
             </Form.Group>
-            <Button type="submit" variant="warning" className="mt-3">Gửi đánh giá</Button>
+            <Button type="submit" variant="warning" className="mt-3">
+              Gửi đánh giá
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>
