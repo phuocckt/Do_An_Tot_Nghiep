@@ -1,28 +1,31 @@
-import { Link, useNavigate } from 'react-router-dom';
-import './css/LoginSignup.css'
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import '../styles/loginSignup.css'
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useDispatch } from 'react-redux';
-import { forgotPassword } from '../features/auth/authSlice';
+import { resetPassword } from '../features/auth/authSlice';
 import Swal from 'sweetalert2';
 
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const tokenPass = useParams();
   let schema = yup.object().shape({
-    email: yup.string().required('Email is required').email('Invalid email format'),
+    password: yup.string().required('Password is required'),
   })
   const formik = useFormik({
     initialValues: {
-      email: ''
+      password: ''
     },
     validationSchema: schema, 
     onSubmit: values => {
-      dispatch(forgotPassword(values))
+        console.log(values);
+        const data = { token: tokenPass.token, password: values };
+      dispatch(resetPassword(data))
         .unwrap()
         .then(() => {
           Swal.fire({
-            title: "Gửi thành công!",
+            title: "Đổi mật khẩu thành công!",
             icon: "success",
             confirmButtonText: "OK",
           });
@@ -30,7 +33,7 @@ function Login() {
         })
         .catch(() => {
           Swal.fire({
-            title: "Email không tồn tại!",
+            title: "Đổi mật khẩu không thành công!",
             icon: "error",
             confirmButtonText: "OK",
           });
@@ -41,20 +44,20 @@ function Login() {
     <>
         <div className='login'>
           <div className='login-container'>
-            <h1>Quên mật khẩu</h1>
+            <h1>Đổi mật khẩu</h1>
             <form onSubmit={formik.handleSubmit}>
             <input 
-              type='email' 
-              placeholder='Email' 
-              name='email'  
-              onChange={formik.handleChange("email")}  
-              value={formik.values.email}
+              type='password' 
+              placeholder='Password' 
+              name='password'  
+              onChange={formik.handleChange("password")}  
+              value={formik.values.password}
             />
-                {formik.touched.email && formik.errors.email ? (
-                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.email}</p>
+                {formik.touched.password && formik.errors.password ? (
+                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.password}</p>
               ) : null}
 
-              <button type='submit'>Gửi</button>
+              <button type='submit'>Thay đổi</button>
             </form>
           </div>   
         </div>

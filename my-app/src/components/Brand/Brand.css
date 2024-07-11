@@ -6,6 +6,7 @@
 }
 .brand-item{
     border: 2px solid gray;
+    border-radius: 1em;
     text-align: center;
     width: 200px;
     height: 200px;

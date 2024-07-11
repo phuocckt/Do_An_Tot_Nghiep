@@ -65,7 +65,7 @@ const Login = () => {
         pauseOnHover
         theme="light"
       />
-      <div className="wrapper">
+      <div className="wrapper-log">
         <form onSubmit={formik.handleSubmit}>
           <h2>Đăng kí</h2>
           <div className="input-box">
@@ -143,7 +143,7 @@ const Login = () => {
           </button>
           <div className="link-log">
             <p>
-              Bạn đã có tài khoản?<Link to={"/login"}>Đăng nhập ngay</Link>
+              Bạn đã có tài khoản?<Link to={"/login"}>Đăng nhập</Link> ngay
             </p>
           </div>
           <Link to={"/"} className="back-home">

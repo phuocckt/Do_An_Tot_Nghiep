@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./css/Home.css";
+import "../styles/home.css";
 import { IoIosFlash } from "react-icons/io";
 import { FaBlogger } from "react-icons/fa";
 import Carousel from "../components/Carousel/Carousel";

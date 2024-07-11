@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import "./css/Cart.css";
+import "../styles/cart.css";
 import { applyCoupon, deleteCart, getCart, payment } from "../features/auth/authSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,10 +17,10 @@ function Cart() {
   const user = useSelector(state => state.auth.user);
   const paymentURL = useSelector(state => state.auth.payment);
   
-  useEffect(() => {
-    dispatch(getCart());
-    dispatch(getUser(user._id));
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getCart());
+  //   dispatch(getUser(user._id));
+  // }, [dispatch]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -167,7 +167,6 @@ function Cart() {
                       </h5>
                       <div className="cart-product-price text-danger">
                         <CurrencyFormatter amount={item.price} />
-                        /1
                       </div>
                     </div>
                     <div className="cart-product-select">

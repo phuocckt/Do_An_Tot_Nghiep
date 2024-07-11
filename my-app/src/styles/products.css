@@ -114,3 +114,29 @@
     box-shadow: none;
     transform: translateY(4%);
 }
+.products .seemore{
+    padding: .5em 1.5em;
+    border-radius: 2em;
+    border: 1px solid gray;
+    background-color: white;
+    box-shadow: 0 4px gray;
+    margin: 0 auto;
+    font-weight: 500;
+    /* animation: abx 2s infinite; */
+}
+.products .seemore:active{
+    box-shadow: none;
+    transform: translateY(4%);
+}
+.products .seemore .icon-down{
+    margin-left: 10px;
+    animation: abx 1s infinite;
+}
+@keyframes abx {
+    50%{
+        transform: translateY(-10%);
+    }
+    100%{
+        transform: translateY(10%);
+    }
+}

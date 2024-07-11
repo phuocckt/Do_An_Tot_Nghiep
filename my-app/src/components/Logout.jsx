@@ -8,10 +8,14 @@ const Logout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   dispatch(getCart(userId));
+  // }, []);
+
 
   const handleLogout = () => {
     dispatch(logout());
-    toast.success("Đăng xuất thành công!");
+    toast.success("Đăng xuất thành công!", {position: "top-center"});
     navigate("/");
   };
 

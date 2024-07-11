@@ -1,107 +1,108 @@
-import "./css/Account.css";
-import Swal from 'sweetalert2';
+import "../styles/account.css";
+import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
-import Modal from 'react-bootstrap/Modal';
+import { Link } from "react-router-dom";
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Modal from "react-bootstrap/Modal";
 import { useFormik } from "formik";
-import * as yup from 'yup';
-import { getUser, updatePassword, updateUser } from "../features/customer/customerSlice";
+import * as yup from "yup";
+import {
+  getUser,
+  updatePassword,
+  updateUser,
+} from "../features/customer/customerSlice";
 import { useEffect, useState } from "react";
-import Logout from "../components/Logout"
+import Avatar from "../components/Avatar";
+import { toast } from "react-toastify";
 
 function Account() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const user = useSelector( state => state.auth.user);
-
+  const user = useSelector((state) => state.auth.user);
   const [showModal, setShowModal] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   useEffect(() => {
     dispatch(getUser(user._id));
-  },[])
-  const userState = useSelector(state => state.customer.customer);
+  }, []);
+  const userState = useSelector((state) => state.customer.customer);
 
   let schema = yup.object().shape({
-    firstname: yup.string().required('Firstname is required'),
-    lastname: yup.string().required('Lastname is required'),
-    email: yup.string().required('Email is required').email('Invalid email format'),
-    mobile: yup.string().required('Mobile is required').matches(/^[0-9]+$/, 'Chỉ được nhập kí tự số'),
-    address: yup.string()
+    firstname: yup.string().required("Firstname is required"),
+    lastname: yup.string().required("Lastname is required"),
+    email: yup
+      .string()
+      .required("Email is required")
+      .email("Invalid email format"),
+    mobile: yup
+      .string()
+      .required("Mobile is required")
+      .matches(/^[0-9]+$/, "Chỉ được nhập kí tự số"),
+    address: yup.string(),
   });
 
   const formik = useFormik({
     initialValues: {
-      firstname: userState.firstname || '',
-      lastname: userState.lastname || '',
-      email: userState.email || '',
-      mobile: userState.mobile || '',
-      address: userState.address || ''
+      firstname: userState.firstname || "",
+      lastname: userState.lastname || "",
+      email: userState.email || "",
+      mobile: userState.mobile || "",
+      address: userState.address || "",
     },
     enableReinitialize: true,
     validationSchema: schema,
-    onSubmit: values => {
-        Swal.fire({
-            title: 'Bạn chắc chắn muốn đổi?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Có',
-            cancelButtonText: 'Không',
-          }).then((result) => {
-            if (result.isConfirmed) {
-                dispatch(updateUser(values))
-                .unwrap()
-                .then(() => {
-                  Swal.fire({
-                    title: "Sửa thành công!",
-                    icon: "success",
-                    confirmButtonText: "OK",
-                  });
-                  setTimeout(() => {
-                    dispatch(getUser(user._id));
-                  }, 200);
-                })
-                .catch(() => {
-                  Swal.fire({
-                    title: "Sửa thất bại!",
-                    icon: "error",
-                    confirmButtonText: "OK",
-                  });
-                });
-            }
-          });
+    onSubmit: (values) => {
+      Swal.fire({
+        title: "Bạn đã kiểm tra lại thông tin?",
+        showCancelButton: true,
+        confirmButtonText: "Có",
+        cancelButtonText: "Không",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(updateUser(values))
+            .unwrap()
+            .then(() => {
+              toast.success("Cập nhật thông tin thành công !");
+              setTimeout(() => {
+                dispatch(getUser(user._id));
+              }, 200);
+              setIsDisabled(true);
+            })
+            .catch(() => {
+              toast.success("Cập nhật thông tin thất bại !");
+            });
+        }
+      });
     },
   });
 
   const passwordSchema = yup.object().shape({
-    oldPassword: yup.string().required('Mật khẩu cũ là bắt buộc'),
-    newPassword: yup.string().required('Mật khẩu mới là bắt buộc').min(6, 'Mật khẩu mới phải có ít nhất 6 ký tự'),
+    oldPassword: yup.string().required("Mật khẩu cũ là bắt buộc"),
+    newPassword: yup
+      .string()
+      .required("Mật khẩu mới là bắt buộc")
+      .min(6, "Mật khẩu mới phải có ít nhất 6 ký tự"),
   });
 
   const passwordFormik = useFormik({
     initialValues: {
-      oldPassword: '',
-      newPassword: '',
+      oldPassword: "",
+      newPassword: "",
     },
     validationSchema: passwordSchema,
-    onSubmit: values => {
-        dispatch(updatePassword(values))
+    onSubmit: (values) => {
+      dispatch(updatePassword(values))
         .unwrap()
         .then(() => {
-          Swal.fire({
-            title: "Đổi mật khẩu thành công!",
-            icon: "success",
-            confirmButtonText: "OK",
-          });
+          toast.success("Đổi mật khẩu thành công !");
           setShowModal(false);
         })
         .catch((error) => {
           Swal.fire({
             title: "Đổi mật khẩu thất bại!",
-            text: error.message || 'Có lỗi xảy ra, vui lòng thử lại.',
+            text: error.message || "Có lỗi xảy ra, vui lòng thử lại.",
             icon: "error",
             confirmButtonText: "OK",
           });
@@ -113,18 +114,19 @@ function Account() {
     <>
       <div className="account">
         <div className="account-info">
-          <h3 className="mb-3">Thông tin tài khoản</h3>
-          {
-            user?.images.length > 0 ? (<img src={user.images[0]?.url} alt="no_image" className="rounded-circle" fluid/>):(<img src="../hinh/user-none.jpg" alt="no_image" className="rounded-circle" fluid/>)
-          }
-          <h3>{user?.firstname + ' ' + user?.lastname}</h3>
-          <button className="bg-danger"><Logout/></button>
+          <Avatar />
         </div>
         <div className="account-content">
           <ul className="account-menu">
-            <Link to='/account'><li className="active">Thông tin tài khoản</li></Link>
-            <Link to='/favorite'><li>Danh sách yêu thích</li></Link>
-            <Link to='/order'><li>Đơn hàng</li></Link>
+            <Link to="/account">
+              <li className="active">Thông tin tài khoản</li>
+            </Link>
+            <Link to="/favorite">
+              <li>Danh sách yêu thích</li>
+            </Link>
+            <Link to="/order">
+              <li>Đơn hàng</li>
+            </Link>
           </ul>
 
           <div className="content">
@@ -132,7 +134,7 @@ function Account() {
             <Form onSubmit={formik.handleSubmit}>
               <Row className="mb-3">
                 <Form.Group as={Col} md="6" controlId="validationCustom01">
-                  <Form.Label>First name</Form.Label>
+                  <Form.Label>Họ:</Form.Label>
                   <Form.Control
                     required
                     type="text"
@@ -140,10 +142,11 @@ function Account() {
                     placeholder="First name"
                     value={formik.values.firstname}
                     onChange={formik.handleChange}
+                    disabled={isDisabled}
                   />
                 </Form.Group>
                 <Form.Group as={Col} md="6" controlId="validationCustom02">
-                  <Form.Label>Last name</Form.Label>
+                  <Form.Label>Tên:</Form.Label>
                   <Form.Control
                     required
                     type="text"
@@ -151,13 +154,14 @@ function Account() {
                     placeholder="Last name"
                     value={formik.values.lastname}
                     onChange={formik.handleChange}
+                    disabled={isDisabled}
                   />
                 </Form.Group>
               </Row>
 
               <Row className="mb-3">
                 <Form.Group as={Col} md="6" controlId="validationCustom01">
-                  <Form.Label>Email</Form.Label>
+                  <Form.Label>Email:</Form.Label>
                   <Form.Control
                     required
                     type="email"
@@ -165,10 +169,11 @@ function Account() {
                     placeholder="Email"
                     value={formik.values.email}
                     onChange={formik.handleChange}
+                    disabled={isDisabled}
                   />
                 </Form.Group>
                 <Form.Group as={Col} md="6" controlId="validationCustom02">
-                  <Form.Label>Số điện thoại</Form.Label>
+                  <Form.Label>Số điện thoại:</Form.Label>
                   <Form.Control
                     required
                     type="text"
@@ -176,24 +181,55 @@ function Account() {
                     placeholder="Số điện thoại"
                     value={formik.values.mobile}
                     onChange={formik.handleChange}
+                    disabled={isDisabled}
                   />
                 </Form.Group>
               </Row>
 
               <Row className="mb-3">
                 <Form.Group as={Col} md="12" controlId="validationCustom01">
-                  <Form.Label>Địa chỉ</Form.Label>
+                  <Form.Label>Địa chỉ:</Form.Label>
                   <Form.Control
                     type="text"
                     name="address"
                     placeholder="Địa chỉ"
                     value={formik.values.address}
                     onChange={formik.handleChange}
+                    disabled={isDisabled}
                   />
                 </Form.Group>
               </Row>
-              <Button type="submit" variant="primary" className="me-3">Cập nhật thông tin</Button>
-              <Button type="button" variant="warning" onClick={() => setShowModal(true)}>Đổi mật khẩu</Button>
+              <Button
+                variant="info"
+                className="me-3"
+                hidden={!isDisabled}
+                onClick={() => setIsDisabled(false)}
+              >
+                Cập nhật thông tin
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                className="me-3"
+                hidden={isDisabled}
+              >
+                Lưu thông tin
+              </Button>
+              <Button
+                variant="danger"
+                className="me-3"
+                hidden={isDisabled}
+                onClick={() => setIsDisabled(true)}
+              >
+                Thoát
+              </Button>
+              <Button
+                hidden={!isDisabled}
+                variant="warning"
+                onClick={() => setShowModal(true)}
+              >
+                Đổi mật khẩu
+              </Button>
             </Form>
           </div>
         </div>
@@ -213,7 +249,10 @@ function Account() {
                 placeholder="Nhập mật khẩu cũ"
                 value={passwordFormik.values.oldPassword}
                 onChange={passwordFormik.handleChange}
-                isInvalid={passwordFormik.touched.oldPassword && passwordFormik.errors.oldPassword}
+                isInvalid={
+                  passwordFormik.touched.oldPassword &&
+                  passwordFormik.errors.oldPassword
+                }
               />
               <Form.Control.Feedback type="invalid">
                 {passwordFormik.errors.oldPassword}
@@ -228,13 +267,18 @@ function Account() {
                 placeholder="Nhập mật khẩu mới"
                 value={passwordFormik.values.newPassword}
                 onChange={passwordFormik.handleChange}
-                isInvalid={passwordFormik.touched.newPassword && passwordFormik.errors.newPassword}
+                isInvalid={
+                  passwordFormik.touched.newPassword &&
+                  passwordFormik.errors.newPassword
+                }
               />
               <Form.Control.Feedback type="invalid">
                 {passwordFormik.errors.newPassword}
               </Form.Control.Feedback>
             </Form.Group>
-            <Button type="submit" variant="warning" className="mt-3">Đổi mật khẩu</Button>
+              <Button type="submit" variant="primary" className="mt-3">
+                Lưu mật khẩu
+              </Button>
           </Form>
         </Modal.Body>
       </Modal>

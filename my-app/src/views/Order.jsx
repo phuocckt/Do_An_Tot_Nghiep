@@ -1,4 +1,5 @@
-import "./css/Account.css";
+import "../styles/account.css";
+import "../styles/order.css";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,15 +8,13 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import { useEffect, useState } from "react";
 import { cancelOrder, getOrders } from "../features/order/orderSlice";
-import "./css/order.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { rating } from "../features/product/productSlice";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
-import FormattedDate from "../components/FormattedDate";
 import { FaStar } from "react-icons/fa";
 import { getUser } from "../features/customer/customerSlice";
-import Logout from "../components/Logout";
+import Avatar from "../components/Avatar";
 
 function Account() {
   const dispatch = useDispatch();
@@ -120,26 +119,7 @@ function Account() {
     <>
       <div className="account">
         <div className="account-info">
-          <h3 className="mb-3">Thông tin tài khoản</h3>
-          {user.images.length > 0 ? (
-            <img
-              src={user.images[0]?.url}
-              alt="no_image"
-              className="rounded-circle"
-              fluid
-            />
-          ) : (
-            <img
-              src="../hinh/user-none.jpg"
-              alt="no_image"
-              className="rounded-circle"
-              fluid
-            />
-          )}
-          <h3>{user?.firstname + " " + user?.lastname}</h3>
-          <button className="bg-danger">
-            <Logout />
-          </button>
+          <Avatar />
         </div>
         <div className="account-content">
           <ul className="account-menu">
@@ -367,7 +347,7 @@ function Account() {
                 {formik.errors.comment}
               </Form.Control.Feedback>
             </Form.Group>
-            <Button type="submit" variant="warning" className="mt-3">
+            <Button type="submit" variant="primary" className="mt-3">
               Gửi đánh giá
             </Button>
           </Form>

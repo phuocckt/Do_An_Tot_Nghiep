@@ -1,24 +1,23 @@
-.account{
-    display: flex;
-    justify-content: start;
-    align-items: start;
-}
-.account-info{
+ .avatar{
     text-align: center;
-    padding: 2em 3em;
-    min-width: 350px;
-    border-bottom: 2px solid gray;
-}
-.account-info img{
-    width: 200px;
+    min-width: 290px;
+ }
+ .avatar .img-avatar{
+    width: 250px;
+    height: 250px;
     border-radius: 50%;
-}
-.account-info button{
-    background-color: #C80036;
-    color: white;
-    border: none;
-    padding: 0.5em 1em;
-    font-weight: bold;
-    margin-top: 1em;
-    border-radius: .5em;
-}
+    overflow: hidden;
+    margin: 0 auto;
+    cursor: pointer;
+ }
+ .avatar .img-avatar img{
+    width: 100%;
+ }
+ .modal-img{
+    width: 400px;
+    height: 400px;
+    overflow: hidden;
+ }
+ .modal-img img{
+    width: 100%;
+ }

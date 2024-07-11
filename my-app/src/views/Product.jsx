@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./css/ProductDetail.css";
+import "../styles/productDetail.css";
 import { FaChevronDown, FaChevronUp, FaRegHeart, FaHeart } from "react-icons/fa";
 import { addWishlist, getProduct, getProducts } from '../features/product/productSlice';
 import { useDispatch, useSelector } from 'react-redux';

@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Card from '../components/Card/Card';
 import { MdFiberNew } from "react-icons/md";
 import { IoIosFlash } from "react-icons/io";
-import "./css/Products.css";
+import "../styles/products.css";
 
 function AutoLayoutExample() {
   return (

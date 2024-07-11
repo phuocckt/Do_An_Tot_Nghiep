@@ -1,4 +1,4 @@
-import "./css/Account.css";
+import "../styles/account.css";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
@@ -8,7 +8,7 @@ import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { addWishlist, getProduct } from "../features/product/productSlice";
 import { useFormik } from "formik";
-import Logout from "../components/Logout";
+import Avatar from "../components/Avatar";
 
 function Account() {
   const dispatch = useDispatch();
@@ -44,26 +44,7 @@ function Account() {
     <>
       <div className="account">
         <div className="account-info">
-          <h3 className="mb-3">Thông tin tài khoản</h3>
-          {user.images.length > 0 ? (
-            <img
-              src={user.images[0]?.url}
-              alt="no_image"
-              className="rounded-circle"
-              fluid
-            />
-          ) : (
-            <img
-              src="../hinh/user-none.jpg"
-              alt="no_image"
-              className="rounded-circle"
-              fluid
-            />
-          )}
-          <h3>{user?.firstname + " " + user?.lastname}</h3>
-          <button className="bg-danger">
-            <Logout />
-          </button>
+          <Avatar />
         </div>
         <div className="account-content">
           <ul className="account-menu">

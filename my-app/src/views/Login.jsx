@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { CiLock, CiMail, CiTurnL1 } from "react-icons/ci";
 import { PiEyeSlashThin, PiEyeThin } from "react-icons/pi";
 import "../styles/login.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { login } from "../features/auth/authSlice";
+import { getCart, login } from "../features/auth/authSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,6 +14,14 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [eye, setEye] = useState(false);
+  const user = useSelector((state) => state.auth.user);
+
+  
+  // const cart = useSelector((state) => state.auth.carts);
+
+  // useEffect(() => {
+  //   dispatch(getCart());
+  // }, []);
 
   let schema = yup.object().shape({
     email: yup
@@ -36,7 +44,7 @@ const Login = () => {
           toast.success("Đăng nhập thành công !");
           setTimeout(() => {
             navigate("/");
-          }, 2000);
+          }, 1000);
         })
         .catch(() => {
           toast.error("Email hoặc Mật khẩu không chính xác !");
@@ -66,7 +74,7 @@ const Login = () => {
         pauseOnHover
         theme="light"
       />
-      <div className="wrapper">
+      <div className="wrapper-log">
         <form onSubmit={formik.handleSubmit}>
           <h2>Đăng nhập</h2>
           <div className="input-box">
@@ -106,7 +114,7 @@ const Login = () => {
           </button>
           <div className="link-log">
             <p>
-              Bạn chưa có tài khoản?<Link to={"/register"}>Đăng kí ngay</Link>
+              Bạn chưa có tài khoản?<Link to={"/register"}>Đăng kí</Link> ngay
             </p>
           </div>
           <Link to={"/"} className="back-home">

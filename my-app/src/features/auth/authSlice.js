@@ -121,6 +121,7 @@ export const authSlice = createSlice({
     reducers: {
         logout: (state) => {
             state.user = null;
+            state.carts = [];
             localStorage.removeItem("user");
         }
     },
