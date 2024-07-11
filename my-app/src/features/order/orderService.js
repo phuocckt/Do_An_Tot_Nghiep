@@ -15,6 +15,7 @@ const createOrder = async (data) => {
 const createPaymentOrder = async (params) => {
     const query = new URLSearchParams(params).toString();
     const res = await axios.get(`${base_url}user/cart/payment-order?${query}`, config);
+    console.log(query, res.data);
     return res.data;
 }
 

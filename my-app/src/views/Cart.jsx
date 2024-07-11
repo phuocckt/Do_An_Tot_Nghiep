@@ -15,20 +15,11 @@ function Cart() {
   const dispatch = useDispatch();
   const location = useLocation();
   const user = useSelector(state => state.auth.user);
-  const paymentURL = useSelector(state => state.auth.payment);
   
-  // useEffect(() => {
-  //   dispatch(getCart());
-  //   dispatch(getUser(user._id));
-  // }, [dispatch]);
-
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    if (queryParams.has('vnp_Amount')) {
-      const params = Object.fromEntries(queryParams.entries());
-      dispatch(createPaymentOrder(params));
-    }
-  }, [location.search, dispatch]);
+    //dispatch(getCart());
+    dispatch(getUser(user._id));
+  }, [dispatch]);
   
   const cartState = useSelector((state) => state.auth.carts);
   const userState = useSelector(state => state.customer.customer);
@@ -48,8 +39,8 @@ function Cart() {
     onSubmit: values => {
       dispatch(payment(values))
         .unwrap()
-        .then(() => {
-          window.location.href = paymentURL;
+        .then((url) => {
+          window.location.href = url;
         })
         .catch(() => {
           Swal.fire({
@@ -90,7 +81,7 @@ function Cart() {
         })
         .catch(() => {
           Swal.fire({
-            title: "Đặt hàng thất bại!",
+            title: "Chưa có sản phẩm trong giỏ hàng!",
             icon: "error",
             confirmButtonText: "OK",
           });

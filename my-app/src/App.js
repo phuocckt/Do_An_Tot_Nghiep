@@ -11,6 +11,7 @@ import Favorite from './views/Favorite';
 import Order from './views/Order';
 import ForgotPassword from './views/ForgotPassword';
 import ResetPassword from './views/ResetPassword';
+import PaymentSuccess from './views/PaymentSuccess';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path='/account' element={<Account />}/>
             <Route path='/favorite' element={<Favorite />}/>
             <Route path='/order' element={<Order />}/>
+            <Route path='/payment-status' element={<PaymentSuccess />}/>
           </Route>
           
           <Route path='/login' element={<Login />}/>

@@ -4,7 +4,7 @@ import { FaChevronDown, FaChevronUp, FaRegHeart, FaHeart } from "react-icons/fa"
 import { addWishlist, getProduct, getProducts } from '../features/product/productSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useParams } from "react-router-dom";
-import { addToCart } from '../features/auth/authSlice';
+import { addToCart, getCart } from '../features/auth/authSlice';
 import * as yup from 'yup';
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
@@ -105,8 +105,10 @@ function ProductDetail() {
             showCancelButton: false,
             showConfirmButton: false
           });
+          dispatch(getCart());
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error("Error adding product to cart:", error);
           Swal.fire({
             title: "Vui lòng đăng nhập",
             html: `

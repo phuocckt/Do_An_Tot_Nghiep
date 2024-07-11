@@ -4,7 +4,7 @@ import Navbar from "react-bootstrap/Navbar";
 import { CiShoppingCart } from "react-icons/ci";
 import Headroom from "react-headroom";
 import "./css/Layout.css";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import userNone from "../assets/images/user-none.jpg";
 import { getCart } from "../features/auth/authSlice";
@@ -38,26 +38,35 @@ function Header() {
             className="justify-content-end"
           >
             <Nav className="align-items-center">
-              <Nav.Link className="text-light" href="/">
+              <Link className="text-light nav-link-spacing" to="/">
                 TRANG CHỦ
-              </Nav.Link>
-              <Nav.Link className="text-light" href="/products">
+              </Link>
+              <Link className="text-light nav-link-spacing" to="/products">
                 SẢN PHẨM
-              </Nav.Link>
-              <Nav.Link className="text-light position-relative" href="/cart">
-                <CiShoppingCart className="fs-1" />
-                <span className="quantity-cart">
-                  {cart && cart.products?.length > 0 ? cart.products?.length : "00"}
-                </span>
-              </Nav.Link>
+              </Link>
               {userId == null || user == null ? (
-                <Link className="text-light" to="/login">
+                <Link className="text-light nav-link-spacing position-relative" to="/login">
+                  <CiShoppingCart className="fs-1" />
+                  <span className="quantity-cart">
+                    {cart && cart.products?.length > 0 ? cart.products?.length : "00"}
+                  </span>
+                </Link>
+              ) : (
+                <Link className="text-light nav-link-spacing position-relative" to="/cart">
+                  <CiShoppingCart className="fs-1" />
+                  <span className="quantity-cart">
+                    {cart && cart.products?.length > 0 ? cart.products?.length : "00"}
+                  </span>
+                </Link>
+              )}
+              {userId == null || user == null ? (
+                <Link className="text-light nav-link-spacing" to="/login">
                   ĐĂNG NHẬP
                 </Link>
               ) : (
-                <NavLink
-                  className="text-light d-flex align-items-center"
-                  to={"/account"}
+                <Link
+                  className="text-light d-flex align-items-center nav-link-spacing"
+                  to="/account"
                 >
                   <div
                     className="nav-avatar me-1"
@@ -83,7 +92,7 @@ function Header() {
                     )}
                   </div>
                   <span>{user.lastname}</span>
-                </NavLink>
+                </Link>
               )}
             </Nav>
           </Navbar.Collapse>

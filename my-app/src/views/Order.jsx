@@ -58,23 +58,33 @@ function Account() {
   };
 
   const handleCancelOrder = (id) => {
-    dispatch(cancelOrder({ id: id, orderData: { status: "Cancelled" } }))
-      .unwrap()
-      .then(() => {
-        Swal.fire({
-          title: "Đã hủy đơn hàng!",
-          icon: "success",
-          confirmButtonText: "OK",
-        });
-        dispatch(getOrders());
-      })
-      .catch((error) => {
-        Swal.fire({
-          title: "Có sự cố về đơn hàng. Không thể hủy!",
-          icon: "error",
-          confirmButtonText: "OK",
-        });
-      });
+    Swal.fire({
+      title: "Bạn có chắc chắn muốn hủy đơn hàng này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Không",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(cancelOrder({ id: id, orderData: { status: "Cancelled" } }))
+          .unwrap()
+          .then(() => {
+            Swal.fire({
+              title: "Đã hủy đơn hàng!",
+              icon: "success",
+              confirmButtonText: "OK",
+            });
+            dispatch(getOrders());
+          })
+          .catch((error) => {
+            Swal.fire({
+              title: "Có sự cố về đơn hàng. Không thể hủy!",
+              icon: "error",
+              confirmButtonText: "OK",
+            });
+          });
+      }
+    });
   };
 
   const Schema = yup.object().shape({

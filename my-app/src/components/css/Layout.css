@@ -77,3 +77,8 @@ footer .input-group-text{
         display: none;
     }
 }
+
+.nav-link-spacing {
+    margin-right: 20px; /* Điều chỉnh giá trị này tùy theo khoảng cách bạn muốn */
+  }
+  

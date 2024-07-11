@@ -639,6 +639,10 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
                 model: 'Size'
             }
         });
+
+        if (!userCart || userCart.products.length === 0) {
+            return;
+        }
         //let finalAmount = userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
 
         // Check stock and update product quantities
@@ -674,31 +678,35 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
         }).save();
 
         // Update product quantities and variants
-        let update = userCart.products.map(item => {
-            let productUpdate = {
-                updateOne: {
-                    filter: { _id: item.product._id },
-                    update: { $inc: { quantity: -item.count, sold: +item.count } }
+        if (userCart.products != []) {
+            let update = userCart.products.map(item => {
+                let productUpdate = {
+                    updateOne: {
+                        filter: { _id: item.product._id },
+                        update: { $inc: { quantity: -item.count, sold: +item.count } }
+                    }
+                };
+                const product = item.product;
+                const size = item.size;
+    
+                const variant = product.variants.find(v => v.size && v.size.title === size);
+    
+                if (variant) {
+                    variant.quantity -= item.count;
                 }
-            };
-            const product = item.product;
-            const size = item.size;
-
-            const variant = product.variants.find(v => v.size && v.size.title === size);
-
-            if (variant) {
-                variant.quantity -= item.count;
-            }
-
-            product.save();
-
-            return productUpdate;
-        }).flat();
-        const updated = await Product.bulkWrite(update, {});
-
-        // Delete cart after creating order
-        await Cart.deleteOne({ orderby: user._id });
-        res.json(newOrder);
+    
+                product.save();
+    
+                return productUpdate;
+            }).flat();
+            const updated = await Product.bulkWrite(update, {});
+    
+            // Delete cart after creating order
+            await Cart.deleteOne({ orderby: user._id });
+            res.json(newOrder);
+        } else {
+            res.json(newOrder);
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -717,7 +725,7 @@ const createPayment = asyncHandler(async (req, res) => {
         var tmnCode = "BPHR7PSX"
         var secretKey = "UPMVCO3UUSB53D86YM1VH45WZ01NENQV"
         var vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        var returnUrl = "http://localhost:3000/cart"
+        var returnUrl = "http://localhost:3000/payment-status"
 
         let date = new Date();
         // currentDate.setHours(currentDate.getHours() + 7); // Chuyển đổi sang UTC+7
@@ -782,7 +790,7 @@ const createPayment = asyncHandler(async (req, res) => {
         vnp_Params['vnp_SecureHash'] = signed;
         vnpUrl += '?' + qs.stringify(vnp_Params, { encode: false });
 
-        res.json(vnpUrl)
+        res.json(vnpUrl);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
