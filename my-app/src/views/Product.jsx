@@ -25,9 +25,9 @@ function ProductDetail() {
   useEffect(() => {
     dispatch(getProducts());
     dispatch(getProduct(id));
-    dispatch(getUser(user._id));
+    dispatch(getUser(user?._id));
     setSelectedSize(null);
-  }, [dispatch, id, user._id]);
+  }, [dispatch, id, user?._id]);
 
   useEffect(() => {
     if (user2.wishlist) {

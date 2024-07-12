@@ -70,14 +70,14 @@ function CardProduct(props) {
       <div className='card-info'>
         <div className='name truncated-text'>{product.title}</div>
         <div className='d-flex justify-content-between'>
-          <h5 className='price'><CurrencyFormatter amount={product.price}/></h5>
-          <ul className='star text-warning'>
+          <h5 className='price mb-3 text-danger'><CurrencyFormatter amount={product.price}/></h5>
+          {/* <ul className='star text-warning'>
             <li><FaStar/></li>
             <li><FaStar/></li>
             <li><FaStar/></li>
             <li><FaStar/></li>
             <li><FaStarHalfAlt/></li>
-          </ul>
+          </ul> */}
         </div> 
       </div>
     </div>

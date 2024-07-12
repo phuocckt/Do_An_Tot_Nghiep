@@ -1,8 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import "../styles/cart.css";
-import { applyCoupon, deleteCart, getCart, payment } from "../features/auth/authSlice";
-import { useEffect } from "react";
+import {
+  applyCoupon,
+  deleteCart,
+  getCart,
+  payment,
+} from "../features/auth/authSlice";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { useFormik } from "formik";
@@ -14,15 +19,21 @@ import { getUser } from "../features/customer/customerSlice";
 function Cart() {
   const dispatch = useDispatch();
   const location = useLocation();
-  const user = useSelector(state => state.auth.user);
-  
+  const user = useSelector((state) => state.auth.user);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [activeBtn, setActiveBtn] = useState(false);
+  const cartState = useSelector((state) => state.auth.carts);
+  const userState = useSelector((state) => state.customer.customer);
+
   useEffect(() => {
     //dispatch(getCart());
     dispatch(getUser(user._id));
+    const total = cartState.products?.reduce(
+      (acc, item) => acc + item.price,
+      0
+    );
+    setTotalPrice(total);
   }, [dispatch]);
-  
-  const cartState = useSelector((state) => state.auth.carts);
-  const userState = useSelector(state => state.customer.customer);
 
   let schema = yup.object().shape({
     COD: yup.boolean().required("COD is required"),
@@ -33,10 +44,10 @@ function Cart() {
       orderType: "billpayment",
       amount: cartState?.cartTotal || 0,
       orderDescription: "paymentOrder",
-      language: "vn"
+      language: "vn",
     },
     enableReinitialize: true,
-    onSubmit: values => {
+    onSubmit: (values) => {
       dispatch(payment(values))
         .unwrap()
         .then((url) => {
@@ -49,7 +60,7 @@ function Cart() {
             confirmButtonText: "OK",
           });
         });
-    }
+    },
   });
 
   const formik = useFormik({
@@ -91,7 +102,7 @@ function Cart() {
 
   const formikCoupon = useFormik({
     initialValues: {
-      coupon: '',
+      coupon: "",
     },
     onSubmit: (values) => {
       dispatch(applyCoupon(values))
@@ -131,6 +142,13 @@ function Cart() {
     });
   };
 
+const handleClick=()=>{
+  setActiveBtn(true);
+}
+const handleReload = () => {
+  window.location.reload();
+};
+
   return (
     <div className="cart">
       <div className="cart-products">
@@ -163,12 +181,14 @@ function Cart() {
                     <div className="cart-product-select">
                       <div className="size">
                         <label style={{ color: "black" }}>
-                          Kích thước: <span className="fw-bold">{item.size}</span>
+                          Kích thước:{" "}
+                          <span className="fw-bold">{item.size}</span>
                         </label>
                       </div>
                       <div className="quantity ms-3">
                         <label style={{ color: "black" }}>
-                          Số lượng: <span className="fw-bold">x{item.count}</span>
+                          Số lượng:{" "}
+                          <span className="fw-bold">x{item.count}</span>
                         </label>
                       </div>
                       <button
@@ -191,22 +211,34 @@ function Cart() {
           <div className="invoice-delivery align-items-center">
             <p>Voucher giảm giá:</p>
             <form className="d-flex" onSubmit={formikCoupon.handleSubmit}>
-              <input 
-                name="coupon" 
-                type="text" 
-                value={formikCoupon.values.coupon} 
-                className="py-2 px-2" 
+              <input
+                name="coupon"
+                type="text"
+                value={formikCoupon.values.coupon}
+                className="py-2 px-2"
                 placeholder="Nhập voucher"
                 onChange={formikCoupon.handleChange}
               />
-              <button className="btn btn-secondary ms-2 py-2" type="submit">Áp dụng</button>
+              <button className="btn btn-secondary ms-2 py-2" type="submit" onClick={handleClick} hidden={activeBtn}>
+                Áp dụng
+              </button>
+              <button className="btn btn-secondary ms-2 py-2" type="button" onClick={handleReload} hidden={!activeBtn}>
+                Hủy voucher
+              </button>
             </form>
           </div>
-          <div className="total">
+          <div className="total align-items-end">
             <p>Thành tiền:</p>
-            <p>
-              <CurrencyFormatter amount={cartState ? cartState.cartTotal : 0} />
-            </p>
+            <div className="text-end">
+              <p className="text-decoration-line-through " hidden={!activeBtn}>
+                <CurrencyFormatter amount={totalPrice} />
+              </p>
+              <p className='text-danger fs-5'>
+                <CurrencyFormatter
+                  amount={cartState ? cartState.cartTotal : 0}
+                />
+              </p>
+            </div>
           </div>
         </div>
         <div className="invoice-action">
@@ -219,19 +251,37 @@ function Cart() {
                   name="COD"
                   value={true}
                   checked={formik.values.COD === true}
-                  onChange={() => formik.setFieldValue('COD', true)}
+                  onChange={() => formik.setFieldValue("COD", true)}
                   className="me-2"
                 />
               </div>
             </div>
-            <button type="submit">Thanh toán khi nhận hàng</button>
+            <button type="submit" onClick={handleClick}>Thanh toán khi nhận hàng</button>
           </form>
           <form onSubmit={paymentFormik.handleSubmit}>
-            <input type="hidden" name="orderDescription" value={paymentFormik.values.orderDescription}/>
-            <input type="hidden" name="amount" value={paymentFormik.values.amount}/>
-            <input type="hidden" name="orderType" value={paymentFormik.values.orderType}/>
-            <input type="hidden" name="language" value={paymentFormik.values.language}/>
-            <button type="submit" name="redirect">Thanh toán trực tuyến</button>
+            <input
+              type="hidden"
+              name="orderDescription"
+              value={paymentFormik.values.orderDescription}
+            />
+            <input
+              type="hidden"
+              name="amount"
+              value={paymentFormik.values.amount}
+            />
+            <input
+              type="hidden"
+              name="orderType"
+              value={paymentFormik.values.orderType}
+            />
+            <input
+              type="hidden"
+              name="language"
+              value={paymentFormik.values.language}
+            />
+            <button type="submit" name="redirect">
+              Thanh toán trực tuyến
+            </button>
           </form>
         </div>
       </div>
