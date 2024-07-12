@@ -32,6 +32,6 @@ router.put('/edit-user', authMiddleware, updateAUser);
 router.put('/save-address', authMiddleware, saveAddress);
 router.put('/block-user/:id', authMiddleware, isAdmin, blockUser);
 router.put('/unblock-user/:id', authMiddleware, isAdmin, unBlockUser);
-router.put('/order/update-order/:id', authMiddleware, isAdmin, updateOrderStatus);
+router.put('/order/update-order/:id', authMiddleware, updateOrderStatus);
 
 module.exports = router;

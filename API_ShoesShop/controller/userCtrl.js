@@ -678,35 +678,31 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
         }).save();
 
         // Update product quantities and variants
-        if (userCart.products != []) {
-            let update = userCart.products.map(item => {
-                let productUpdate = {
-                    updateOne: {
-                        filter: { _id: item.product._id },
-                        update: { $inc: { quantity: -item.count, sold: +item.count } }
-                    }
-                };
-                const product = item.product;
-                const size = item.size;
-    
-                const variant = product.variants.find(v => v.size && v.size.title === size);
-    
-                if (variant) {
-                    variant.quantity -= item.count;
+        let update = userCart.products.map(item => {
+            let productUpdate = {
+                updateOne: {
+                    filter: { _id: item.product._id },
+                    update: { $inc: { quantity: -item.count, sold: +item.count } }
                 }
-    
-                product.save();
-    
-                return productUpdate;
-            }).flat();
-            const updated = await Product.bulkWrite(update, {});
-    
-            // Delete cart after creating order
-            await Cart.deleteOne({ orderby: user._id });
-            res.json(newOrder);
-        } else {
-            res.json(newOrder);
-        }
+            };
+            const product = item.product;
+            const size = item.size;
+
+            const variant = product.variants.find(v => v.size && v.size.title === size);
+
+            if (variant) {
+                variant.quantity -= item.count;
+            }
+
+            product.save();
+
+            return productUpdate;
+        }).flat();
+        const updated = await Product.bulkWrite(update, {});
+
+        // Delete cart after creating order
+        await Cart.deleteOne({ orderby: user._id });
+        res.json(newOrder);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -738,7 +734,7 @@ const createPayment = asyncHandler(async (req, res) => {
 
         // Convert the date to a string in ISO format and slice to get 'yyyy-mm-ddTHH:mm:ss'
         let isoString =
-        ExpireDate.toISOString();
+            ExpireDate.toISOString();
 
         // Replace '-' and 'T' to get 'yyyymmddHHmmss' format
         ExpireDate = isoString.replace(/-/g, '').replace(/T/g, '');
@@ -797,15 +793,15 @@ const createPayment = asyncHandler(async (req, res) => {
 });
 
 function sortObject(obj) {
-	let sorted = {};
-	let str = [];
-	let key;
-	for (key in obj){
-		if (obj.hasOwnProperty(key)) {
-		str.push(encodeURIComponent(key));
-		}
-	}
-	str.sort();
+    let sorted = {};
+    let str = [];
+    let key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            str.push(encodeURIComponent(key));
+        }
+    }
+    str.sort();
     for (key = 0; key < str.length; key++) {
         sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
     }
