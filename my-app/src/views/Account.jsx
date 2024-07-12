@@ -54,27 +54,18 @@ function Account() {
     enableReinitialize: true,
     validationSchema: schema,
     onSubmit: (values) => {
-      Swal.fire({
-        title: "Bạn đã kiểm tra lại thông tin?",
-        showCancelButton: true,
-        confirmButtonText: "Có",
-        cancelButtonText: "Không",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          dispatch(updateUser(values))
-            .unwrap()
-            .then(() => {
-              toast.success("Cập nhật thông tin thành công !");
-              setTimeout(() => {
-                dispatch(getUser(user._id));
-              }, 200);
-              setIsDisabled(true);
-            })
-            .catch(() => {
-              toast.success("Cập nhật thông tin thất bại !");
-            });
-        }
-      });
+      dispatch(updateUser(values))
+        .unwrap()
+        .then(() => {
+          toast.success("Cập nhật thông tin thành công !");
+          setTimeout(() => {
+            dispatch(getUser(user._id));
+          }, 200);
+          setIsDisabled(true);
+        })
+        .catch(() => {
+          toast.success("Cập nhật thông tin thất bại !");
+        });
     },
   });
 
@@ -276,9 +267,9 @@ function Account() {
                 {passwordFormik.errors.newPassword}
               </Form.Control.Feedback>
             </Form.Group>
-              <Button type="submit" variant="primary" className="mt-3">
-                Lưu mật khẩu
-              </Button>
+            <Button type="submit" variant="primary" className="mt-3">
+              Lưu mật khẩu
+            </Button>
           </Form>
         </Modal.Body>
       </Modal>

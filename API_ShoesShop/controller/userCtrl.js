@@ -431,6 +431,7 @@ const userCart = asyncHandler(async (req, res) => {
 
             // Update cart total and save
             existingCart.cartTotal = cartTotal;
+            existingCart.totalAfterDiscount = 0;
             await existingCart.save();
 
             res.json(existingCart);
@@ -508,6 +509,7 @@ const emptyCart = asyncHandler(async (req, res) => {
 
         // Update cartTotal in the cart document
         cart.cartTotal = cartTotal;
+        cart.totalAfterDiscount = 0;
 
         // Save the updated cart
         await cart.save();
@@ -516,6 +518,27 @@ const emptyCart = asyncHandler(async (req, res) => {
     } catch (error) {
         throw new Error(error);
     }
+});
+
+const deleteCoupon = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { coupon } = req.body;
+    console.log(coupon);
+    const validCoupon = await Coupon.findOne({ name: coupon });
+    if (!validCoupon) {
+        return res.status(400).json({ message: "Invalid Coupon" });
+    }
+    const user = await User.findOne({ _id });
+    let { cartTotal } = await Cart.findOne({
+        orderby: user._id,
+    }).populate("products.product");
+    let totalAfterDiscount = 0;
+    await Cart.findOneAndUpdate(
+        { orderby: user._id },
+        { totalAfterDiscount: totalAfterDiscount },
+        { new: true }
+    );
+    res.json(totalAfterDiscount);
 });
 
 const applyCoupon = asyncHandler(async (req, res) => {
@@ -535,10 +558,10 @@ const applyCoupon = asyncHandler(async (req, res) => {
     ).toFixed(2);
     await Cart.findOneAndUpdate(
         { orderby: user._id },
-        { cartTotal: totalAfterDiscount },
+        { totalAfterDiscount: totalAfterDiscount },
         { new: true }
     );
-    res.json(totalAfterDiscount);
+    res.json(coupon);
 });
 
 const createCashOrder = asyncHandler(async (req, res) => {
@@ -554,22 +577,21 @@ const createCashOrder = asyncHandler(async (req, res) => {
                 model: 'Size'
             }
         });
-        let finalAmount = couponApplied && userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
+        let finalAmount = userCart.totalAfterDiscount != 0 ? userCart.totalAfterDiscount : userCart.cartTotal;
 
         // Kiểm tra và cập nhật số lượng sản phẩm và các biến thể
         for (let item of userCart.products) {
-            let product = await Product.findById(item.product._id);
+            let product = await Product.findById(item.product._id).populate("variants.size");
             if (!product) throw new Error(`Product with ID ${item.product._id} not found`);
-
-            // Kiểm tra số lượng sản phẩm
-            if (product.quantity < item.count) {
-                throw new Error(`Insufficient stock for product ${product.title}`);
-            }
 
             // Kiểm tra số lượng trong các biến thể
             let variant = product.variants.find(variant => variant.size.title === item.size);
             if (variant && variant.quantity < item.count) {
                 throw new Error(`Insufficient stock for product ${product.title} in size ${item.size}`);
+            }
+
+            if (product.quantity < item.count) {
+                throw new Error(`Insufficient stock for product ${product.title}`);
             }
         }
 
@@ -643,11 +665,11 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
         if (!userCart || userCart.products.length === 0) {
             return;
         }
-        //let finalAmount = userCart.totalAfterDiscount ? userCart.totalAfterDiscount : userCart.cartTotal;
+        //let finalAmount = userCart.totalAfterDiscount != 0 ? userCart.totalAfterDiscount : userCart.cartTotal;
 
         // Check stock and update product quantities
         for (let item of userCart.products) {
-            let product = await Product.findById(item.product._id);
+            let product = await Product.findById(item.product._id).populate("variants.size");
             if (!product) throw new Error(`Product with ID ${item.product._id} not found`);
 
             // Check product stock
@@ -994,6 +1016,7 @@ module.exports = {
     UserCart,
     emptyCart,
     applyCoupon,
+    deleteCoupon,
     createCashOrder,
     createPaymentOrder,
     getOrders,

@@ -75,7 +75,7 @@ function ProductDetail() {
     initialValues: {
       _id: id,
       count: value,
-      size: '',
+      size: selectedSize || '',
       price: productState?.price || 0  // Default to 0 if price is not available
     },
     validationSchema: schema, 
@@ -93,7 +93,6 @@ function ProductDetail() {
         ]
       };
       dispatch(addToCart(cartData))
-        .unwrap()
         .then(() => {
           Swal.fire({
             title: "Sản phẩm đã thêm!",
@@ -186,6 +185,8 @@ function ProductDetail() {
                       key={variant.size._id} 
                       className={selectedSize === variant.size.title ? 'active-color' : ''} 
                       onClick={() => handleSizeClick(variant.size.title)}
+                      onChange={formik.handleChange}
+                      value={formik.values.size}
                     >
                       {variant.size.title}
                     </span>
@@ -200,7 +201,6 @@ function ProductDetail() {
                     name="count"
                     type="text"
                     onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
                     className="number-input"
                     value={formik.values.count}
                     min="1"

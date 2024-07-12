@@ -24,6 +24,7 @@ function Products() {
   const [activeFavorite, setActiveFavorite] = useState(false);
   const [quantity, setQuantity] = useState(0);
   const [visibleCount, setVisibleCount] = useState(12);
+  const [searchName, setSearchName] = useState('');
 
   const dispatch = useDispatch();
 
@@ -91,6 +92,14 @@ function Products() {
     });
     setSortProducts(product.sort((a, b) => (a.price > b.price ? 1 : -1)));
   };
+  const filteredProducts = () => {
+    return productState.filter(product => {
+      if (searchName && !product.title.toLowerCase().includes(searchName.toLowerCase())) {
+        return false;
+      }
+      return true;
+    });
+  };
 
   return (
     <>
@@ -122,6 +131,13 @@ function Products() {
             type="text"
             placeholder="Tìm kiếm tại đây ..."
           />
+          <input
+            placeholder="Tìm kiếm theo tên sản phẩm"
+            value={searchName}
+            onChange={e => setSearchName(e.target.value)}
+            className="search"
+            type="text"
+          />
           <Dropdown>
             <Dropdown.Toggle
               variant="light"
@@ -152,7 +168,7 @@ function Products() {
       <div className="products">
       {sortProducts?.length > 0 ? (
         <>
-          {sortProducts.slice(0, visibleCount).map((item) => (
+          {sortProducts.slice(0, visibleCount) && filteredProducts().map((item) => (
             <Card key={item.id} product={item} users={userState} />
           ))}
           {visibleCount < sortProducts.length && (

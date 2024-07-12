@@ -27,9 +27,9 @@ function App() {
             <Route path='/account' element={<Account />}/>
             <Route path='/favorite' element={<Favorite />}/>
             <Route path='/order' element={<Order />}/>
-            <Route path='/payment-status' element={<PaymentSuccess />}/>
           </Route>
           
+          <Route path='/payment-status' element={<PaymentSuccess />}/>
           <Route path='/login' element={<Login />}/>
           <Route path='/register' element={<Register />}/>
           <Route path='/forgot-password' element={<ForgotPassword />}/>

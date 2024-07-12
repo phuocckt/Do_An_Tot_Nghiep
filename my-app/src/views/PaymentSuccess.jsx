@@ -27,7 +27,7 @@ function PaymentSuccess() {
 
   return (
     <div className="payment-success-container">
-      <h1>Giao dịch thành công!!</h1>
+      <h1>Giao dịch {isSuccessful ? "thành công" : "thất bại"}!!</h1>
       <div className="success-icon">✔️</div>
       <div className="payment-details">
         <div className="detail">
@@ -55,8 +55,12 @@ function PaymentSuccess() {
           <span>{date}</span>
         </div>
         <div className="d-flex">
-          <Link to="/products" className="btn btn-primary">Mua tiếp</Link>
-          <Link to="/order" className="btn btn-success">Xem đơn hàng</Link>
+          {isSuccessful ? 
+          (<>
+            <Link to="/products" className="btn btn-primary me-2">Mua tiếp</Link>
+            <Link to="/order" className="btn btn-success">Xem đơn hàng</Link>
+          </>)
+           : (<Link to="/cart" className="btn btn-success">Về giỏ hàng</Link>)}
         </div>
       </div>
     </div>

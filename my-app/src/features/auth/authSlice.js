@@ -104,6 +104,17 @@ export const applyCoupon = createAsyncThunk(
     }
 )
 
+export const deleteCoupon = createAsyncThunk(
+    "auth/delete-coupon",
+    async (data, thunkAPI) => {
+        try {
+            return await authService.deleteCoupon(data);
+        } catch(error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+)
+
 export const payment = createAsyncThunk(
     "auth/payment",
     async (data, thunkAPI) => {

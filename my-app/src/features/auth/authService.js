@@ -51,6 +51,11 @@ const applyCoupon = async (data) => {
     return res.data;
 }
 
+const deleteCoupon = async (data) => {
+    const res = await axios.post(`${base_url}user/cart/delete-coupon`, data, config);
+    return res.data;
+}
+
 const payment = async (data) => {
     const res = await axios.post(`${base_url}user/cart/create_payment_url`, data, config);
     return res.data;
@@ -65,7 +70,8 @@ const authService = {
     addToCart,
     deleteCart,
     applyCoupon,
-    payment
+    payment,
+    deleteCoupon
 }
 
 export default authService;

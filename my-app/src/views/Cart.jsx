@@ -4,6 +4,7 @@ import "../styles/cart.css";
 import {
   applyCoupon,
   deleteCart,
+  deleteCoupon,
   getCart,
   payment,
 } from "../features/auth/authSlice";
@@ -12,23 +13,24 @@ import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { createOrder, createPaymentOrder } from "../features/order/orderSlice";
+import { createOrder } from "../features/order/orderSlice";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import { getUser } from "../features/customer/customerSlice";
 
 function Cart() {
   const dispatch = useDispatch();
-  const location = useLocation();
   const user = useSelector((state) => state.auth.user);
   const [totalPrice, setTotalPrice] = useState(0);
   const [activeBtn, setActiveBtn] = useState(false);
   const cartState = useSelector((state) => state.auth.carts);
   const userState = useSelector((state) => state.customer.customer);
+  const [voucher, setVoucher] = useState("");
+  let finalAmount = cartState?.totalAfterDiscount > 0 ? cartState.totalAfterDiscount : cartState?.cartTotal;
 
   useEffect(() => {
     //dispatch(getCart());
     dispatch(getUser(user._id));
-    const total = cartState.products?.reduce(
+    const total = cartState?.products?.reduce(
       (acc, item) => acc + item.price,
       0
     );
@@ -48,6 +50,24 @@ function Cart() {
     },
     enableReinitialize: true,
     onSubmit: (values) => {
+      if (!userState.address) {
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Người dùng chưa nhập địa chỉ.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+      if (cartState?.cartTotal == 0) {
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Giỏ hàng rỗng. Không thể thanh toán",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
       dispatch(payment(values))
         .unwrap()
         .then((url) => {
@@ -79,7 +99,15 @@ function Cart() {
         });
         return;
       }
-
+      if (cartState?.cartTotal == 0) {
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Giỏ hàng rỗng. Không thể thanh toán",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
       dispatch(createOrder(values))
         .unwrap()
         .then(() => {
@@ -105,9 +133,19 @@ function Cart() {
       coupon: "",
     },
     onSubmit: (values) => {
+      if(values.coupon == ""){
+        Swal.fire({
+          title: "Vui lòng nhập mã giảm giá!",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
       dispatch(applyCoupon(values))
         .unwrap()
-        .then(() => {
+        .then((v) => {
+          setVoucher(v);
+          setActiveBtn(true);
           dispatch(getCart());
         })
         .catch(() => {
@@ -142,23 +180,32 @@ function Cart() {
     });
   };
 
-const handleClick=()=>{
-  setActiveBtn(true);
-}
-const handleReload = () => {
-  window.location.reload();
-};
+  const handleReload = () => {
+    dispatch(deleteCoupon({ coupon: voucher }))
+      .unwrap()
+      .then(() => {
+        dispatch(getCart());
+      })
+      .catch(() => {
+        Swal.fire({
+          title: "Mã không tồn tại!",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+      });
+    setActiveBtn(false);
+  };
 
   return (
     <div className="cart">
       <div className="cart-products">
         <h3 className="py-3 right-cart">Giỏ hàng</h3>
-        {!cartState || !cartState.products ? (
+        {!cartState || !cartState?.products ? (
           <p>Giỏ hàng đang trống...</p>
         ) : (
           <div className="products m-0 p-0">
             <div className="cart-card d-block">
-              {cartState.products.map((item) => (
+              {cartState?.products.map((item) => (
                 <div key={item.product._id} className="cart-item">
                   <Link to={`/product/${item.product._id}`}>
                     <img
@@ -219,7 +266,7 @@ const handleReload = () => {
                 placeholder="Nhập voucher"
                 onChange={formikCoupon.handleChange}
               />
-              <button className="btn btn-secondary ms-2 py-2" type="submit" onClick={handleClick} hidden={activeBtn}>
+              <button className="btn btn-secondary ms-2 py-2" type="submit" hidden={activeBtn}>
                 Áp dụng
               </button>
               <button className="btn btn-secondary ms-2 py-2" type="button" onClick={handleReload} hidden={!activeBtn}>
@@ -230,12 +277,12 @@ const handleReload = () => {
           <div className="total align-items-end">
             <p>Thành tiền:</p>
             <div className="text-end">
-              <p className="text-decoration-line-through " hidden={!activeBtn}>
-                <CurrencyFormatter amount={totalPrice} />
+              <p className="text-decoration-line-through" hidden={cartState?.cartTotal == finalAmount}>
+                <CurrencyFormatter amount={cartState?.cartTotal != finalAmount && cartState?.cartTotal} />
               </p>
               <p className='text-danger fs-5'>
                 <CurrencyFormatter
-                  amount={cartState ? cartState.cartTotal : 0}
+                  amount={cartState && cartState?.cartTotal > 0 ? finalAmount : 0}
                 />
               </p>
             </div>
@@ -256,7 +303,7 @@ const handleReload = () => {
                 />
               </div>
             </div>
-            <button type="submit" onClick={handleClick}>Thanh toán khi nhận hàng</button>
+            <button type="submit">Thanh toán khi nhận hàng</button>
           </form>
           <form onSubmit={paymentFormik.handleSubmit}>
             <input
