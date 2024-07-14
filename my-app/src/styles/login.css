@@ -89,12 +89,18 @@
 }
 .back-home{
     display: flex;
+    width: 200px;
+    margin: 0 auto;
     align-items: center;
     justify-content: center;
     border: 2px solid rgba(255, 255, 255, .2);
     border-radius: 20px;
     padding: 5px 0;
     color: white;
+    transition: .5s;
+}
+.back-home:hover{
+    border: 2px solid white;
 }
 .text-error{
     color: red;

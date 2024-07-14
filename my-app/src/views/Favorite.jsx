@@ -10,7 +10,7 @@ import { addWishlist, getProduct } from "../features/product/productSlice";
 import { useFormik } from "formik";
 import Avatar from "../components/Avatar";
 
-function Account() {
+function Favorite() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
@@ -120,4 +120,4 @@ function Account() {
   );
 }
 
-export default Account;
+export default Favorite;

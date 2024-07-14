@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import "./style.css"
 import { FaShippingFast, FaShieldAlt } from "react-icons/fa";
 import { MdOutlinePayment } from "react-icons/md";
@@ -8,32 +8,33 @@ const Wrapper = () => {
   const data = [
     {
       cover: <FaShippingFast/>,
-      title: "Worldwide Delivery",
-      decs: "We offer competitive prices on our 100 million plus product any range.",
+      title: "Giao hàng miễn phí",
+      decs: "Chúng tôi hỗ trợ giao hàng trên toàn quốc và hoàn toàn miễn phí.",
     },
     {
       cover: <MdOutlinePayment />,
-      title: "Safe Payment",
-      decs: "We offer competitive prices on our 100 million plus product any range.",
+      title: "Thanh toán sau",
+      decs: "Khách hàng hoàn toàn có thể thanh toán sau khi kiểm tra hàng.",
     },
     {
       cover: <FaShieldAlt />,
-      title: "Shop With Confidence ",
-      decs: "We offer competitive prices on our 100 million plus product any range.",
+      title: "Dịch vụ bảo hành",
+      decs: "Chúng tôi sẽ đổi mới 100% sản phẩm nếu gặp lỗi do cửa hàng.",
     },
     {
       cover: <BiSupport />,
-      title: "24/7 Support ",
-      decs: "We offer competitive prices on our 100 million plus product any range.",
+      title: "Hỗ trợ 24/7",
+      decs: "Khi gặp vấn đề cần tư vấn hãy liên hệ chúng tôi để được hỗ trợ.",
     },
   ]
   return (
     <>
       <section className='wrapper background'>
+        <h3 className="m-5 text-center fw-bold">Dịch vụ</h3>
         <div className='container grid2'>
           {data.map((val, index) => {
             return (
-              <div className='product' key={index}>
+              <div className='product' key={index} >
                 <div className='img icon-circle'>
                   <i className="fs-1">{val.cover}</i>
                 </div>

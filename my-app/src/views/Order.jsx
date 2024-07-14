@@ -16,7 +16,7 @@ import { FaStar } from "react-icons/fa";
 import { getUser } from "../features/customer/customerSlice";
 import Avatar from "../components/Avatar";
 
-function Account() {
+function Order() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
@@ -154,11 +154,17 @@ function Account() {
               >
                 Tất cả
               </Button>
-              {/* <Button variant="secondary" onClick={()=>handleClick('Unpaid')} className={colorActive === 'Unpaid' ? 'bg-dark' : ''}>Chưa thanh toán</Button> */}
+              {/* <Button
+                variant="secondary"
+                onClick={() => handleClick("Unpaid")}
+                className={colorActive === "Unpaid" ? "bg-dark" : ""}
+              >
+                Chưa thanh toán
+              </Button> */}
               <Button
                 variant="warning"
                 onClick={() => handleClick("Pending")}
-                className={colorActive === "Pending" ? "bg-dark" : ""}
+                className={colorActive === "Pending" ? "bg-dark text-light" : ""}
               >
                 Đang xử lí
               </Button>
@@ -192,54 +198,60 @@ function Account() {
                     <div className="product-details d-block">
                       {item.products.map((i) => {
                         return (
-                          <div className="d-flex mb-3" key={i.product._id}>
-                            <Link to={`/product/${i.product._id}`}>
-                              <img
-                                src={i.product.image[0].url}
-                                alt="product"
-                                className="product-image"
-                              />
-                            </Link>
+                          <div
+                            className="d-flex mb-3 justify-content-between"
+                            key={i.product._id}
+                          >
+                            <div className="d-flex">
+                              <Link to={`/product/${i.product._id}`}>
+                                <img
+                                  src={i.product.image[0].url}
+                                  alt="product"
+                                  className="product-image"
+                                />
+                              </Link>
 
-                            <div className="product-info">
-                              <h3>{i.product.title}</h3>
-                              <p>
-                                Kích thước:{" "}
-                                <span className="fw-bold">{i.size}</span>
-                              </p>
-                              <p>
-                                Số lượng:{" "}
-                                <span className="fw-bold">x{i.count}</span>
-                              </p>
-                              {item.orderStatus == "Delivered" ? (
-                                <button
-                                  className="btn btn-warning"
-                                  onClick={() => {
-                                    setShowModal(true);
-                                    setCurrentProdId(i.product._id);
-                                    setInfo([
-                                      i.product.image[0].url,
-                                      i.product.title,
-                                    ]);
-                                    setStars(null);
-                                  }}
-                                >
-                                  Đánh giá
-                                </button>
-                              ) : (
-                                ""
-                              )}
-                              {i.product.ratings?.map((rat) => {
-                                return rat.postedby == user._id ? (
-                                  <p className="fst-italic text-danger">
-                                    Sản phẩm đã được bạn đánh giá {rat.star}{" "}
-                                    sao.
-                                  </p>
+                              <div className="product-info">
+                                <h3>{i.product.title}</h3>
+                                <p>
+                                  Kích thước:{" "}
+                                  <span className="fw-bold">{i.size}</span>
+                                </p>
+                                <p>
+                                  Số lượng:{" "}
+                                  <span className="fw-bold">x{i.count}</span>
+                                </p>
+                                {item.orderStatus == "Delivered" ? (
+                                  <button
+                                    className="btn btn-warning"
+                                    onClick={() => {
+                                      setShowModal(true);
+                                      setCurrentProdId(i.product._id);
+                                      setInfo([
+                                        i.product.image[0].url,
+                                        i.product.title,
+                                      ]);
+                                      setStars(null);
+                                    }}
+                                  >
+                                    Đánh giá
+                                  </button>
                                 ) : (
                                   ""
-                                );
-                              })}
+                                )}
+                                {i.product.ratings?.map((rat) => {
+                                  return rat.postedby == user._id ? (
+                                    <p className="fst-italic text-danger">
+                                      Sản phẩm đã được bạn đánh giá {rat.star}{" "}
+                                      sao.
+                                    </p>
+                                  ) : (
+                                    ""
+                                  );
+                                })}
+                              </div>
                             </div>
+
                             <div className="product-price">
                               {i.product.priceOld != null ? (
                                 <span className="original-price">
@@ -279,7 +291,7 @@ function Account() {
                           Hủy đơn hàng
                         </button>
                       ) : item.orderStatus == "Cancelled" ? (
-                        <span>Đã hủy bởi bạn</span>
+                        <span>Đã hủy</span>
                       ) : (
                         ""
                       )}
@@ -367,4 +379,4 @@ function Account() {
   );
 }
 
-export default Account;
+export default Order;

@@ -164,6 +164,15 @@ export const authSlice = createSlice({
                 state.isError = true;
                 state.isSuccess = false;
             })
+            .addCase(forgotPassword.pending, (state) => {
+                state.isLoading = true;
+            })
+            .addCase(forgotPassword.fulfilled, (state) => {
+                state.isLoading = false;
+            })
+            .addCase(forgotPassword.rejected, (state) => {
+                state.isLoading = false;
+            })
             .addCase(getCart.pending, (state) => {
                 state.isLoading = true;
             })

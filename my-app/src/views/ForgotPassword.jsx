@@ -1,65 +1,89 @@
-import { Link, useNavigate } from 'react-router-dom';
-import '../styles/loginSignup.css'
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { useDispatch } from 'react-redux';
-import { forgotPassword } from '../features/auth/authSlice';
-import Swal from 'sweetalert2';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { CiMail, CiTurnL1 } from "react-icons/ci";
+import "../styles/login.css";
+import { useFormik } from "formik";
+import * as yup from "yup";
+import { forgotPassword } from "../features/auth/authSlice";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import loadingSend from "../assets/video/loading.gif";
 
-function Login() {
+const ForgotPassword = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const isLoading = useSelector((state) => state.auth.isLoading);
+
   let schema = yup.object().shape({
-    email: yup.string().required('Email is required').email('Invalid email format'),
-  })
+    email: yup
+      .string()
+      .required("Vui lòng nhập email.")
+      .email("Email không đúng định dạng."),
+  });
   const formik = useFormik({
     initialValues: {
-      email: ''
+      email: "",
     },
-    validationSchema: schema, 
-    onSubmit: values => {
+    validationSchema: schema,
+    onSubmit: (values) => {
       dispatch(forgotPassword(values))
         .unwrap()
         .then(() => {
-          Swal.fire({
-            title: "Gửi thành công!",
-            icon: "success",
-            confirmButtonText: "OK",
-          });
-          navigate("/login");
+          toast.success("Vui lòng kiểm tra email để đổi mật khẩu !");
         })
         .catch(() => {
-          Swal.fire({
-            title: "Email không tồn tại!",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-        })
+          toast.error("Email chưa được đăng kí !");
+        });
     },
   });
+
   return (
     <>
-        <div className='login'>
-          <div className='login-container'>
-            <h1>Quên mật khẩu</h1>
-            <form onSubmit={formik.handleSubmit}>
-            <input 
-              type='email' 
-              placeholder='Email' 
-              name='email'  
-              onChange={formik.handleChange("email")}  
-              value={formik.values.email}
-            />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className="wrapper-log">
+        <form onSubmit={formik.handleSubmit}>
+          {isLoading ? (
+            <img hidden={!isLoading} src={loadingSend} width={"350px"} />
+          ) : (
+            <>
+              <h2>Quên mật khẩu</h2>
+              <div className="input-box">
+                <input
+                  name="email"
+                  onChange={formik.handleChange("email")}
+                  value={formik.values.email}
+                  type="text"
+                  placeholder="Email"
+                />
+                <CiMail />
                 {formik.touched.email && formik.errors.email ? (
-                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.email}</p>
-              ) : null}
-
-              <button type='submit'>Gửi</button>
-            </form>
-          </div>   
-        </div>
+                  <span className="text-error">{formik.errors.email}</span>
+                ) : null}
+              </div>
+              <button type="submit" className="btn-log mb-4">
+                Gửi
+              </button>
+              <Link to={"/"} className="back-home">
+                <CiTurnL1 className="me-2" />
+                Về trang chủ
+              </Link>
+            </>
+          )}
+        </form>
+      </div>
     </>
   );
-}
+};
 
-export default Login;
+export default ForgotPassword;

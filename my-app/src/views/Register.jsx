@@ -10,7 +10,7 @@ import { register } from "../features/auth/authSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Login = () => {
+const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -156,4 +156,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

@@ -41,7 +41,7 @@ const Brand = () => {
   return (
     <>
       <div>
-        <h3 className="mb-4">Các nhãn hiệu hàng đầu thế giới:</h3>
+        <h3 className="mb-5 text-center fw-bold">Các nhãn hiệu hàng đầu thế giới</h3>
         <div className="brand-list">
           {data.map((val, index) => {
             return (

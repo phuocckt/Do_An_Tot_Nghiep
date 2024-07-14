@@ -1,17 +1,21 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import '../styles/loginSignup.css'
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { useDispatch } from 'react-redux';
-import { resetPassword } from '../features/auth/authSlice';
-import Swal from 'sweetalert2';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { CiLock, CiTurnL1 } from "react-icons/ci";
+import { PiEyeSlashThin, PiEyeThin } from "react-icons/pi";
+import "../styles/login.css";
+import { useFormik } from "formik";
+import * as yup from "yup";
+import {resetPassword } from "../features/auth/authSlice";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-function Login() {
+const ResetPassword = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const tokenPass = useParams();
   let schema = yup.object().shape({
-    password: yup.string().required('Password is required'),
+    password: yup.string().required('Vui lòng nhật mật khẩu.'),
   })
   const formik = useFormik({
     initialValues: {
@@ -24,45 +28,59 @@ function Login() {
       dispatch(resetPassword(data))
         .unwrap()
         .then(() => {
-          Swal.fire({
-            title: "Đổi mật khẩu thành công!",
-            icon: "success",
-            confirmButtonText: "OK",
-          });
-          navigate("/login");
+          toast.success("Cập nhật mật khẩu thành công !");
+          setTimeout(() => {
+            navigate("/login");
+          }, 1500);
         })
         .catch(() => {
-          Swal.fire({
-            title: "Đổi mật khẩu không thành công!",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
+          toast.error("Cập nhật mật khẩu thất bại !");
         })
     },
   });
+
   return (
     <>
-        <div className='login'>
-          <div className='login-container'>
-            <h1>Đổi mật khẩu</h1>
-            <form onSubmit={formik.handleSubmit}>
-            <input 
-              type='password' 
-              placeholder='Password' 
-              name='password'  
-              onChange={formik.handleChange("password")}  
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <div className="wrapper-log">
+        <form onSubmit={formik.handleSubmit}>
+          <h2>Đổi mật khẩu</h2>
+          <div className="input-box">
+            <input
+              name="password"
+              onChange={formik.handleChange("password")}
               value={formik.values.password}
+              type="password"
+              placeholder="Nhập mật khẩu mới"
             />
-                {formik.touched.password && formik.errors.password ? (
-                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.password}</p>
-              ) : null}
-
-              <button type='submit'>Thay đổi</button>
-            </form>
-          </div>   
-        </div>
+            {/* {eye? <PiEyeSlashThin onClick={handleClick()}/>:<CiLock/>} */}
+            <CiLock />
+            {formik.touched.password && formik.errors.password ? (
+              <span className="text-error">{formik.errors.password}</span>
+            ) : null}
+          </div>
+          <button type="submit" className="btn-log">
+            Cập nhật
+          </button>
+          <Link to={"/"} className="back-home mt-4">
+            <CiTurnL1 className="me-2" />
+            Về trang chủ
+          </Link>
+        </form>
+      </div>
     </>
   );
-}
+};
 
-export default Login;
+export default ResetPassword;

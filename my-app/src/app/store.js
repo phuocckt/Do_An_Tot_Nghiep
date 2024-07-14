@@ -7,6 +7,7 @@ import categoryReducer from "../features/category/categorySlice";
 import sizeReducer from "../features/size/sizeSlice";
 import orderReducer from "../features/order/orderSlice";
 import uploadReducer from "../features/upload/uploadSlice";
+import couponReducer from "../features/coupon/couponSlice";
 
 export const store = configureStore({
     reducer: { auth: authReducer, 
@@ -16,6 +17,7 @@ export const store = configureStore({
                 category: categoryReducer, 
                 size: sizeReducer,
                 order: orderReducer,
-                upload: uploadReducer
+                upload: uploadReducer,
+                coupon: couponReducer,
             },
 });

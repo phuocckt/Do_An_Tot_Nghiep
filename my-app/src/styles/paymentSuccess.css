@@ -1,5 +1,11 @@
+.pay-container{
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  width: 100vw;
+}
 .payment-success-container {
-    max-width: 600px;
+    min-width: 550px;
     margin: 0 auto;
     padding: 20px;
     text-align: center;

@@ -7,6 +7,7 @@ import "./css/Layout.css";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import userNone from "../assets/images/user-none.jpg";
+import { IoCart } from "react-icons/io5";
 import { getCart } from "../features/auth/authSlice";
 import { useEffect } from "react";
 
@@ -44,21 +45,22 @@ function Header() {
               <Link className="text-light nav-link-spacing" to="/products">
                 SẢN PHẨM
               </Link>
-              {userId == null || user == null ? (
+              {/* {userId == null || user == null ? (
                 <Link className="text-light nav-link-spacing position-relative" to="/login">
                   <CiShoppingCart className="fs-1" />
                   <span className="quantity-cart">
                     {cart && cart.products?.length > 0 ? cart.products?.length : "00"}
                   </span>
                 </Link>
-              ) : (
+              ) : ( */}
                 <Link className="text-light nav-link-spacing position-relative" to="/cart">
-                  <CiShoppingCart className="fs-1" />
-                  <span className="quantity-cart">
+                  {/* <CiShoppingCart className="fs-1" /> */}
+                  <IoCart className="fs-3"/>
+                  {/* <span className="quantity-cart">
                     {cart && cart.products?.length > 0 ? cart.products?.length : "00"}
-                  </span>
+                  </span> */}
                 </Link>
-              )}
+              {/* )} */}
               {userId == null || user == null ? (
                 <Link className="text-light nav-link-spacing" to="/login">
                   ĐĂNG NHẬP

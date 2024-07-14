@@ -1,27 +1,38 @@
 import { useEffect, useState } from "react";
 import "../styles/productDetail.css";
-import { FaChevronDown, FaChevronUp, FaRegHeart, FaHeart } from "react-icons/fa";
-import { addWishlist, getProduct, getProducts } from '../features/product/productSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaRegHeart,
+  FaHeart,
+} from "react-icons/fa";
+import {
+  addWishlist,
+  getProduct,
+  getProducts,
+} from "../features/product/productSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
-import { addToCart, getCart } from '../features/auth/authSlice';
-import * as yup from 'yup';
-import Swal from 'sweetalert2';
+import { addToCart, getCart } from "../features/auth/authSlice";
+import * as yup from "yup";
+import Swal from "sweetalert2";
 import { useFormik } from "formik";
-import Comment from '../components/Comment/Comment';
+import Comment from "../components/Comment/Comment";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import { getUser } from "../features/customer/customerSlice";
 
 function ProductDetail() {
   const [active, setActive] = useState(false);
+  const [activeSize, setActiveSize] = useState(false);
   const [activeFavorite, setActiveFavorite] = useState(false);
   const [urlImage, setUlrImage] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);  // State to track selected size
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [quantitySize, setQuantitySize] = useState("");
   const { id } = useParams();
-  const user = useSelector(state => state.auth.user);
-  const user2 = useSelector(state => state.customer.customer);
+  const user = useSelector((state) => state.auth.user);
+  const user2 = useSelector((state) => state.customer.customer);
   const dispatch = useDispatch();
-  
+
   useEffect(() => {
     dispatch(getProducts());
     dispatch(getProduct(id));
@@ -31,7 +42,7 @@ function ProductDetail() {
 
   useEffect(() => {
     if (user2.wishlist) {
-      user2.wishlist.forEach(item => {
+      user2.wishlist.forEach((item) => {
         if (item._id === id) {
           setActiveFavorite(true);
         }
@@ -45,52 +56,57 @@ function ProductDetail() {
   const [value, setValue] = useState(1);
 
   const increment = () => {
-    setValue(prevValue => (prevValue < productState.quantity ? prevValue + 1 : productState.quantity));
+    setValue((prevValue) =>
+      prevValue < quantitySize ? prevValue + 1 : quantitySize
+    );
   };
 
   const decrement = () => {
-    setValue(prevValue => (prevValue > 1 ? prevValue - 1 : 1));
+    setValue((prevValue) => (prevValue > 1 ? prevValue - 1 : 1));
   };
 
   const formikFavorite = useFormik({
     initialValues: {
-      prodId: ''
+      prodId: "",
     },
-    onSubmit: values => {
+    onSubmit: (values) => {
       dispatch(addWishlist(values));
     },
   });
 
   const handleFavoriteClick = () => {
-    formikFavorite.setFieldValue('prodId', productState._id);
+    formikFavorite.setFieldValue("prodId", productState._id);
     setActiveFavorite(!activeFavorite);
   };
 
   const schema = yup.object().shape({
-    size: yup.string().required('Size is required'),
-    count: yup.number().required('Count is required').min(1, 'Count must be at least 1')
+    size: yup.string().required("Size is required"),
+    count: yup
+      .number()
+      .required("Count is required")
+      .min(1, "Count must be at least 1"),
   });
 
   const formik = useFormik({
     initialValues: {
       _id: id,
       count: value,
-      size: selectedSize || '',
-      price: productState?.price || 0  // Default to 0 if price is not available
+      size: selectedSize || "",
+      price: productState?.price || 0, // Default to 0 if price is not available
     },
-    validationSchema: schema, 
-    onSubmit: values => {
-      values.size = selectedSize;  // Set the selected size before submitting
-      values.price = productState?.price;  // Ensure price is included in the form data
+    validationSchema: schema,
+    onSubmit: (values) => {
+      values.size = selectedSize; // Set the selected size before submitting
+      values.price = productState?.price; // Ensure price is included in the form data
       const cartData = {
         cart: [
           {
             _id: id,
             count: values.count,
             size: values.size,
-            price: values.price
-          }
-        ]
+            price: values.price,
+          },
+        ],
       };
       dispatch(addToCart(cartData))
         .then(() => {
@@ -102,7 +118,7 @@ function ProductDetail() {
             `,
             icon: "success",
             showCancelButton: false,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
           dispatch(getCart());
         })
@@ -115,26 +131,30 @@ function ProductDetail() {
             `,
             icon: "error",
             showCancelButton: false,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
         });
     },
-    enableReinitialize: true  // This will reinitialize formik state when productState changes
+    enableReinitialize: true, // This will reinitialize formik state when productState changes
   });
 
   const handleChange = (item) => () => {
     setUlrImage(item.url);
-  }
+  };
 
-  const handleSizeClick = (size) => {
-    setSelectedSize(size);  // Set the selected size
-    formik.setFieldValue('size', size);  // Update formik state
-  }
+  const handleSizeClick = (size, quantity) => {
+    setSelectedSize(size); // Set the selected size
+    setQuantitySize(quantity);
+    setActiveSize(true);
+    setValue(1);
+    formik.setFieldValue("size", size); // Update formik state
+  };
 
   const handleClick = () => {
     setActive(!active);
     setUlrImage(null);
-  }
+    setActiveSize(false);
+  };
 
   // Render loading state while productState is being fetched
   if (!productState) {
@@ -146,56 +166,138 @@ function ProductDetail() {
       <div className="product-detail">
         <div className="product-images">
           <div className="images">
-            {productState.image?.map(item => (
-              <img key={item.url} onClick={handleChange(item)} className='product-img' src={item.url} alt="Ảnh sản phẩm" />
+            {productState.image?.map((item) => (
+              <img
+                key={item.url}
+                onClick={handleChange(item)}
+                className="product-img"
+                src={item.url}
+                alt="Ảnh sản phẩm"
+              />
             ))}
           </div>
           <div className="main-image">
-            <img className='product-img' src={urlImage || productState.image?.[0].url} alt="Ảnh sản phẩm" />
+            <img
+              className="product-img"
+              src={urlImage || productState.image?.[0].url}
+              alt="Ảnh sản phẩm"
+            />
           </div>
         </div>
 
         <div className="image-carousel">
-          {productState.image?.map(item => (
-            <img key={item.url} onClick={handleChange(item)} className='product-img' src={item.url} alt="Ảnh sản phẩm" />
+          {productState.image?.map((item) => (
+            <img
+              key={item.url}
+              onClick={handleChange(item)}
+              className="product-img"
+              src={item.url}
+              alt="Ảnh sản phẩm"
+            />
           ))}
         </div>
 
         <div className="product-info">
           <div className="product-content">
             <h2 className="pb-3">{productState.title}</h2>
-            <p name="price">Giá: <CurrencyFormatter className="fw-bold text-danger" amount={productState.price}/></p>
-            <p className="mt-3">Màu sắc:</p>
-            <div className="product-color">
+            <p name="price">
+              Giá:{" "}
+              <CurrencyFormatter
+                className="fw-bold text-danger fs-4"
+                amount={productState.price}
+              />
+            </p>
+            {/* <p className="mt-3">Màu sắc:</p> */}
+            <div className="product-color mt-3">
               {productsState
-                .filter(item => item.title === productState.title)
-                .map(item => (
+                .filter((item) => item.title === productState.title)
+                .filter((item)=>item._id !== id)
+                .map((item) => (
                   <Link key={item._id} to={`/product/${item._id}`}>
-                    <img onClick={handleClick} className='product-img' src={item.image?.[0].url} alt="Ảnh sản phẩm" />
+                    <img
+                      onClick={handleClick}
+                      className="product-img"
+                      src={item.image?.[0].url}
+                      alt="Ảnh sản phẩm"
+                    />
                   </Link>
-                ))
-              }
+                ))}
             </div>
             <div className="product-action">
               <form onSubmit={formik.handleSubmit}>
                 <div className="product-size m-0">
                   <p>Kích thước:</p>
-                  {productState.variants?.map(variant => (
-                    <span 
-                      key={variant.size._id} 
-                      className={selectedSize === variant.size.title ? 'active-color' : ''} 
-                      onClick={() => handleSizeClick(variant.size.title)}
+                  {productState.variants?.map((variant) => (
+                    <button
+                      type="button"
+                      key={variant.size._id}
+                      className={
+                        selectedSize === variant.size.title
+                          ? "active-color size"
+                          : "size"
+                      }
+                      onClick={() =>
+                        handleSizeClick(variant.size.title, variant.quantity)
+                      }
                       onChange={formik.handleChange}
                       value={formik.values.size}
+                      disabled={variant.quantity == 0}
                     >
                       {variant.size.title}
-                    </span>
+                    </button>
                   ))}
                 </div>
-                {formik.errors.size && <p style={{ color: "red", fontSize: "13px" }} className="error m-0">{formik.errors.size}</p>}
-                <p>Số lượng:</p>
-                <div className="input-number mb-4">
-                  <div className="btn-decrement" onClick={decrement}>-</div>
+                {formik.errors.size && (
+                  <p
+                    style={{ color: "red", fontSize: "13px" }}
+                    className="error m-0"
+                  >
+                    {formik.errors.size}
+                  </p>
+                )}
+                {activeSize ? (
+                  <>
+                    <p>
+                      Số lượng size {selectedSize}:{" "}
+                      <span className="fw-bold">{quantitySize}</span>
+                    </p>
+                    <div className="input-number mb-4">
+                      <div className="btn-decrement" onClick={decrement}>
+                        -
+                      </div>
+                      <input
+                        id="count"
+                        name="count"
+                        type="text"
+                        onChange={formik.handleChange}
+                        className="number-input"
+                        value={formik.values.count}
+                        min="1"
+                        readOnly
+                      />
+                      <div className="btn-increment" onClick={increment}>
+                        +
+                      </div>
+                      {formik.errors.count && formik.touched.count && (
+                        <p
+                          style={{ color: "red", fontSize: "13px" }}
+                          className="error"
+                        >
+                          {formik.errors.count}
+                        </p>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <p className="mb-4">
+                    Số lượng tổng:{" "}
+                    <span className="fw-bold">{productState.quantity}</span>
+                  </p>
+                )}
+                {/* <div className="input-number mb-4">
+                  <div className="btn-decrement" onClick={decrement}>
+                    -
+                  </div>
                   <input
                     id="count"
                     name="count"
@@ -204,28 +306,51 @@ function ProductDetail() {
                     className="number-input"
                     value={formik.values.count}
                     min="1"
+                    readOnly
                   />
-                  <div className="btn-increment" onClick={increment}>+</div>
-                  {formik.errors.count && formik.touched.count && <p style={{ color: "red", fontSize: "13px" }} className="error">{formik.errors.count}</p>}
-                </div>
+                  <div className="btn-increment" onClick={increment}>
+                    +
+                  </div>
+                  {formik.errors.count && formik.touched.count && (
+                    <p
+                      style={{ color: "red", fontSize: "13px" }}
+                      className="error"
+                    >
+                      {formik.errors.count}
+                    </p>
+                  )}
+                </div> */}
                 <button type="submit">Thêm vào giỏ hàng</button>
               </form>
               <form onSubmit={formikFavorite.handleSubmit}>
-                <input type="hidden" name="prodId" value={formikFavorite.values.prodId}/>
-                {
-                  user?._id ? (
-                    <button type="submit" className={activeFavorite ? 'active-favorite' : 'favorite'} onClick={handleFavoriteClick}>
-                      Yêu thích {activeFavorite ? <FaHeart className="text-danger" /> : <FaRegHeart />}
-                    </button>
-                  ) : ("")
-                }
+                <input
+                  type="hidden"
+                  name="prodId"
+                  value={formikFavorite.values.prodId}
+                />
+                {user?._id ? (
+                  <button
+                    type="submit"
+                    className={activeFavorite ? "active-favorite" : "favorite"}
+                    onClick={handleFavoriteClick}
+                  >
+                    Yêu thích{" "}
+                    {activeFavorite ? (
+                      <FaHeart className="text-danger" />
+                    ) : (
+                      <FaRegHeart />
+                    )}
+                  </button>
+                ) : (
+                  ""
+                )}
               </form>
             </div>
             <p>{productState.description}</p>
           </div>
         </div>
       </div>
-      <Comment product={productState}/>
+      <Comment product={productState} />
     </>
   );
 }

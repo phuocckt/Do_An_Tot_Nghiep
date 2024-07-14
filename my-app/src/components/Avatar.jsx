@@ -61,8 +61,8 @@ const Avatar = () => {
         </Modal.Body>
         <Modal.Footer className="d-flex justify-content-between">
           {/* <input type="file" name="" id="" /> */}
-          <Button onClick={()=>setIsDisabled(false)} hidden={!isDisabled} variant="info">Đổi ảnh đại diện</Button>
-          <Button hidden={isDisabled} variant="primary">Lưu ảnh đại diện</Button>
+          {/* <Button onClick={()=>setIsDisabled(false)} hidden={!isDisabled} variant="info">Đổi ảnh đại diện</Button>
+          <Button hidden={isDisabled} variant="primary">Lưu ảnh đại diện</Button> */}
           <Button variant="danger" onClick={() => setModalShow(false)}>Đóng</Button>
         </Modal.Footer>
       </Modal>

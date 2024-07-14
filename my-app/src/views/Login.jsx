@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { CiLock, CiMail, CiTurnL1 } from "react-icons/ci";
 import { PiEyeSlashThin, PiEyeThin } from "react-icons/pi";
 import "../styles/login.css";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { getCart, login } from "../features/auth/authSlice";
+import { login } from "../features/auth/authSlice";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,14 +14,6 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [eye, setEye] = useState(false);
-  const user = useSelector((state) => state.auth.user);
-
-  
-  // const cart = useSelector((state) => state.auth.carts);
-
-  // useEffect(() => {
-  //   dispatch(getCart());
-  // }, []);
 
   let schema = yup.object().shape({
     email: yup
@@ -51,14 +43,6 @@ const Login = () => {
         });
     },
   });
-
-//   const hanldeFocus = () => {
-//     setEye(!eye);
-//   };
-
-  const handleClick = () => {
-
-  }
 
   return (
     <>
@@ -100,14 +84,14 @@ const Login = () => {
               type="password"
               placeholder="Mật khẩu"
             />
-            {eye? <PiEyeSlashThin onClick={handleClick()}/>:<CiLock/>}
-            {/* <CiLock /> */}
+            {/* {eye? <PiEyeSlashThin onClick={handleClick()}/>:<CiLock/>} */}
+            <CiLock />
             {formik.touched.password && formik.errors.password ? (
               <span className="text-error">{formik.errors.password}</span>
             ) : null}
           </div>
           <div className="forgot-pass">
-            <Link to={"/"}>Quên mật khẩu ?</Link>
+            <Link to={"/forgot-password"}>Quên mật khẩu ?</Link>
           </div>
           <button type="submit" className="btn-log">
             Đăng nhập

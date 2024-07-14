@@ -609,7 +609,7 @@ const createCashOrder = asyncHandler(async (req, res) => {
             orderby: user._id,
             orderStatus: "Pending"
         }).save();
-
+        
         // Cập nhật số lượng sản phẩm và các biến thể
         let update = userCart.products.map(item => {
             let productUpdate = {
@@ -620,19 +620,24 @@ const createCashOrder = asyncHandler(async (req, res) => {
             };
             const product = item.product;
             const size = item.size;
-
+        
             const variant = product.variants.find(v => v.size && v.size.title === size);
-
+        
             if (variant) {
                 variant.quantity -= item.count;
             }
-
-            product.save();
-
-
-            return productUpdate;
-        }).flat();
-        const updated = await Product.bulkWrite(update, {});
+        
+            return { product, productUpdate };
+        });
+        
+        for (const item of update) {
+            await item.product.save(); // Lưu từng sản phẩm một cách tuần tự để tránh lỗi ParallelSaveError
+        }
+        
+        const bulkUpdate = update.map(item => item.productUpdate);
+        
+        const updated = await Product.bulkWrite(bulkUpdate, {});
+        
 
         // Xóa giỏ hàng sau khi tạo đơn hàng
         await Cart.deleteOne({ orderby: user._id });

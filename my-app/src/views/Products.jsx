@@ -168,7 +168,7 @@ function Products() {
       <div className="products">
       {sortProducts?.length > 0 ? (
         <>
-          {sortProducts.slice(0, visibleCount) && filteredProducts().map((item) => (
+          {sortProducts.slice(0, visibleCount).map((item) => (
             <Card key={item.id} product={item} users={userState} />
           ))}
           {visibleCount < sortProducts.length && (
