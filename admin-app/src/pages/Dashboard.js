@@ -1,30 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { GoArrowDownRight, GoArrowUpRight } from 'react-icons/go';
 import { Column } from '@ant-design/plots';
-import { Table } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUsers } from '../features/customer/customerSlice';
 import { getProducts } from '../features/product/productSlice';
 import { getOrders } from '../features/order/orderSlice';
-
-const columns = [
-  {
-    title: 'No.',
-    dataIndex: 'key',
-  },
-  {
-    title: 'Name',
-    dataIndex: 'name',
-  },
-  {
-    title: 'Product',
-    dataIndex: 'product',
-  },
-  {
-    title: 'Status',
-    dataIndex: 'status',
-  },
-];
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -38,55 +17,67 @@ const Dashboard = () => {
   const productsState = useSelector((state) => state.product.products);
   const ordersState = useSelector((state) => state.order.orders);
 
-  // Get current month and year
+  // Lấy tháng và năm hiện tại
   const currentDate = new Date();
-  const currentMonth = (currentDate.getMonth() + 1).toString(); // January is 0!
   const currentYear = currentDate.getFullYear().toString();
 
-  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
   const [selectedYear, setSelectedYear] = useState(currentYear);
 
-  // Function to handle changes in select boxes
+  // Xử lý khi chọn lọc doanh thu theo năm
   const handleSelectChange = (value, type) => {
-    if (type === 'month') {
-      setSelectedMonth(value);
-    } else if (type === 'year') {
+    if (type === 'year') {
       setSelectedYear(value);
     }
   };
 
-  // Logic to calculate and filter data based on selected date
-  const filteredOrders = ordersState.filter((order) => {
-    const orderDate = new Date(order.createdAt);
-    const orderMonth = (orderDate.getMonth() + 1).toString();
-    const orderYear = orderDate.getFullYear().toString();
+  // Lọc đơn hàng dựa trên năm đã chọn
+  // const filteredOrders = ordersState.filter((order) => {
+  //   const orderDate = new Date(order.createdAt);
+  //   const orderYear = orderDate.getFullYear().toString();
 
-    return orderMonth === selectedMonth && orderYear === selectedYear;
-  });
+  //   return orderYear === selectedYear;
+  // });
 
-  // Initial data with all months and sales set to 0
+  // Tính tổng số đơn đặt hàng không bao gồm đơn hàng bị hủy
+  const totalOrders = ordersState.filter(order => order.orderStatus !== 'Cancelled').length;
+
+  // Tính tổng số đơn hàng đã giao
+  const totalDeliveredOrders = ordersState.filter(order => order.orderStatus === 'Delivered').length;
+
+  // Tính tổng doanh thu từ đơn hàng đã giao
+  const totalDeliveredRevenue = ordersState
+    .filter(order => order.orderStatus === 'Delivered')
+    .reduce((total, order) => {
+      return total + order.products.reduce((orderTotal, product) => {
+        return orderTotal + (product.count * product.product.price);
+      }, 0);
+    }, 0);
+
+  // Dữ liệu ban đầu với tất cả các tháng và doanh số bán hàng mặc định được đặt thành 0
   const data = [
-    { type: 'January', sales: 0 },
-    { type: 'February', sales: 0 },
-    { type: 'March', sales: 0 },
-    { type: 'April', sales: 0 },
-    { type: 'May', sales: 0 },
-    { type: 'June', sales: 0 },
-    { type: 'July', sales: 0 },
-    { type: 'August', sales: 0 },
-    { type: 'September', sales: 0 },
-    { type: 'October', sales: 0 },
-    { type: 'November', sales: 0 },
-    { type: 'December', sales: 0 },
+    { type: 'Tháng 1', sales: 0 },
+    { type: 'Tháng 2', sales: 0 },
+    { type: 'Tháng 3', sales: 0 },
+    { type: 'Tháng 4', sales: 0 },
+    { type: 'Tháng 5', sales: 0 },
+    { type: 'Tháng 6', sales: 0 },
+    { type: 'Tháng 7', sales: 0 },
+    { type: 'Tháng 8', sales: 0 },
+    { type: 'Tháng 9', sales: 0 },
+    { type: 'Tháng 10', sales: 0 },
+    { type: 'Tháng 11', sales: 0 },
+    { type: 'Tháng 12', sales: 0 },
   ];
 
-  // Calculate sales for each month from filtered orders
-  filteredOrders.forEach((order) => {
-    const monthIndex = new Date(order.createdAt).getMonth();
-    data[monthIndex].sales += order.products.reduce((total, product) => {
-      return total + (product.count * product.product.price);
-    }, 0);
-  });
+  // Tính doanh số cho mỗi tháng từ các đơn hàng được giao trong năm đã chọn
+  ordersState
+    .filter(order => order.orderStatus === 'Delivered' && new Date(order.createdAt).getFullYear().toString() === selectedYear)
+    .forEach((order) => {
+      const monthIndex = new Date(order.createdAt).getMonth();
+      data[monthIndex].sales += order.products.reduce((total, product) => {
+        return total + (product.count * product.product.price);
+      }, 0);
+    });
 
   const config = {
     data: data,
@@ -122,7 +113,7 @@ const Dashboard = () => {
       <div className='d-flex justify-content-between align-items-center gap-3'>
         <div className='d-flex justify-content-between align-items-end flex-grow-1 bg-white p-3 rounded-3'>
           <div>
-            <p className='desc'>Tổng hạch hàng</p>
+            <p className='desc'>Tổng khách hàng</p>
             <h4 className='mb-0 sub-title'>{customerState.length} người dùng</h4>
           </div>
         </div>
@@ -135,23 +126,26 @@ const Dashboard = () => {
         <div className='d-flex justify-content-between align-items-end flex-grow-1 bg-white p-3 rounded-3'>
           <div>
             <p className='desc'>Tổng số hóa đơn</p>
-            <h4 className='mb-0 sub-title'>{ordersState.length} hóa đơn</h4>
+            <h4 className='mb-0 sub-title'>{totalOrders} hóa đơn</h4>
+          </div>
+        </div>
+        <div className='d-flex justify-content-between align-items-end flex-grow-1 bg-white p-3 rounded-3'>
+          <div>
+            <p className='desc'>Tổng số hóa đơn đã giao</p>
+            <h4 className='mb-0 sub-title'>{totalDeliveredOrders} hóa đơn</h4>
+          </div>
+        </div>
+        <div className='d-flex justify-content-between align-items-end flex-grow-1 bg-white p-3 rounded-3'>
+          <div>
+            <p className='desc'>Tổng doanh thu hóa đơn đã giao</p>
+            <h4 className='mb-0 sub-title'>{totalDeliveredRevenue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h4>
           </div>
         </div>
       </div>
       <div className='mt-4'>
         <h3 className='mb-4'>Thống kê thu nhập</h3>
         <div className='mb-3'>
-          <select
-            value={selectedMonth}
-            onChange={(e) => handleSelectChange(e.target.value, 'month')}
-          >
-            {[...Array(12)].map((_, index) => (
-              <option key={index + 1} value={index + 1}>
-                {index + 1}
-              </option>
-            ))}
-          </select>
+          <label>Lọc theo năm:</label>
           <select
             value={selectedYear}
             onChange={(e) => handleSelectChange(e.target.value, 'year')}

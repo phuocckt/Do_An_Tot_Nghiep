@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import CustomerInput from '../Components/CustomerInput';
 import * as yup from 'yup';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useFormik } from 'formik';
 import { createBrand } from '../features/brand/brandSlice';
 import Swal from 'sweetalert2';
