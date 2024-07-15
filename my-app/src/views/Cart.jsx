@@ -57,7 +57,7 @@ function Cart() {
   const paymentFormik = useFormik({
     initialValues: {
       orderType: "billpayment",
-      amount: cartState?.cartTotal || 0,
+      amount: finalAmount || 0,
       orderDescription: "paymentOrder",
       language: "vn",
     },

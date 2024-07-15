@@ -1,5 +1,5 @@
 const express = require("express");
-const { createUser, loginUserCtrl, getallUsers, getAUser, deleteAUser, updateAUser, blockUser, unBlockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, saveAddress, userCart, UserCart, emptyCart, applyCoupon, createCashOrder ,getOrders, updateOrderStatus, getAllOrders, uploadAvatar, getOrdersByUser, createPayment, vnpayIpn, vnpayReturn, createPaymentOrder, deleteCoupon} = require("../controller/userCtrl");
+const { createUser, loginUserCtrl, getallUsers, getAUser, deleteAUser, updateAUser, blockUser, unBlockUser, handleRefreshToken, logout, updatePassword, forgotPasswordToken, resetPassword, loginAdmin, saveAddress, userCart, UserCart, emptyCart, applyCoupon, createCashOrder ,getOrders, updateOrderStatus, getAllOrders, uploadAvatar, getOrdersByUser, createPayment, vnpayIpn, vnpayReturn, createPaymentOrder, deleteCoupon, updateAUserByAdmin} = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 const { uploadPhoto } = require("../middlewares/uploadImages");
 const router =  express.Router();
@@ -30,6 +30,7 @@ router.get('/:id', authMiddleware, getAUser);
 router.delete('/empty-cart/:id', authMiddleware, emptyCart);
 router.delete('/:id', deleteAUser);
 router.put('/edit-user', authMiddleware, updateAUser);
+router.put('/edit-user-by-admin', authMiddleware, updateAUserByAdmin);
 router.put('/save-address', authMiddleware, saveAddress);
 router.put('/block-user/:id', authMiddleware, isAdmin, blockUser);
 router.put('/unblock-user/:id', authMiddleware, isAdmin, unBlockUser);

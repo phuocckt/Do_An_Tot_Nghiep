@@ -1,11 +1,5 @@
-import { Link } from "react-router-dom";
 import "../styles/home.css";
-import { IoIosFlash } from "react-icons/io";
-import { FaBlogger } from "react-icons/fa";
-import Carousel from "../components/Carousel/Carousel";
 import Wrapper from "../components/wrapper/Wrapper";
-import Blogs from "../components/News/News";
-import Products from "./Products";
 import Slider from "../components/Slider/Slider";
 import Brand from "../components/Brand/Brand";
 import ProHot from "../components/ProHot";
@@ -19,14 +13,14 @@ function Home() {
         <div className="box">
           <ProHot />
         </div>
-        <div className="box">
+        {/* <div className="box">
           <Blogs />
-        </div>
+        </div> */}
       </div>
 
       <section className="home-wrapper-1 pb-5">
         <div className="container-xxl ">
-          <div className="row mb-5">
+          {/* <div className="row mb-5">
             <h3 className="mb-2">
               <IoIosFlash className="me-2 blink" />
               Flash Sale
@@ -86,7 +80,7 @@ function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
           {/* <Products /> */}
 
           <Wrapper />

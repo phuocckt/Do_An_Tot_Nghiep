@@ -26,37 +26,29 @@ const columns = [
   },
 ];
 
-const data1 = [];
-for (let i = 1; i < 46; i++) {
-  data1.push({
-    key: i,
-    name: `Edward King ${i}`,
-    product: 'Jogger',
-    status: `Delivering`,
-  });
-}
-
 const Dashboard = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getUsers());
     dispatch(getProducts());
     dispatch(getOrders());
-  }, []);
+  }, [dispatch]);
 
   const customerState = useSelector((state) => state.customer.customers);
   const productsState = useSelector((state) => state.product.products);
   const ordersState = useSelector((state) => state.order.orders);
 
-  const [selectedDay, setSelectedDay] = useState('1');
-  const [selectedMonth, setSelectedMonth] = useState('1');
-  const [selectedYear, setSelectedYear] = useState('2022'); // Change default year as needed
+  // Get current month and year
+  const currentDate = new Date();
+  const currentMonth = (currentDate.getMonth() + 1).toString(); // January is 0!
+  const currentYear = currentDate.getFullYear().toString();
+
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
 
   // Function to handle changes in select boxes
   const handleSelectChange = (value, type) => {
-    if (type === 'day') {
-      setSelectedDay(value);
-    } else if (type === 'month') {
+    if (type === 'month') {
       setSelectedMonth(value);
     } else if (type === 'year') {
       setSelectedYear(value);
@@ -66,15 +58,10 @@ const Dashboard = () => {
   // Logic to calculate and filter data based on selected date
   const filteredOrders = ordersState.filter((order) => {
     const orderDate = new Date(order.createdAt);
-    const orderDay = orderDate.getDate().toString();
     const orderMonth = (orderDate.getMonth() + 1).toString();
     const orderYear = orderDate.getFullYear().toString();
 
-    return (
-      orderDay === selectedDay &&
-      orderMonth === selectedMonth &&
-      orderYear === selectedYear
-    );
+    return orderMonth === selectedMonth && orderYear === selectedYear;
   });
 
   // Initial data with all months and sales set to 0
@@ -155,16 +142,6 @@ const Dashboard = () => {
       <div className='mt-4'>
         <h3 className='mb-4'>Thống kê thu nhập</h3>
         <div className='mb-3'>
-          <select
-            value={selectedDay}
-            onChange={(e) => handleSelectChange(e.target.value, 'day')}
-          >
-            {[...Array(31)].map((_, index) => (
-              <option key={index + 1} value={index + 1}>
-                {index + 1}
-              </option>
-            ))}
-          </select>
           <select
             value={selectedMonth}
             onChange={(e) => handleSelectChange(e.target.value, 'month')}

@@ -131,13 +131,6 @@ function Products() {
             type="text"
             placeholder="Tìm kiếm tại đây ..."
           />
-          <input
-            placeholder="Tìm kiếm theo tên sản phẩm"
-            value={searchName}
-            onChange={e => setSearchName(e.target.value)}
-            className="search"
-            type="text"
-          />
           <Dropdown>
             <Dropdown.Toggle
               variant="light"

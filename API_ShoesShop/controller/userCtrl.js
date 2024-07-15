@@ -187,7 +187,31 @@ const updateAUser = asyncHandler(async (req, res) => {
             lastname: req?.body?.lastname,
             email: req?.body?.email,
             mobile: req?.body?.mobile,
-            address: req?.body?.address
+            address: req?.body?.address,
+            role: req?.body?.role
+        },
+            {
+                new: true
+            }
+        );
+        res.json(getUser);
+    } catch (error) {
+        throw new Error(error);
+    }
+});
+
+// sửa 1 user
+const updateAUserByAdmin = asyncHandler(async (req, res) => {
+    const { _id } = req.body;
+    try {
+        const getUser = await User.findByIdAndUpdate( // cập nhật thông tin người dùng nếu _id tồn tại
+            _id, {
+            firstname: req?.body?.firstname,
+            lastname: req?.body?.lastname,
+            email: req?.body?.email,
+            mobile: req?.body?.mobile,
+            address: req?.body?.address,
+            role: req?.body?.role
         },
             {
                 new: true
@@ -1008,6 +1032,7 @@ module.exports = {
     getAUser,
     deleteAUser,
     updateAUser,
+    updateAUserByAdmin,
     blockUser,
     unBlockUser,
     handleRefreshToken,

@@ -44,9 +44,6 @@ const Coupons = () => {
             discount: coupon.discount + "%",
             action: (
                 <>
-                    <Link to='/' className='ps-3 text-warning'>
-                        <FiEdit />
-                    </Link>
                     <button
                         className='ms-3 ps-3 text-danger btn btn-link'
                         onClick={() => handleDelete(coupon._id)}
