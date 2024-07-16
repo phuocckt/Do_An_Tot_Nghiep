@@ -6,10 +6,8 @@
 *.pack.old
 
 .vscode/
-admin-app/node_modules/.bin/
-admin-app/node_modules/.cache/
-admin-app/node_modules/.cache/.eslintcache
-
+admin-app/node_modules/
+my-app/node_modules/
 # dependencies
 /node_modules
 /.pnp
