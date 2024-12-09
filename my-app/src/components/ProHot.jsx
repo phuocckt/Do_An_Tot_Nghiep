@@ -28,11 +28,6 @@ function AutoLayoutExample() {
             .map((item) => (
               <Card  key={item.id} product={item} users={userState} />
             ))}
-        <Link to={"/products"} className="m-auto">
-          <button className="seemore">
-            Xem thêm
-          </button>
-        </Link>
       </div>
     </div>
   );

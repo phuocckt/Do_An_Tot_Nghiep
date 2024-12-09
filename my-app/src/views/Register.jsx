@@ -34,6 +34,7 @@ const Register = () => {
       mobile: "",
       email: "",
       password: "",
+      images: "user-none.jpg"
     },
     validationSchema: schema,
     onSubmit: (values) => {
@@ -129,7 +130,7 @@ const Register = () => {
               name="password"
               onChange={formik.handleChange("password")}
               value={formik.values.password}
-              type="text"
+              type="password"
               placeholder="Mật khẩu"
             />
             <CiLock />
@@ -137,6 +138,12 @@ const Register = () => {
               <span className="text-error">{formik.errors.password}</span>
             ) : null}
           </div>
+          <input
+            name="images"
+            onChange={formik.handleChange("images")}
+            value={formik.values.images}
+            type="hidden"
+          />
 
           <button type="submit" className="btn-log">
             Đăng kí

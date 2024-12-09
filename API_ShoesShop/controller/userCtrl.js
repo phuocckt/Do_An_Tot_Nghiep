@@ -126,7 +126,13 @@ const getallUsers = asyncHandler(async (req, res) => {
 const getAUser = asyncHandler(async (req, res) => {
     const { id } = req.params;
     try {
-        const getUser = await User.findById(id).populate("wishlist").exec();
+        const getUser = await User.findById(id).populate({
+            path: 'wishlist',
+            populate: {
+              path: 'brand', 
+              model: 'Brand' 
+            }
+          }).exec();
         res.json(getUser);
     } catch (error) {
         throw new Error(error);
@@ -920,8 +926,14 @@ const vnpayReturn = asyncHandler(async (req, res) => {
 const getOrders = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     try {
-        const getOrders = await Order.findOne({ orderby: _id }).populate("products.product").exec();
-        res.json(getOrders);
+        const getOrders = await Order.find({ orderby: _id })
+            .populate("products.product")
+            .exec();
+        
+        // Sắp xếp thủ công tăng dần theo createdAt
+        const sortedOrders = getOrders.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        
+        res.json(sortedOrders);
     } catch (error) {
         throw new Error(error);
     }
@@ -935,10 +947,21 @@ const getAllOrders = asyncHandler(async (req, res) => {
         throw new Error(error);
     }
 });
+
 const getOrdersByUser = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     try {
-        const getAllOrders = await Order.find({ orderby: _id }).populate("products.product").populate("orderby").exec();
+        const getAllOrders = await Order.find({ orderby: _id })
+            .sort({ createdAt: -1 }) // Sắp xếp tăng dần
+            .populate({
+                path: "products.product",
+                populate: {
+                    path: "brand",
+                    model: "Brand"
+                }
+            })
+            .populate("orderby")
+            .exec();
         res.json(getAllOrders);
     } catch (error) {
         throw new Error(error);

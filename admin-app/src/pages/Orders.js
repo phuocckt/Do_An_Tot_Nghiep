@@ -32,6 +32,10 @@ const columns = [
     dataIndex: 'orderby',
   },
   {
+    title: 'Phương thức thanh toán',
+    dataIndex: 'paymentIntent',
+  },
+  {
     title: 'Ngày và giờ đặt',
     dataIndex: 'createdAt',
   },
@@ -153,6 +157,7 @@ const Orders = () => {
       address: order.orderby.address,
       mobile: order.orderby.mobile,
       orderby: `${order.orderby.firstname} ${order.orderby.lastname}`,
+      paymentIntent: order?.paymentIntent?.method,
       createdAt: format(new Date(order.createdAt), 'HH:mm dd/MM/yyyy'),
       updatedAt: format(new Date(order.updatedAt), 'HH:mm dd/MM/yyyy'),
       orderStatus: getStatusInVietnamese(order.orderStatus), // Hiển thị trạng thái bằng tiếng Việt
@@ -172,6 +177,7 @@ const Orders = () => {
       'Địa chỉ': order.orderby.address,
       'Số điện thoại': `${'Tel: '}${order.orderby.mobile}`,
       'Người đặt': `${order.orderby.firstname} ${order.orderby.lastname}`,
+      'Phương thức thanh toán': order?.paymentIntent?.method,
       'Ngày và giờ đặt': format(new Date(order.createdAt), 'HH:mm dd/MM/yyyy'),
       'Ngày và giờ sửa': format(new Date(order.updatedAt), 'HH:mm dd/MM/yyyy'),
       'Trạng thái đơn hàng': order.orderStatus, // Dữ liệu gốc vẫn giữ nguyên bằng tiếng Anh

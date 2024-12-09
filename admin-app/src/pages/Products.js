@@ -200,7 +200,6 @@ const Products = () => {
     ? groupedProducts[selectedBrand].map((product, index) => ({
       key: index + 1,
       title: product.title,
-      description: product.description,
       priceOld: product.priceOld == null ? "" : formatCurrency(product.priceOld),
       price: formatCurrency(product.price),
       category: product.category ? product.category.title : '',
@@ -230,7 +229,6 @@ const Products = () => {
     : filteredProducts().map((product, index) => ({
       key: index + 1,
       title: product.title,
-      description: product.description,
       priceOld: product.priceOld == null ? "" : formatCurrency(product.priceOld),
       price: formatCurrency(product.price),
       category: product.category ? product.category.title : '',
@@ -268,10 +266,6 @@ const Products = () => {
       dataIndex: 'title',
       defaultSortOrder: "descend",
       sorter: (a, b) => a.title.length - b.title.length
-    },
-    {
-      title: 'Mô tả',
-      dataIndex: 'description',
     },
     {
       title: 'Giá tiền cũ',

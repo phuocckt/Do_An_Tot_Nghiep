@@ -73,7 +73,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
             //Nếu trang không tồn tại (tức là số lượng phẩm cần bỏ qua lớn hơn hoặc bằng tổng số lượng sản phẩm), một lỗi sẽ được ném
             if (skip >= productCount) throw new Error("This Page doesn't exists");
         }
-        query = query.populate("variants.size").populate("brand").populate("category");
+        query = query.populate("variants.size").sort({ createdAt: -1 }).populate("brand").populate("category");
         const products = await query;
         res.json(products);
     } catch(error) {

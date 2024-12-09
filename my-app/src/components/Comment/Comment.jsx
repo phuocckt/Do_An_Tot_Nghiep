@@ -6,15 +6,24 @@ function Comment(props) {
 
   const StarRating = ({ count }) => {
     const totalStars = 5;
-    const stars = Array(totalStars).fill(0).map((_, index) => (
-      <FaStar key={index} className={index < count ? 'text-warning' : 'text-secondary'} />
-    ));
-  
-    return (
-      <div className="star-rating">
-        {stars}
-      </div>
-    );
+    const stars = Array(totalStars)
+      .fill(0)
+      .map((_, index) => (
+        <FaStar
+          key={index}
+          className={index < count ? "text-warning" : "text-secondary"}
+        />
+      ));
+
+    return <div className="star-rating">{stars}</div>;
+  };
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
   return (
@@ -25,11 +34,11 @@ function Comment(props) {
           <div className="cmt-list">
             {product.ratings && product.ratings.length > 0 ? (
               product.ratings.map((item, index) => (
-                <div key={index}>
+                <div key={index} className="mb-4">
                   <div className="flex">
                     <div className="user">
                       <div className="user-img">
-                        {item.postedby.images.length > 0 ? (
+                        {item.postedby.images?.length > 0 ? (
                           <img
                             src={item.postedby.images[0]?.url}
                             alt="no_image"
@@ -53,6 +62,9 @@ function Comment(props) {
                         </div>
                         <div className="day text-warning">
                           <StarRating count={item.star} />
+                          <span className="date text-muted ms-2">
+                            {formatDate(item.updatedAt)}
+                          </span>
                         </div>
                       </div>
                     </div>

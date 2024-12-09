@@ -15,7 +15,7 @@ const Logout = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    toast.success("Đăng xuất thành công!", {position: "top-center"});
+    toast.success("Đăng xuất thành công!");
     navigate("/");
   };
 

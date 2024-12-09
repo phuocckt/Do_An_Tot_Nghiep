@@ -77,7 +77,7 @@ const Slider = () => {
                             <div className="content">
                                 <p className="category">Sport Shoes</p>
                                 <h2>{item.name}</h2>
-                                <p className="description">{item.desc}</p>
+                                {/* <p className="description">{item.desc}</p> */}
                                 {/* <div className="more">
                                     <button>Add To Cart</button>
                                     <button>See More</button>

@@ -1,15 +1,18 @@
-.comments{
+.comments {
     font-size: 16px;
     background-color: #eee;
     font-family: system-ui;
     margin-bottom: 2em;
 }
-.post-cmt{
+
+.post-cmt {
     width: 85%;
     margin: 0 auto;
     padding: 2em 3em;
 }
-.cmt-box, .cmt-list{
+
+.cmt-box,
+.cmt-list {
     width: 70%;
     margin: 25px auto;
     background-color: white;
@@ -17,59 +20,70 @@
     box-shadow: 5px 5px 2px #0003;
     padding: 10px 20px;
 }
-.flex{
+
+.flex {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.cmt-list{
+
+.cmt-list {
     margin-bottom: 12px;
 }
-.cmt-list .user{
+
+.cmt-list .user {
     display: flex;
     align-items: center;
     padding: 8px;
     overflow: hidden;
 }
-.cmt-list .user img{
+
+.cmt-list .user img {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     margin-right: 10px;
     object-fit: cover;
 }
-.cmt-list .name{
+
+.cmt-list .name {
     text-transform: uppercase;
     font-weight: 600;
 }
-.cmt-list .name-reply{
+
+.cmt-list .name-reply {
     text-transform: uppercase;
     font-weight: 400;
     color: rgba(0, 0, 255, 0.7);
 }
-.cmt-list .day{
+
+.cmt-list .day {
     font-size: 12px;
 }
-.cmt-list .reply{
+
+.cmt-list .reply {
     margin-right: 20px;
     cursor: pointer;
     font-weight: 600;
 }
 
-.post-cmt .cmt{
+.post-cmt .cmt {
     padding: 0 0 15px 60px;
 }
-.cmt-box .user img{
+
+.cmt-box .user img {
     width: 25px;
     height: 25px;
     border-radius: 50%;
     margin-right: 10px;
 }
-.cmt-box .user{
+
+.cmt-box .user {
     display: flex;
     align-items: center;
 }
-.cmt-box input{
+
+.cmt-box input {
     padding: 10px 20px !important;
     background-color: #eee;
     outline: none;
@@ -79,7 +93,8 @@
     border-radius: 5px;
     box-shadow: 0 0 0 0.5px #0003;
 }
-.cmt-box button{
+
+.cmt-box button {
     background-color: #2a2a2a;
     border: none;
     outline: none;
@@ -88,6 +103,12 @@
     padding: 7px 20px;
     font-size: 12px;
 }
-.cmt-reply{
+
+.cmt-reply {
     margin-left: 50px;
+}
+
+.date {
+    font-size: 0.9rem;
+    color: #6c757d;
 }

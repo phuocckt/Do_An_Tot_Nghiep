@@ -56,7 +56,7 @@ const Coupons = () => {
     });
     const handleDelete = (categoryId) => {
         Swal.fire({
-            title: 'Bạn có chắc chắn muốn xóa loại sản phẩm này?',
+            title: 'Bạn có chắc chắn muốn xóa mã giảm giá này?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Có, xóa nó!',
@@ -66,7 +66,7 @@ const Coupons = () => {
                 dispatch(deleteCoupon(categoryId))
                     .unwrap()
                     .then(() => {
-                        Swal.fire('Đã xóa!', 'Loại sản phẩm đã được xóa.', 'success');
+                        Swal.fire('Đã xóa!', 'Mã giảm giá đã được xóa.', 'success');
                         dispatch(getCoupons());
                     })
                     .catch((error) => {

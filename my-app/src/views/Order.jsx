@@ -203,7 +203,7 @@ function Order() {
                             key={i.product._id}
                           >
                             <div className="d-flex">
-                              <Link to={`/product/${i.product._id}`}>
+                              <Link to={`/${i.product.brand.title.toLowerCase()}/${i.product._id}`}>
                                 <img
                                   src={i.product.image[0].url}
                                   alt="product"
@@ -283,7 +283,7 @@ function Order() {
                           ? "Thanh toán bằng VNPAY"
                           : "Thanh toán bằng tiền mặt"}
                       </span>
-                      {item.orderStatus == "Pending" ? (
+                      {item.orderStatus == "Pending" && item.paymentIntent.method !== "VNPAY" ? (
                         <button
                           className="btn btn-danger"
                           onClick={() => handleCancelOrder(item._id)}

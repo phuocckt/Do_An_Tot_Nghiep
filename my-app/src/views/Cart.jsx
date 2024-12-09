@@ -119,7 +119,12 @@ function Cart() {
         .then(() => {
           Swal.fire({
             title: "Đặt hàng thành công!",
-            icon: "success"
+            html: `
+              <a class="btn btn-success" href="/order">Xem đơn hàng</a>
+            `,
+            icon: "success",
+            showCancelButton: false,
+            showConfirmButton: false
           });
           dispatch(getCart());
         })

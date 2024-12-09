@@ -20,8 +20,9 @@ import { useFormik } from "formik";
 import Comment from "../components/Comment/Comment";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import { getUser } from "../features/customer/customerSlice";
+import { IoCart } from "react-icons/io5";
 
-function ProductDetail() {
+function ProductDetail(props) {
   const [active, setActive] = useState(false);
   const [activeSize, setActiveSize] = useState(false);
   const [activeFavorite, setActiveFavorite] = useState(false);
@@ -80,11 +81,11 @@ function ProductDetail() {
   };
 
   const schema = yup.object().shape({
-    size: yup.string().required("Size is required"),
+    size: yup.string().required("Vui lòng chọn kích thước"),
     count: yup
       .number()
-      .required("Count is required")
-      .min(1, "Count must be at least 1"),
+      .required("Vui lòng chọn số lượng")
+      .min(1, "Số lượng phải lớn hơn 1"),
   });
 
   const formik = useFormik({
@@ -92,19 +93,19 @@ function ProductDetail() {
       _id: id,
       count: value,
       size: selectedSize || "",
-      price: productState?.price || 0, // Default to 0 if price is not available
+      price: productState?.price || 0,
     },
     validationSchema: schema,
     onSubmit: (values) => {
-      values.size = selectedSize; // Set the selected size before submitting
-      values.price = productState?.price; // Ensure price is included in the form data
+      values.size = selectedSize;
+      values.price = productState?.price;
       const cartData = {
         cart: [
           {
             _id: id,
-            count: values.count,
-            size: values.size,
-            price: values.price,
+            count: values?.count,
+            size: values?.size,
+            price: values?.price,
           },
         ],
       };
@@ -113,7 +114,7 @@ function ProductDetail() {
           Swal.fire({
             title: "Sản phẩm đã thêm!",
             html: `
-              <p>Sản phẩm ${productState.title} đã được thêm vào giỏ hàng</p>
+              <p>Sản phẩm ${productState?.title} đã được thêm vào giỏ hàng</p></br>
               <a class="btn btn-success" href="/cart">Xem giỏ hàng</a>
             `,
             icon: "success",
@@ -201,19 +202,19 @@ function ProductDetail() {
           <div className="product-content">
             <h2 className="pb-3">{productState.title}</h2>
             <p name="price">
-              Giá:{" "}
+              {" "}
               <CurrencyFormatter
-                className="fw-bold text-danger fs-4"
+                className="fw-bold fs-4"
                 amount={productState.price}
               />
             </p>
             {/* <p className="mt-3">Màu sắc:</p> */}
             <div className="product-color mt-3">
               {productsState
-                .filter((item) => item.title === productState.title)
-                .filter((item)=>item._id !== id)
+                ?.filter((item) => item?.title === productState?.title)
+                ?.filter((item) => item?._id !== id)
                 .map((item) => (
-                  <Link key={item._id} to={`/product/${item._id}`}>
+                  <Link key={item._id} to={`/${productState.brand.title.toLowerCase()}/${item._id}`}>
                     <img
                       onClick={handleClick}
                       className="product-img"
@@ -226,7 +227,7 @@ function ProductDetail() {
             <div className="product-action">
               <form onSubmit={formik.handleSubmit}>
                 <div className="product-size m-0">
-                  <p>Kích thước:</p>
+                  <p>Kích thước</p>
                   {productState.variants?.map((variant) => (
                     <button
                       type="button"
@@ -320,7 +321,7 @@ function ProductDetail() {
                     </p>
                   )}
                 </div> */}
-                <button type="submit">Thêm vào giỏ hàng</button>
+                <button type="submit" className="btn btn-success"><IoCart className="fs-3" />Thêm vào giỏ hàng</button>
               </form>
               <form onSubmit={formikFavorite.handleSubmit}>
                 <input
@@ -331,24 +332,28 @@ function ProductDetail() {
                 {user?._id ? (
                   <button
                     type="submit"
-                    className={activeFavorite ? "active-favorite" : "favorite"}
+                    className={activeFavorite ? "active-favorite btn" : "favorite btn"}
                     onClick={handleFavoriteClick}
                   >
-                    Yêu thích{" "}
                     {activeFavorite ? (
                       <FaHeart className="text-danger" />
                     ) : (
                       <FaRegHeart />
                     )}
+                    Yêu thích{" "}
                   </button>
                 ) : (
                   ""
                 )}
               </form>
             </div>
-            <p>{productState.description}</p>
           </div>
         </div>
+      </div>
+      <div className="product-description">
+        <div
+          dangerouslySetInnerHTML={{ __html: productState.description }}
+        />
       </div>
       <Comment product={productState} />
     </>

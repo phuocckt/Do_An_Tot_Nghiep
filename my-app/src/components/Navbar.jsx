@@ -1,37 +1,31 @@
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { CiShoppingCart } from "react-icons/ci";
-import Headroom from "react-headroom";
-import "./css/Layout.css";
-import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import userNone from "../assets/images/user-none.jpg";
 import { IoCart } from "react-icons/io5";
-import { getCart } from "../features/auth/authSlice";
-import { useEffect } from "react";
+import Headroom from "react-headroom";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import userNone from "../assets/images/user-none.jpg";
+import Logo from "../assets/images/Logo.png";
+import { Image, Dropdown } from "react-bootstrap";
+import "./css/Layout.css";
 
 function Header() {
-  const dispatch = useDispatch();
-
   const user = useSelector((state) => state.auth.user);
   const cart = useSelector((state) => state.auth.carts);
+  const brandState = useSelector((state) => state.brand.brands); // Lấy danh sách danh mục
   const userId = user?._id;
-
-  // useEffect(() => {
-  //   dispatch(getCart());
-  // }, []);
 
   return (
     <Headroom>
       <Navbar
         collapseOnSelect
         expand="lg"
-        style={{ backgroundColor: "#111126", fontWeight: "bold" }}
+        style={{ backgroundColor: "#dedfe0", fontWeight: "bold" }}
       >
         <Container>
-          <Navbar.Brand href="/" className="text-light">
-            SHOES SHOP
+          <Navbar.Brand href="/" className="text-dark">
+            <Image src={Logo} alt="ShoesShop" width={145} height={94} />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse
@@ -39,35 +33,78 @@ function Header() {
             className="justify-content-end"
           >
             <Nav className="align-items-center">
-              <Link className="text-light nav-link-spacing" to="/">
-                TRANG CHỦ
+              <Link
+                className="text-dark nav-link-spacing"
+                style={{ fontSize: "20px" }}
+                to="/gioi-thieu"
+              >
+                GIỚI THIỆU
               </Link>
-              <Link className="text-light nav-link-spacing" to="/products">
-                SẢN PHẨM
+
+              {/* Menu Sản Phẩm với Dropdown */}
+              <Dropdown className="dropdown">
+                <Dropdown.Toggle
+                  variant="light"
+                  id="dropdown-basic"
+                  className="text-dark nav-link-spacing"
+                  style={{
+                    fontSize: "20px", // Đảm bảo rằng kích thước chữ khớp với các menu khác
+                    fontWeight: "bold", // Kiểu chữ giống nhau
+                  }}
+                >
+                  SẢN PHẨM
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                  {brandState.map((brand) => (
+                    <Dropdown.Item
+                      key={brand._id} // Thêm khóa để tránh lỗi khi map qua
+                      as={Link}
+                      to={`/${brand.title.toLowerCase()}`}
+                      style={{
+                        fontSize: "20px", // Kích thước chữ
+                        fontWeight: "bold", // Kiểu chữ đậm
+                      }}
+                    >
+                      {brand.title}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+
+              <Link
+                className="text-dark nav-link-spacing"
+                style={{ fontSize: "20px" }}
+                to="/tin-tuc"
+              >
+                TIN TỨC
               </Link>
-              {/* {userId == null || user == null ? (
-                <Link className="text-light nav-link-spacing position-relative" to="/login">
-                  <CiShoppingCart className="fs-1" />
-                  <span className="quantity-cart">
-                    {cart && cart.products?.length > 0 ? cart.products?.length : "00"}
-                  </span>
-                </Link>
-              ) : ( */}
-                <Link className="text-light nav-link-spacing position-relative" to="/cart">
-                  {/* <CiShoppingCart className="fs-1" /> */}
-                  <IoCart className="fs-3"/>
-                  {/* <span className="quantity-cart">
-                    {cart && cart.products?.length > 0 ? cart.products?.length : "00"}
-                  </span> */}
-                </Link>
-              {/* )} */}
+              <Link
+                className="text-dark nav-link-spacing"
+                style={{ fontSize: "20px" }}
+                to="/lien-he"
+              >
+                LIÊN HỆ
+              </Link>
+              <Link
+                className="text-dark nav-link-spacing position-relative"
+                to="/cart"
+              >
+                <IoCart className="fs-3" />
+              </Link>
+
               {userId == null || user == null ? (
-                <Link className="text-light nav-link-spacing" to="/login">
+                <Link
+                  className="text-dark nav-link-spacing"
+                  style={{ fontSize: "20px" }}
+                  to="/login"
+                >
                   ĐĂNG NHẬP
                 </Link>
               ) : (
                 <Link
-                  className="text-light d-flex align-items-center nav-link-spacing"
+                  className="text-dark d-flex align-items-center nav-link-spacing"
+                  style={{ fontSize: "20px" }}
                   to="/account"
                 >
                   <div
@@ -79,16 +116,12 @@ function Header() {
                       overflow: "hidden",
                     }}
                   >
-                    {user !== null ? (
-                      user.images[0] ? (
-                        <img
-                          src={user.images[0]?.url}
-                          alt="avatar"
-                          className="w-100"
-                        />
-                      ) : (
-                        <img src={userNone} alt="avatar" className="w-100" />
-                      )
+                    {user?.images?.[0] ? (
+                      <img
+                        src={user.images[0]?.url}
+                        alt="avatar"
+                        className="w-100"
+                      />
                     ) : (
                       <img src={userNone} alt="avatar" className="w-100" />
                     )}

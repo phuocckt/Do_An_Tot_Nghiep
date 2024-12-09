@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './Card.css';
 import { FaHeart, FaStar, FaStarHalfAlt } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { addWishlist } from '../../features/product/productSlice';
 import { useFormik } from 'formik';
@@ -24,25 +24,25 @@ function CardProduct(props) {
   //   },
   // });
   //dem so luot tim
-  const countHearts = (id) => {
-    let count = 0;
-    users.forEach(user => {
-      user.wishlist.forEach(item => {
-        if (item === id) {
-          count += 1;
-        }
-      });
-    });
-    return count;
-  };
+  // const countHearts = (id) => {
+  //   let count = 0;
+  //   users.forEach(user => {
+  //     user.wishlist.forEach(item => {
+  //       if (item === id) {
+  //         count += 1;
+  //       }
+  //     });
+  //   });
+  //   return count;
+  // };
 
- 
-  
-  
-    useEffect(() => {
-      const newQuantity = countHearts(product._id);
-      setQuantity(newQuantity);
-    }, [product._id, users]);
+
+
+
+  // useEffect(() => {
+  //   const newQuantity = countHearts(product._id);
+  //   setQuantity(newQuantity);
+  // }, [product._id, users]);
 
 
   // const handleFavoriteClick = () => {
@@ -54,15 +54,15 @@ function CardProduct(props) {
 
   return (
     <div className='card-product'>
-      <Link to={`/product/${product._id}`}>
-        <img className='card-image' src={product.image[0].url} alt="Ảnh sản phẩm"/>
+      <Link to={`/${product.brand.title.toLowerCase()}/${product._id}`}>
+        <img className='card-image' src={product.image[0].url} alt="Ảnh sản phẩm" />
       </Link>
 
       {/* <form onSubmit={formik.handleSubmit}> */}
-        {/* <div name="prodId" value={formik.values.prodId}></div>  */}
-        <button type='button' className={activeFavorite ? 'favorite active-favorite' : 'favorite'}>
-          <FaHeart className={activeFavorite ? 'text-danger' : ''}/><span>{quantity}</span>
-        </button>
+      {/* <div name="prodId" value={formik.values.prodId}></div>  */}
+      {/* <button type='button' className={activeFavorite ? 'favorite active-favorite' : 'favorite'}>
+        <FaHeart className={activeFavorite ? 'text-danger' : ''} /><span>{quantity}</span>
+      </button> */}
       {/* </form> */}
 
       <div className='brand d-flex align-items-center ps-4'>{product.brand.title}</div>
@@ -70,7 +70,7 @@ function CardProduct(props) {
       <div className='card-info'>
         <div className='name truncated-text'>{product.title}</div>
         <div className='d-flex justify-content-between'>
-          <h5 className='price mb-3 text-danger'><CurrencyFormatter amount={product.price}/></h5>
+          <h5 className='price mb-3 text-danger'><CurrencyFormatter amount={product.price} /></h5>
           {/* <ul className='star text-warning'>
             <li><FaStar/></li>
             <li><FaStar/></li>
@@ -78,7 +78,7 @@ function CardProduct(props) {
             <li><FaStar/></li>
             <li><FaStarHalfAlt/></li>
           </ul> */}
-        </div> 
+        </div>
       </div>
     </div>
   );
