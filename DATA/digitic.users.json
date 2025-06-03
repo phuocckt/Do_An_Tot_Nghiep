@@ -1,0 +1,114 @@
+[{
+  "_id": {
+    "$oid": "66062027587f0dd4b0146bfb"
+  },
+  "firstname": "Võ Huỳnh Ngọc",
+  "lastname": "Phước",
+  "email": "vhnp177@gmail.com",
+  "mobile": "0333560276",
+  "password": "$2b$10$nI5wjZlUH1bnuJ0q61VX.eQutfYjTAhZXi0.BZhMjASro8qpjI/aK",
+  "role": "admin",
+  "cart": [],
+  "address": "57/7 D5, phường 25, quận Bình Thạnh, Tp. Hồ Chí Minh",
+  "wishlist": [
+    {
+      "$oid": "660a83cd00a459043a5f626a"
+    },
+    {
+      "$oid": "660a838c00a459043a5f6265"
+    },
+    {
+      "$oid": "66799af1abeeb40b240b14c6"
+    },
+    {
+      "$oid": "6672a57220a42cb0d1276a20"
+    }
+  ],
+  "createdAt": {
+    "$date": "2024-03-29T01:57:59.293Z"
+  },
+  "updatedAt": {
+    "$date": "2025-06-03T17:13:21.689Z"
+  },
+  "__v": 0,
+  "isBlocked": false,
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDYyMDI3NTg3ZjBkZDRiMDE0NmJmYiIsImlhdCI6MTc0ODk3MDgwMSwiZXhwIjoxNzQ5MjMwMDAxfQ.s9WgvfcSqvIjTyFZUvB87dyJ6AcOLoY1mg9Z5YpJafI",
+  "images": [
+    {
+      "url": "https://res.cloudinary.com/ddnmen0qs/image/upload/v1718605859/l7h8iworhb0ddr7wcb1z.jpg",
+      "asset_id": "fa42dd58263d53fb0143aaceeb90b520",
+      "public_id": "l7h8iworhb0ddr7wcb1z"
+    }
+  ],
+  "passwordResetExpires": {
+    "$date": "2024-12-17T18:01:06.505Z"
+  },
+  "passwordResetToken": "07a3453ddc1eb3af7cf5a066e890959e62ad794defff28bfa701a54ee53d584d"
+},
+{
+  "_id": {
+    "$oid": "6606206a587f0dd4b0146bfe"
+  },
+  "firstname": "Trần Bình",
+  "lastname": "Bình",
+  "email": "tranbinhbinh.2005vta@gmail.com",
+  "mobile": "0934730284",
+  "password": "$2b$10$ukhX8YiGug./lrYC6EyNn.wyBEEScffn51EEPMkcIyOoIlKimPOtK",
+  "role": "user",
+  "cart": [],
+  "address": "80 Nguyễn Đình Thụ, TT. Diêu Trì, Tuy Phước, Bình Định, Việt Nam",
+  "wishlist": [
+    {
+      "$oid": "6695369ed32086875e1432b3"
+    }
+  ],
+  "createdAt": {
+    "$date": "2024-03-29T01:59:06.500Z"
+  },
+  "updatedAt": {
+    "$date": "2025-01-14T15:00:11.828Z"
+  },
+  "__v": 1,
+  "isBlocked": false,
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MDYyMDZhNTg3ZjBkZDRiMDE0NmJmZSIsImlhdCI6MTczNjMxNTk5NiwiZXhwIjoxNzM2NTc1MTk2fQ.26mtvF-pzvajNWbgyuWEbI3Dwfdxe3rXwuOThSxRnlc",
+  "images": [],
+  "passwordResetExpires": {
+    "$date": "2024-07-16T12:02:15.452Z"
+  },
+  "passwordResetToken": "a5fd3d33723869e8452a49859db0d88e24113066542b6f82ef0f10e680a8cfd6"
+},
+{
+  "_id": {
+    "$oid": "67506ff5ac38b0eaea52873a"
+  },
+  "firstname": "Nguyễn Phạm Hoàng",
+  "lastname": "Phúc",
+  "email": "0306211392@caothang.edu.vn",
+  "mobile": "0338115861",
+  "password": "$2b$10$0B/.yP6BW5.2O98EGermJeVXvYuDMs3HXEw454VnwNsexA68KBL2u",
+  "role": "admin",
+  "isBlocked": false,
+  "cart": [],
+  "images": [],
+  "wishlist": [
+    {
+      "$oid": "6695369ed32086875e1432b3"
+    },
+    {
+      "$oid": "66799af1abeeb40b240b14c6"
+    }
+  ],
+  "createdAt": {
+    "$date": "2024-12-04T15:06:29.999Z"
+  },
+  "updatedAt": {
+    "$date": "2025-03-08T15:38:04.577Z"
+  },
+  "__v": 0,
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3NTA2ZmY1YWMzOGIwZWFlYTUyODczYSIsImlhdCI6MTc0MTQ0ODI4NCwiZXhwIjoxNzQxNzA3NDg0fQ.kXUOPv7y2YVc1IqPLRmUpB0juZ0rbSnSLpoCHp01pAg",
+  "address": "Gò Vấp",
+  "passwordResetExpires": {
+    "$date": "2025-01-14T22:35:17.755Z"
+  },
+  "passwordResetToken": "833c0280a615d60609ad2361dd2491f96c19464ca90cb338c59832393a03619a"
+}]

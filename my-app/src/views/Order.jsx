@@ -200,19 +200,19 @@ function Order() {
                         return (
                           <div
                             className="d-flex mb-3 justify-content-between"
-                            key={i.product._id}
+                            key={i.product?._id}
                           >
                             <div className="d-flex">
-                              <Link to={`/${i.product.brand.title.toLowerCase()}/${i.product._id}`}>
+                              <Link to={`/${i.product?.brand.title.toLowerCase()}/${i.product?.slug}`}>
                                 <img
-                                  src={i.product.image[0].url}
+                                  src={i.product?.image[0].url}
                                   alt="product"
                                   className="product-image"
                                 />
                               </Link>
 
                               <div className="product-info">
-                                <h3>{i.product.title}</h3>
+                                <h3>{i.product?.title}</h3>
                                 <p>
                                   Kích thước:{" "}
                                   <span className="fw-bold">{i.size}</span>
@@ -226,7 +226,7 @@ function Order() {
                                     className="btn btn-warning"
                                     onClick={() => {
                                       setShowModal(true);
-                                      setCurrentProdId(i.product._id);
+                                      setCurrentProdId(i.product?._id);
                                       setInfo([
                                         i.product.image[0].url,
                                         i.product.title,
@@ -239,8 +239,8 @@ function Order() {
                                 ) : (
                                   ""
                                 )}
-                                {i.product.ratings?.map((rat) => {
-                                  return rat.postedby == user._id ? (
+                                {i.product?.ratings?.map((rat) => {
+                                  return rat.postedby == user?._id ? (
                                     <p className="fst-italic text-danger">
                                       Sản phẩm đã được bạn đánh giá {rat.star}{" "}
                                       sao.
@@ -253,7 +253,7 @@ function Order() {
                             </div>
 
                             <div className="product-price">
-                              {i.product.priceOld != null ? (
+                              {i.product?.priceOld != null ? (
                                 <span className="original-price">
                                   <CurrencyFormatter
                                     amount={i.product.priceOld}
@@ -263,7 +263,7 @@ function Order() {
                                 <span className="original-price"></span>
                               )}
                               <span className="discounted-price">
-                                <CurrencyFormatter amount={i.product.price} />
+                                <CurrencyFormatter amount={i.product?.price} />
                               </span>
                             </div>
                           </div>
@@ -286,7 +286,7 @@ function Order() {
                       {item.orderStatus == "Pending" && item.paymentIntent.method !== "VNPAY" ? (
                         <button
                           className="btn btn-danger"
-                          onClick={() => handleCancelOrder(item._id)}
+                          onClick={() => handleCancelOrder(item?._id)}
                         >
                           Hủy đơn hàng
                         </button>

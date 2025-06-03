@@ -1,26 +1,30 @@
-.blink{
+.blink {
     color: red;
     animation: blink 2s infinite;
     font-size: 60px;
 }
+
 @keyframes blink {
-    100%{
+    100% {
         color: black;
 
     }
 }
-.filters{
-    padding: 2em 3.5em;
+
+.products-page {
     display: flex;
-    justify-content: space-between;
-    /* position: fixed; */
-    top: 11em;
-    z-index: 9999;
-    background-color: #F6F5F2;
-    width: 100%;
-    box-shadow: 0px 10px 5px gray;
+    gap: 20px;
+    padding: 20px;
 }
-.sortby{
+
+.filters {
+    flex: 1;
+    max-width: 300px;
+    border-right: 1px solid #ddd;
+    padding-right: 20px;
+}
+
+.sortby {
     padding: 0.5em 2.2em;
     border: 1px solid gray;
     border-radius: 1.5em;
@@ -28,50 +32,102 @@
     letter-spacing: 1px;
     font-weight: bold;
     box-shadow: 0 4px gray;
-    z-index: 9999!important;
+    z-index: 9999 !important;
     position: relative;
 }
-.sortby:hover{
+
+.sortby:hover {
     background-color: white;
     border: 1px solid gray;
 }
-.sortby-items{
+
+.sortby-items {
     padding: 0.5em 1.6em;
     border: 1px solid gray;
     border-radius: 1.5em;
     background-color: white;
     font-weight: bold;
-    transform: translateY(4%)!important;
+    transform: translateY(4%) !important;
     padding-top: 2.2em;
     text-align: center;
 }
-.sortby-item{
+
+.sortby-item {
     border-bottom: 1px solid gray;
     background-color: white;
     letter-spacing: 1px;
     font-weight: bold;
 }
-.sortby-item:last-child{
+
+.sortby-item:last-child {
     border: none;
 }
-.sortby-item:hover{
+
+.sortby-item:hover {
     background-color: #EEEEEE;
 }
-.products{
-    padding: 20px;
-    display: flex;
-    gap: 30px;
+
+.advanced-filters {
     flex-wrap: wrap;
-    justify-content: left;
-    margin-left: 30px;
-    /* margin-top: 100px; */
+    gap: 20px;
 }
-.btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active {
+
+.price-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.price-btn {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.price-btn.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.size-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.size-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.size-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%; /* Đảm bảo container chiếm toàn bộ chiều rộng */
+    min-height: 200px; /* Tùy chỉnh chiều cao tối thiểu nếu cần */
+}
+
+.btn-check:checked+.btn,
+.btn.active,
+.btn.show,
+.btn:first-child:active,
+:not(.btn-check)+.btn:active {
     background-color: white;
     border-color: gray;
     box-shadow: none;
 }
-.brand button{
+
+.brand button {
     padding: .5em 1.5em;
     border-radius: 2em;
     border: 1px solid gray;
@@ -80,14 +136,17 @@
     box-shadow: 0 4px gray;
     margin-right: 1em;
 }
-.brand button:active{
+
+.brand button:active {
     box-shadow: none;
     transform: translateY(4%);
 }
-.no-data{
+
+.no-data {
     width: 100%;
 }
-.search{
+
+.search {
     display: block;
     padding: .5em 1.5em;
     border-radius: 2em;
@@ -98,23 +157,28 @@
     font-weight: 500;
     width: 15em;
 }
-.search::placeholder{
+
+.search::placeholder {
     color: black;
 }
-.search:focus{
+
+.search:focus {
     box-shadow: none;
     outline: none;
     transform: translateY(4%);
 }
-.search:focus::placeholder{
+
+.search:focus::placeholder {
     color: gray;
 }
-.brand .active-button{
+
+.brand .active-button {
     color: red;
     box-shadow: none;
     transform: translateY(4%);
 }
-.products .seemore{
+
+.products .seemore {
     padding: .5em 1.5em;
     border-radius: 2em;
     border: 1px solid gray;
@@ -124,19 +188,23 @@
     font-weight: 500;
     /* animation: abx 2s infinite; */
 }
-.products .seemore:active{
+
+.products .seemore:active {
     box-shadow: none;
     transform: translateY(4%);
 }
-.products .seemore .icon-down{
+
+.products .seemore .icon-down {
     margin-left: 10px;
     animation: abx 1s infinite;
 }
+
 @keyframes abx {
-    50%{
+    50% {
         transform: translateY(-10%);
     }
-    100%{
+
+    100% {
         transform: translateY(10%);
     }
 }

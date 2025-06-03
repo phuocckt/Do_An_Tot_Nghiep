@@ -17,8 +17,11 @@
     "bootstrap": "^5.3.2",
     "buffer": "^6.0.3",
     "date-fns": "^3.6.0",
+    "file-saver": "^2.0.5",
     "formik": "^2.4.6",
+    "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^3.0.0",
     "jwt-decode": "^4.0.0",
     "mdb-react-ui-kit": "^8.0.0",
     "navigate": "^0.3.6",
@@ -40,6 +43,7 @@
     "sweetalert2": "^11.11.0",
     "toastr": "^2.1.4",
     "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5",
     "yup": "^1.4.0"
   },
   "scripts": {

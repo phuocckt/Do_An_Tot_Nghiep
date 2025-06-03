@@ -38,13 +38,13 @@ const Products = () => {
     dispatch(getProduct(id))
       .unwrap()
       .then((product) => {
-        setVariants(product.variants);
+        setVariants(product?.variants);
         formik.setValues({
-          description: product.description || '',
-          priceOld: product.priceOld || '',
-          price: product.price || '',
-          variants: product.variants || [],
-          quantity: product.quantity || 0,
+          description: product?.description || '',
+          priceOld: product?.priceOld || '',
+          price: product?.price || '',
+          variants: product?.variants || [],
+          quantity: product?.quantity || 0,
         });
       });
     setIsModalOpen(true);
@@ -105,18 +105,18 @@ const Products = () => {
   };
 
   const updateTotalQuantity = (updatedVariants) => {
-    const totalQuantity = updatedVariants.reduce((total, variant) => total + Number(variant.quantity || 0), 0);
+    const totalQuantity = updatedVariants.reduce((total, variant) => total + Number(variant?.quantity || 0), 0);
     formik.setFieldValue('quantity', totalQuantity);
   };
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      description: product.description || '',
-      priceOld: product.priceOld || '',
-      price: product.price || '',
-      variants: product.variants || [],
-      quantity: product.quantity || 0
+      description: product?.description || '',
+      priceOld: product?.priceOld || '',
+      price: product?.price || '',
+      variants: product?.variants || [],
+      quantity: product?.quantity || 0
     },
     validationSchema: schema,
     onSubmit: values => {
@@ -170,7 +170,7 @@ const Products = () => {
       if (searchName && !product.title.toLowerCase().includes(searchName.toLowerCase())) {
         return false;
       }
-      if (searchPrice && parseFloat(product.price) !== parseFloat(searchPrice)) {
+      if (searchPrice && parseFloat(product?.price) !== parseFloat(searchPrice)) {
         return false;
       }
       if (searchCategory && product.category.title.toLowerCase() !== searchCategory.toLowerCase()) {
@@ -197,17 +197,17 @@ const Products = () => {
     });
 
   let tableData = selectedBrand
-    ? groupedProducts[selectedBrand].map((product, index) => ({
+    ? groupedProducts[selectedBrand]?.map((product, index) => ({
       key: index + 1,
       title: product.title,
-      priceOld: product.priceOld == null ? "" : formatCurrency(product.priceOld),
-      price: formatCurrency(product.price),
+      priceOld: product?.priceOld == null ? "" : formatCurrency(product?.priceOld),
+      price: formatCurrency(product?.price),
       category: product.category ? product.category.title : '',
-      quantity: product.quantity,
+      quantity: product?.quantity,
       image: product.image,
-      variants: product.variants.map(variant => ({
+      variants: product?.variants.map(variant => ({
         size: variant.size ? variant.size.title : '',
-        quantity: variant.quantity
+        quantity: variant?.quantity
       })),
       action: (
         <>
@@ -229,14 +229,14 @@ const Products = () => {
     : filteredProducts().map((product, index) => ({
       key: index + 1,
       title: product.title,
-      priceOld: product.priceOld == null ? "" : formatCurrency(product.priceOld),
-      price: formatCurrency(product.price),
+      priceOld: product?.priceOld == null ? "" : formatCurrency(product?.priceOld),
+      price: formatCurrency(product?.price),
       category: product.category ? product.category.title : '',
-      quantity: product.quantity,
+      quantity: product?.quantity,
       image: product.image,
-      variants: product.variants.map(variant => ({
+      variants: product?.variants.map(variant => ({
         size: variant.size ? variant.size.title : '',
-        quantity: variant.quantity
+        quantity: variant?.quantity
       })),
       action: (
         <>
@@ -271,13 +271,13 @@ const Products = () => {
       title: 'Giá tiền cũ',
       dataIndex: 'priceOld',
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.priceOld - b.priceOld
+      sorter: (a, b) => a?.priceOld - b?.priceOld
     },
     {
       title: 'Giá tiền',
       dataIndex: 'price',
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.price - b.price
+      sorter: (a, b) => a?.price - b?.price
     },
     {
       title: 'Loại sản phẩm',
@@ -301,7 +301,7 @@ const Products = () => {
       dataIndex: 'variants',
       render: variants => variants.map((variant, index) => (
         <div key={index}>
-          Kích thước: {variant.size}, Số lượng: {variant.quantity}
+          Kích thước: {variant.size}, Số lượng: {variant?.quantity}
         </div>
       )),
       width: 300,
@@ -368,25 +368,25 @@ const Products = () => {
             <div className="col-md-6 mb-3">
               <CustomerInput
                 type="number"
-                value={formik.values.priceOld}
+                value={formik.values?.priceOld}
                 label="Giá gốc"
                 name="priceOld"
                 onChange={formik.handleChange("priceOld")}
               />
-              {formik.touched.priceOld && formik.errors.priceOld ? (
-                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.priceOld}</p>
+              {formik.touched?.priceOld && formik.errors?.priceOld ? (
+                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors?.priceOld}</p>
               ) : null}
             </div>
             <div className="col-md-6 mb-3">
               <CustomerInput
                 type="number"
-                value={formik.values.price}
+                value={formik.values?.price}
                 label="Giá khuyến mãi"
                 name="price"
                 onChange={formik.handleChange("price")}
               />
-              {formik.touched.price && formik.errors.price ? (
-                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.price}</p>
+              {formik.touched?.price && formik.errors?.price ? (
+                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors?.price}</p>
               ) : null}
             </div>
           </div>
@@ -394,13 +394,13 @@ const Products = () => {
             <div className="col-md-6 mb-3">
               <CustomerInput
                 type="number"
-                value={formik.values.quantity}
+                value={formik.values?.quantity}
                 label="Tổng số lượng"
                 name="quantity"
                 readOnly
               />
-              {formik.touched.quantity && formik.errors.quantity ? (
-                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.quantity}</p>
+              {formik.touched?.quantity && formik.errors?.quantity ? (
+                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors?.quantity}</p>
               ) : null}
             </div>
             <div className="col-md-6 mb-3">
@@ -429,7 +429,7 @@ const Products = () => {
               <div className="col-md-4">
                 <CustomerInput
                   type="number"
-                  value={variant.quantity}
+                  value={variant?.quantity}
                   label="Số lượng"
                   name={`variants[${index}].quantity`}
                   onChange={(e) => handleVariantChange(index, 'quantity', e.target.value)}
@@ -450,12 +450,12 @@ const Products = () => {
               <label htmlFor="description">Mô tả</label>
               <ReactQuill
                 theme="snow"
-                value={formik.values.description}
+                value={formik.values?.description}
                 name="description"
                 onChange={(value) => formik.setFieldValue('description', value)}
               />
-              {formik.touched.description && formik.errors.description ? (
-                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors.description}</p>
+              {formik.touched?.description && formik.errors?.description ? (
+                <p style={{ color: "red", fontSize: "13px" }}>{formik.errors?.description}</p>
               ) : null}
             </div>
           </div>

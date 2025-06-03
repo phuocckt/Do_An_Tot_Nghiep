@@ -7,6 +7,10 @@ import Swal from 'sweetalert2';
 import { CiExport } from "react-icons/ci";
 import { CSVLink } from 'react-csv';
 import { format } from 'date-fns';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const { Option } = Select;
 
@@ -53,7 +57,6 @@ const columns = [
   }
 ];
 
-// Hàm để chuyển đổi trạng thái đơn hàng từ tiếng Anh sang tiếng Việt
 const getStatusInVietnamese = (status) => {
   switch (status) {
     case 'Pending':
@@ -67,6 +70,52 @@ const getStatusInVietnamese = (status) => {
     default:
       return status;
   }
+};
+
+const exportOrderToPDF = (order) => {
+  const doc = new jsPDF();
+  doc.setFontSize(18);
+  doc.text("Hóa Đơn Đơn Hàng", 14, 22);
+  
+  doc.setFontSize(12);
+  doc.text(`Mã đơn hàng: #${order._id}`, 14, 32);
+  doc.text(`Người đặt: ${order.orderby.firstname} ${order.orderby.lastname}`, 14, 42);
+  doc.text(`Số điện thoại: ${order.orderby.mobile}`, 14, 52);
+  doc.text(`Địa chỉ: ${order.orderby.address}`, 14, 62);
+  
+  let startY = 72;
+  order.products.forEach((product, idx) => {
+    const productTitle = product.product?.title || "";
+    doc.text(`${idx + 1}. ${productTitle}`, 14, startY);
+    startY += 10;
+  });
+  
+  doc.save(`order_${order._id}.pdf`);
+};
+
+const exportOrdersToExcel = (orders) => {
+  const dataExport = orders.map(order => {
+    const productNames = order.products.map(product => product.product?.title).join(", ");
+    return {
+      'Mã đơn hàng': "#" + order._id,
+      'Tên sản phẩm': productNames,
+      'Địa chỉ': order.orderby.address,
+      'Số điện thoại': order.orderby.mobile,
+      'Người đặt': `${order.orderby.firstname} ${order.orderby.lastname}`,
+      'Phương thức thanh toán': order?.paymentIntent?.method,
+      'Ngày và giờ đặt': format(new Date(order.createdAt), 'HH:mm dd/MM/yyyy'),
+      'Ngày và giờ sửa': format(new Date(order.updatedAt), 'HH:mm dd/MM/yyyy'),
+      'Trạng thái đơn hàng': order.orderStatus,
+    };
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(dataExport);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+  
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  const dataBlob = new Blob([excelBuffer], { type: "application/octet-stream" });
+  saveAs(dataBlob, "orders.xlsx");
 };
 
 const Orders = () => {
@@ -149,8 +198,8 @@ const Orders = () => {
     .filter(order => filterStatus === 'All' || order.orderStatus === filterStatus)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  const data = filteredOrders.map((order, index) => {
-    const productNames = order.products.map(product => product.product.title).join(", ");
+  const data = filteredOrders.map((order) => {
+    const productNames = order.products.map(product => product.product?.title).join(", ");
     return {
       _id: "#" + order._id,
       products: productNames,
@@ -160,17 +209,22 @@ const Orders = () => {
       paymentIntent: order?.paymentIntent?.method,
       createdAt: format(new Date(order.createdAt), 'HH:mm dd/MM/yyyy'),
       updatedAt: format(new Date(order.updatedAt), 'HH:mm dd/MM/yyyy'),
-      orderStatus: getStatusInVietnamese(order.orderStatus), // Hiển thị trạng thái bằng tiếng Việt
+      orderStatus: getStatusInVietnamese(order.orderStatus),
       action: (
-        <Button onClick={() => showModal(order)} disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered'}>
-          <FiEdit />
-        </Button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <Button onClick={() => showModal(order)} disabled={order.orderStatus === 'Cancelled' || order.orderStatus === 'Delivered'}>
+            <FiEdit />
+          </Button>
+          <Button onClick={() => exportOrderToPDF(order)} type="primary">
+            Xuất PDF
+          </Button>
+        </div>
       )
     };
   });
 
-  const dataExport = filteredOrders.map((order, index) => {
-    const productNames = order.products.map(product => product.product.title).join(", ");
+  const dataExport = filteredOrders.map((order) => {
+    const productNames = order.products.map(product => product.product?.title).join(", ");
     return {
       'Mã đơn hàng': "#" + order._id,
       'Tên sản phẩm': productNames,
@@ -180,7 +234,7 @@ const Orders = () => {
       'Phương thức thanh toán': order?.paymentIntent?.method,
       'Ngày và giờ đặt': format(new Date(order.createdAt), 'HH:mm dd/MM/yyyy'),
       'Ngày và giờ sửa': format(new Date(order.updatedAt), 'HH:mm dd/MM/yyyy'),
-      'Trạng thái đơn hàng': order.orderStatus, // Dữ liệu gốc vẫn giữ nguyên bằng tiếng Anh
+      'Trạng thái đơn hàng': order.orderStatus,
     };
   });
 
@@ -202,13 +256,16 @@ const Orders = () => {
             filename={"order.csv"}
             className="btn btn-warning d-flex align-items-center"
           >
-            <CiExport className='me-1'/> Export
+            <CiExport className='me-1'/> Export CSV
           </CSVLink>
+          <Button onClick={() => exportOrdersToExcel(filteredOrders)} className="btn btn-success ms-2">
+            Xuất Excel
+          </Button>
         </div>
       </div>
       
       <Table columns={columns} dataSource={data} style={{"white-space": "nowrap"}} />
-      <Modal title="Cập nhật trang thái đơn hàng" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
+      <Modal title="Cập nhật trạng thái đơn hàng" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel}>
         <Select style={{ width: '100%' }} onChange={handleChange} value={getStatusInVietnamese(newStatus)}>
           {currentOrder && renderStatusOptions(currentOrder.orderStatus).map(opt => (
             <Option key={opt.value} value={opt.value}>{opt.label}</Option>

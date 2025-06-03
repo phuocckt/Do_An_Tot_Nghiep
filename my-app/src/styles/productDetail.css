@@ -265,3 +265,17 @@ button.size {
    box-sizing: border-box;
    /* Đảm bảo padding không làm tăng kích thước tổng */
 }
+.comments {
+   font-size: 16px;
+   background-color: #ffffff;
+   margin-bottom: 2em;
+   border-radius: 8px;
+   /* Bo góc 8px */
+   padding: 1em;
+   /* Thêm padding bên trong thẻ */
+   display: flex;
+   /* Sử dụng Flexbox */
+   flex-direction: column;
+   /* Sắp xếp các con theo cột */
+   align-items: center;
+}

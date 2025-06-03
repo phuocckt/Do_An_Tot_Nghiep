@@ -49,7 +49,7 @@ const Dashboard = () => {
     .filter(order => order.orderStatus === 'Delivered')
     .reduce((total, order) => {
       return total + order.products.reduce((orderTotal, product) => {
-        return orderTotal + (product.count * product.product.price);
+        return orderTotal + (product.count * product.product?.price);
       }, 0);
     }, 0);
 
@@ -75,7 +75,7 @@ const Dashboard = () => {
     .forEach((order) => {
       const monthIndex = new Date(order.createdAt).getMonth();
       data[monthIndex].sales += order.products.reduce((total, product) => {
-        return total + (product.count * product.product.price);
+        return total + (product.count * product.product?.price);
       }, 0);
     });
 

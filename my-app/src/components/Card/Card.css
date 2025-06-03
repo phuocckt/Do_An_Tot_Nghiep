@@ -1,89 +1,97 @@
 :root{
-    --spacing: 30px;
-    --columns: 4;
+    --spacing: 20px; /* Giảm khoảng cách để tối ưu cho nhiều màn hình hơn */
+    --columns: 5; /* Số cột mặc định */
 }
-.card-product{
-    width: calc(calc(100% / var(--columns) - var(--spacing)));
+.card-product {
+    width: calc(100% / var(--columns) - var(--spacing));
     border-radius: 1em;
-    border: 1px solid gray;
-    background-color: white;
+    border: 1px solid rgba(200, 200, 200, 0.5); /* Màu sắc mềm mại hơn */
+    background-color: #fdfdfd; /* Màu nền nhẹ hơn */
     position: relative;
     overflow: hidden;
-    padding: .5em;
-    padding-bottom: 2.5em;
-    transition: .3s;
+    padding: 1em;
+    padding-bottom: 2em;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Chuyển động mượt hơn */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Bóng nhẹ hơn */
 }
-.card-product:hover{
-    box-shadow: 5px 10px 5px gray;
-    transform: translate(-5px, -10px);
+.card-product:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Bóng đậm hơn khi hover */
+    transform: translateY(-5px); /* Chỉ dịch chuyển lên theo trục Y */
 }
-.card-image{
+.card-image {
     width: 100%;
-    border-radius: 1em;
-    transition: .3s;  
+    border-radius: 0.8em; /* Góc bo mềm hơn */
+    transition: transform 0.3s ease, filter 0.3s ease; /* Thêm hiệu ứng mờ dần */
     padding: 0.5em;
+    filter: brightness(0.95); /* Tối nhẹ ảnh để tạo chiều sâu */
 }
-.card-image:hover{
-    transform: scale(102%);
+.card-image:hover {
+    transform: scale(1.05); /* Tăng kích thước ảnh rõ rệt hơn */
+    filter: brightness(1); /* Khôi phục độ sáng */
 }
-.card-product .favorite{
+.card-product .favorite {
     display: flex;
     align-items: center;
     position: absolute;
-    top: 1.5em;
-    left: 1.5em;
+    top: 1em; /* Điều chỉnh để phù hợp với kích thước mới */
+    left: 1em;
     color: white;
-    background-color: gray;
-    border-radius: 2em;
+    background-color: #ff6f61; /* Màu nhấn đỏ cam */
+    border-radius: 50%;
     border: none;
-    padding: 5px 12px;
-    gap: 5px;
+    padding: 10px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
-.card-product .active-favorite{
-    background-color: white;
-    color: gray;
-    border: 1px solid gray;
+.card-product .favorite:hover {
+    background-color: #ff4c3b; /* Màu nhấn đậm hơn khi hover */
 }
-.card-product .brand{
+.card-product .active-favorite {
     background-color: white;
+    color: #ff6f61; /* Màu chính của nút yêu thích khi active */
+    border: 1px solid #ff6f61;
+}
+.card-product .brand {
+    background-color: rgba(255, 255, 255, 0.9); /* Nền trong suốt nhẹ hơn */
     position: absolute;
     top: 0;
     right: 0;
-    padding: 1em 2em 0.5em 1.2em;
+    padding: 0.8em 1.5em; /* Thu gọn padding */
     font-weight: bold;
+    font-size: 0.9em;
     border-bottom-left-radius: 1em;
 }
-.card-info{
+.card-info {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    padding:.5em 1em 0 1em;
+    padding: 1em; /* Tăng padding để dễ đọc hơn */
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0)); /* Hiệu ứng gradient cho phần thông tin */
 }
-.card-info .name{
-    font-weight: bold;  
-    padding: 0 0 1em 1em;
+.card-info .name {
+    font-weight: bold;
+    font-size: 1.1em; /* Tăng kích thước chữ để nổi bật hơn */
+    padding: 0 0 0.5em;
 }
-.card-info .star{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    list-style: none;
-    gap: .2em;
+.card-info .price {
+    color: #e63946; /* Màu đỏ nhấn mạnh giá */
+    font-weight: bold;
+    font-size: 1.2em;
 }
+
 @media screen and (max-width: 1350px) {
-    :root{
-        --columns: 3;
+    :root {
+        --columns: 3; /* Giảm số cột trên màn hình vừa */
     }
 }
 @media screen and (max-width: 1024px) {
-    :root{
-        --columns: 2;
+    :root {
+        --columns: 2; /* Chỉ 2 cột trên màn hình nhỏ hơn */
     }
 }
 @media screen and (max-width: 700px) {
-    :root{
-        --columns: 1;
+    :root {
+        --columns: 1; /* Một cột trên thiết bị di động */
     }
 }

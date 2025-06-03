@@ -21,8 +21,10 @@ import Comment from "../components/Comment/Comment";
 import { CurrencyFormatter } from "../components/CurrencyFormatter";
 import { getUser } from "../features/customer/customerSlice";
 import { IoCart } from "react-icons/io5";
+import Related from "../components/Related";
+import NewProduct from "../components/NewProduct";
 
-function ProductDetail(props) {
+function ProductDetail() {
   const [active, setActive] = useState(false);
   const [activeSize, setActiveSize] = useState(false);
   const [activeFavorite, setActiveFavorite] = useState(false);
@@ -53,6 +55,8 @@ function ProductDetail(props) {
 
   const productState = useSelector((state) => state.product.product);
   const productsState = useSelector((state) => state.product.products);
+  const brandProduct = productState?.brand.title
+  const idProduct = productState?._id;
 
   const [value, setValue] = useState(1);
 
@@ -90,7 +94,7 @@ function ProductDetail(props) {
 
   const formik = useFormik({
     initialValues: {
-      _id: id,
+      _id: productState?._id,
       count: value,
       size: selectedSize || "",
       price: productState?.price || 0,
@@ -102,7 +106,7 @@ function ProductDetail(props) {
       const cartData = {
         cart: [
           {
-            _id: id,
+            _id: productState?._id,
             count: values?.count,
             size: values?.size,
             price: values?.price,
@@ -110,6 +114,7 @@ function ProductDetail(props) {
         ],
       };
       dispatch(addToCart(cartData))
+        .unwrap() // Giải nén kết quả trả về từ Redux Thunk
         .then(() => {
           Swal.fire({
             title: "Sản phẩm đã thêm!",
@@ -214,7 +219,7 @@ function ProductDetail(props) {
                 ?.filter((item) => item?.title === productState?.title)
                 ?.filter((item) => item?._id !== id)
                 .map((item) => (
-                  <Link key={item._id} to={`/${productState.brand.title.toLowerCase()}/${item._id}`}>
+                  <Link key={item._id} to={`/${productState.brand.title.toLowerCase()}/${item.slug}`}>
                     <img
                       onClick={handleClick}
                       className="product-img"
@@ -355,7 +360,12 @@ function ProductDetail(props) {
           dangerouslySetInnerHTML={{ __html: productState.description }}
         />
       </div>
-      <Comment product={productState} />
+      <div className="comments">
+        <h4>Các đánh giá từ khách hàng đã mua sản phẩm</h4>
+        <Comment product={productState} />
+      </div>
+      <Related currentBrand={brandProduct} currentProductId={idProduct}/>
+      <NewProduct />
     </>
   );
 }

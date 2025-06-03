@@ -95,7 +95,7 @@ function Favorite() {
                                 <RiDeleteBin5Line className="fs-5" />
                               </button>
                             </form>
-                            <Link to={`/${item.brand.title.toLowerCase()}/${item._id}`}>
+                            <Link to={`/${item.brand.title.toLowerCase()}/${item.slug}`}>
                               Xem chi tiết
                             </Link>
                           </div>

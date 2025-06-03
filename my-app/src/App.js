@@ -16,6 +16,7 @@ import ProtectedRoute from './features/auth/ProtectedRoute';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBrands } from './features/brand/brandSlice';
 import { useEffect } from 'react';
+import Reviews from './views/Reviews';
 
 function App() {
   const dispatch = useDispatch();
@@ -42,7 +43,10 @@ function App() {
               />
               <Route key={item._id}
                 path={`/${item.title}/:id`}
-                 element={<ProductDetail props={item.title} />} />
+                element={<ProductDetail props={item.title} />} />
+              <Route key={item._id}
+                path={`/${item.title}/:id/danh-gia`}
+                element={<Reviews />} />
               </>
             ))}
             <Route path='/cart' element={

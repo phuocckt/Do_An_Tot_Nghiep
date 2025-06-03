@@ -1,11 +1,13 @@
 import axios from "axios";
 import { base_url } from "../../utils/base_url";
 import { config } from "../../utils/axiosconfig";
+import Cookies from "js-cookie";
 
 const login = async (userData) => {
     const res = await axios.post(`${base_url}user/login`, userData);
     if (res.data) {
-        localStorage.setItem("user", JSON.stringify(res.data))
+        localStorage.setItem("user", JSON.stringify(res.data));
+        Cookies.set("user", JSON.stringify(res.data), { expires: 7 }); // Lưu trong 7 ngày
     }
     return res.data;
 }

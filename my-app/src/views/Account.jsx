@@ -28,6 +28,8 @@ function Account() {
     dispatch(getUser(user._id));
   }, []);
   const userState = useSelector((state) => state.customer.customer);
+  const account = localStorage.getItem("user");
+  const profile = JSON.parse(account);
 
   let schema = yup.object().shape({
     firstname: yup.string().required("Firstname is required"),
@@ -45,11 +47,11 @@ function Account() {
 
   const formik = useFormik({
     initialValues: {
-      firstname: userState.firstname || "",
-      lastname: userState.lastname || "",
-      email: userState.email || "",
-      mobile: userState.mobile || "",
-      address: userState.address || "",
+      firstname: profile.firstname || "",
+      lastname: profile.lastname || "",
+      email: profile.email || "",
+      mobile: profile.mobile || "",
+      address: profile.address || "",
     },
     enableReinitialize: true,
     validationSchema: schema,

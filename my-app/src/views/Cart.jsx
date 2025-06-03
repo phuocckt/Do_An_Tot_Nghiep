@@ -234,14 +234,14 @@ function Cart() {
       <div className="cart">
         <div className="cart-products">
           <h3 className="py-3 right-cart">Giỏ hàng</h3>
-          {!cartState || !cartState?.products ? (
+          {!cartState || !cartState?.products || cartState.cartTotal == 0 ? (
             <p>Giỏ hàng đang trống...</p>
           ) : (
             <div className="products m-0 p-0">
               <div className="cart-card d-block">
                 {cartState?.products.map((item) => (
                   <div key={item.product._id} className="cart-item">
-                    <Link to={`/product/${item.product._id}`}>
+                    <Link to={`/${item.product.brand.title.toLowerCase()}/${item.product.slug}`}>
                       <img
                         className="product-img me-3"
                         width={150}

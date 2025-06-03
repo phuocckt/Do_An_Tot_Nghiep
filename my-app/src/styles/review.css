@@ -1,0 +1,72 @@
+.product-container {
+    margin: 20px auto; /* Center the container horizontally */
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    max-width: 1450px; /* Set a max width to ensure consistent centering */
+  }
+  
+  .product-title {
+    font-size: 24px;
+    margin-bottom: 30px; /* Increase spacing below the title */
+  }
+  
+  .product-card {
+    display: flex;
+    align-items: start;
+    justify-content: start; /* Center items horizontally */
+    gap: 20px; /* Add spacing between the image and details */
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px; /* Increase padding for better spacing */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-image {
+    width: 150px; /* Increase image size */
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .product-details {
+    display: block;
+    text-align: left; /* Ensure text aligns to the left */
+  }
+  
+  .product-name {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 12px; /* Add more spacing below the name */
+  }
+  
+  .product-price {
+    font-size: 18px;
+    margin-bottom: 15px; /* Add more spacing below the price */
+  }
+  
+  .product-price-sale {
+    color: red;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  .buy-now-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 16px; /* Increase button size */
+    cursor: pointer;
+    font-size: 16px; /* Increase font size */
+    transition: 0.3s;
+  }
+  
+  .buy-now-button:hover {
+    background-color: rgb(0, 84, 0);
+  }
+  

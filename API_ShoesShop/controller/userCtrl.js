@@ -501,7 +501,10 @@ const userCart = asyncHandler(async (req, res) => {
 const UserCart = asyncHandler(async (req, res) => {
     const { _id } = req.user;
     try {
-        const cart = await Cart.findOne({ orderby: _id }).populate("products.product");
+        const cart = await Cart.findOne({ orderby: _id })
+                                .populate({ path: "products.product",
+                                    populate: ({ path: "brand" })
+                                });
         res.json(cart);
     } catch (error) {
         throw new Error(error);

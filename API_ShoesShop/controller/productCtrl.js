@@ -83,10 +83,10 @@ const getAllProduct = asyncHandler(async (req, res) => {
 
 // lấy 1 sản phẩm
 const getAProduct = asyncHandler(async (req, res) => {
-    const { id } = req.params;
+    const { slug } = req.params;
     //
     try {
-        const getProducts = await Product.findById(id)
+        const getProducts = await Product.findOne({slug})
                                         .populate('variants.size')
                                         .populate("brand")
                                         .populate("category")
