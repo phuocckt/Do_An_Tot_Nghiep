@@ -1,6 +1,6 @@
 :root{
     --spacing: 20px; /* Giảm khoảng cách để tối ưu cho nhiều màn hình hơn */
-    --columns: 5; /* Số cột mặc định */
+    --columns: 4; /* Số cột mặc định */
 }
 .card-product {
     width: calc(100% / var(--columns) - var(--spacing));
